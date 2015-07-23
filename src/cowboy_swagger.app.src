@@ -1,0 +1,14 @@
+{application, cowboy_swagger,
+ [
+  {description,
+   "Swagger for Cowboy Erlang projects"},
+  {vsn, "0.0.1"},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {modules, []},
+  {mod, {cowboy_swagger, []}},
+  {registered, []}
+ ]
+}.
