@@ -1,0 +1,5 @@
+%% Specific modules to include in cover.
+{
+ incl_mods,
+ [cowboy_swagger]
+}.
