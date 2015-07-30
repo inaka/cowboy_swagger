@@ -1,7 +1,8 @@
 PROJECT = cowboy_swagger
 
-DEPS = trails
+DEPS = jiffy trails
 
+dep_jiffy  = git https://github.com/davisp/jiffy.git        0.14.2
 dep_trails = git https://github.com/inaka/cowboy-trails.git 0.0.1
 
 SHELL_DEPS = sync
