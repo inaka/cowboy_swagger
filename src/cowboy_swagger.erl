@@ -8,14 +8,14 @@
 %% Types.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--opaque swagger_parameter() ::
+-opaque swagger_parameters() ::
   #{ name        => binary()
    , in          => binary()
    , description => binary()
    , required    => boolean()
    , type        => binary()
    }.
--export_type([swagger_parameter/0]).
+-export_type([swagger_parameters/0]).
 
 -opaque response_obj() ::
   #{ description => binary()
@@ -27,7 +27,7 @@
 -opaque swagger_map() ::
   #{ description => binary()
    , summary     => binary()
-   , parameters  => [swagger_parameter()]
+   , parameters  => [swagger_parameters()]
    , tags        => [binary()]
    , consumes    => [binary()]
    , produces    => [binary()]
