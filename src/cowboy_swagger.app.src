@@ -9,7 +9,7 @@
     trails
    ]},
   {modules, []},
-  {mod, {cowboy_swagger, []}},
+  {mod, {cowboy_swagger_app, []}},
   {registered, []}
  ]
 }.

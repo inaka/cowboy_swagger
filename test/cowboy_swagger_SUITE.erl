@@ -1,12 +1,15 @@
 -module(cowboy_swagger_SUITE).
 
-%% CT
--export([all/0, init_per_suite/1, end_per_suite/1]).
+-include_lib("mixer/include/mixer.hrl").
+-mixin([
+        {cowboy_swagger_test_utils,
+         [ init_per_suite/1
+         , end_per_suite/1
+         ]}
+       ]).
 
-%% Test cases
+-export([all/0]).
 -export([to_json_test/1]).
-
--type config() :: [{atom(), term()}].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Common test
@@ -14,22 +17,13 @@
 
 -spec all() -> [atom()].
 all() ->
-  Exports = ?MODULE:module_info(exports),
-  [F || {F, 1} <- Exports, F /= module_info].
-
--spec init_per_suite(config()) -> config().
-init_per_suite(Config) ->
-  Config.
-
--spec end_per_suite(config()) -> config().
-end_per_suite(Config) ->
-  Config.
+  cowboy_swagger_test_utils:all(?MODULE).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Test Cases
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec to_json_test(config()) -> {atom(), string()}.
+-spec to_json_test(cowboy_swagger_test_utils:config()) -> {atom(), string()}.
 to_json_test(_Config) ->
   Trails = test_trails(),
   SwaggerJson = cowboy_swagger:to_json(Trails),

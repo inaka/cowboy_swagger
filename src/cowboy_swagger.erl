@@ -4,6 +4,10 @@
 %% API
 -export([to_json/1]).
 
+%% Utilities
+-export([enc_json/1, dec_json/1]).
+-export([swagger_paths/1]).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Types.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -41,18 +45,34 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% @doc Returns the swagger json specification from given `trails'.
--spec to_json(Trails :: [trails:trail()]) -> iolist().
+-spec to_json([trails:trail()]) -> iolist().
 to_json(Trails) ->
   SwaggerSpec = #{paths => swagger_paths(Trails)},
-  jiffy:encode(SwaggerSpec, [uescape]).
+  enc_json(SwaggerSpec).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Utilities.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec enc_json(jiffy:json_value()) -> iolist().
+enc_json(Json) ->
+  jiffy:encode(Json, [uescape]).
+
+-spec dec_json(iodata()) -> jiffy:json_value().
+dec_json(Data) ->
+  try jiffy:decode(Data, [return_maps])
+  catch
+    _:{error, _} ->
+      throw(bad_json)
+  end.
+
+-spec swagger_paths([trails:trail()]) -> map().
+swagger_paths(Trails) ->
+  swagger_paths(Trails, #{}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Private API.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% @private
-swagger_paths(Trails) ->
-  swagger_paths(Trails, #{}).
 
 %% @private
 swagger_paths([], Acc) ->
