@@ -50,6 +50,15 @@ handler_test(_Config) ->
   ct:comment("GET /api-docs/swagger.json should return 200 OK"),
   #{status_code := 200, body := Body0} =
     cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger.json"),
-  #{<<"paths">> := ExpectedPaths} = cowboy_swagger:dec_json(Body0),
+  #{<<"swagger">> := <<"2.0">>,
+    <<"info">> := #{<<"title">> := <<"Example API">>},
+    <<"paths">> := ExpectedPaths} = cowboy_swagger:dec_json(Body0),
+
+  %% GET index.html
+  ct:comment("GET /api-docs should return 200 OK with the index.html"),
+  #{status_code := 200, body := Body1} =
+    cowboy_swagger_test_utils:api_call(get, "/api-docs"),
+  {ok, Index} = file:read_file("../../priv/swagger/index.html"),
+  Index = Body1,
 
   {comment, ""}.
