@@ -23,7 +23,8 @@
 trails() ->
   Metadata =
     #{get =>
-      #{description => "Retrives trails's server description",
+      #{tags => ["example"],
+        description => "Retrives trails's server description",
         produces => ["text/plain"]
       }
     },

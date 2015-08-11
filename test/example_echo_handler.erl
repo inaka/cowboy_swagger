@@ -24,11 +24,13 @@
 trails() ->
   Metadata =
     #{get =>
-      #{description => "Gets echo var from the server",
+      #{tags => ["echo"],
+        description => "Gets echo var from the server",
         produces => ["text/plain"]
       },
       put =>
-      #{description => "Sets echo var in the server",
+      #{tags => ["echo"],
+        description => "Sets echo var in the server",
         produces => ["text/plain"],
         parameters => [
           #{name => <<"echo">>,

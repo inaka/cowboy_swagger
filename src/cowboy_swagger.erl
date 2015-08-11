@@ -47,7 +47,10 @@
 %% @doc Returns the swagger json specification from given `trails'.
 -spec to_json([trails:trail()]) -> iolist().
 to_json(Trails) ->
-  SwaggerSpec = #{paths => swagger_paths(Trails)},
+  Default = #{swagger => <<"2.0">>, info => #{title => <<"API-DOCS">>}},
+  GlobalSpec = normalize_map_values(
+    application:get_env(cowboy_swagger, global_spec, Default)),
+  SwaggerSpec = GlobalSpec#{paths => swagger_paths(Trails)},
   enc_json(SwaggerSpec).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

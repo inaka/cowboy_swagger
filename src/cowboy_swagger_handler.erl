@@ -49,10 +49,25 @@ handle_get(Req, State) ->
 
 %% @hidden
 trails() ->
+  StaticFiles = application:get_env(
+    cowboy_swagger, static_files, "priv/swagger"),
+  Static1 = trails:trail(
+    "/api-docs",
+    cowboy_static,
+    {file, StaticFiles ++ "/index.html"},
+    #{get => #{tags => ["static-content"], description => "index.html"}}),
+  Static2 = trails:trail(
+    "/[...]",
+    cowboy_static,
+    {dir, StaticFiles, [{mimetypes, cow_mimetypes, all}]},
+    #{get => #{tags => ["static-content"], description => "Static Content"}}),
   MD =
     #{get =>
-      #{description => "Retrives swagger's specification.",
+      #{tags => ["api-docs"],
+        description => "Retrives swagger's specification.",
         produces => ["application/json"]
       }
     },
-  [trails:trail("/api-docs/swagger.json", cowboy_swagger_handler, [], MD)].
+  Handler = trails:trail(
+    "/api-docs/swagger.json", cowboy_swagger_handler, [], MD),
+  [Static1, Handler, Static2].
