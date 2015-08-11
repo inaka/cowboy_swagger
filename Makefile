@@ -6,7 +6,7 @@ DEPS = jiffy trails aleppo
 
 dep_jiffy  = git https://github.com/davisp/jiffy.git        0.14.2
 dep_trails = git https://github.com/inaka/cowboy-trails.git 0.0.2
-dep_aleppo = git https://github.com/inaka/aleppo.git  f5ccf47856990890bfba42350871227141774648
+dep_aleppo = git https://github.com/inaka/aleppo.git  a6bab05379563dd88f95d9239674b25a3501a69d
 
 SHELL_DEPS = sync
 
