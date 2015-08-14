@@ -6,36 +6,36 @@
 
 %% Utilities
 -export([enc_json/1, dec_json/1]).
--export([swagger_paths/1]).
+-export([swagger_paths/1, validate_metadata/1]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Types.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--opaque swagger_parameters() ::
-  #{ name        => binary()
-   , in          => binary()
-   , description => binary()
+-opaque parameter_obj() ::
+  #{ name        => binary() | string()
+   , in          => binary() | string()
+   , description => binary() | string()
    , required    => boolean()
-   , type        => binary()
+   , type        => binary() | string()
    }.
--export_type([swagger_parameters/0]).
+-export_type([parameter_obj/0]).
 
 -opaque response_obj() ::
   #{ description => binary()
    }.
--type swagger_response() :: #{binary() => response_obj()}.
--export_type([response_obj/0, swagger_response/0]).
+-type responses_definitions() :: #{binary() => response_obj()}.
+-export_type([response_obj/0, responses_definitions/0]).
 
 %% Swagger map spec
 -opaque swagger_map() ::
-  #{ description => binary()
-   , summary     => binary()
-   , parameters  => [swagger_parameters()]
-   , tags        => [binary()]
-   , consumes    => [binary()]
-   , produces    => [binary()]
-   , responses   => swagger_response()
+  #{ description => binary() | string()
+   , summary     => binary() | string()
+   , parameters  => [parameter_obj()]
+   , tags        => [binary() | string()]
+   , consumes    => [binary() | string()]
+   , produces    => [binary() | string()]
+   , responses   => responses_definitions()
    }.
 -type metadata() :: trails:metadata(swagger_map()).
 -export_type([swagger_map/0, metadata/0]).
@@ -73,6 +73,10 @@ dec_json(Data) ->
 swagger_paths(Trails) ->
   swagger_paths(Trails, #{}).
 
+-spec validate_metadata(trails:metadata()) -> trails:metadata().
+validate_metadata(Metadata) ->
+  validate_swagger_map(maps:keys(Metadata), Metadata).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Private API.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -82,7 +86,7 @@ swagger_paths([], Acc) ->
   Acc;
 swagger_paths([Trail | T], Acc) ->
   Path = normalize_path(trails:path_match(Trail)),
-  Metadata = normalize_map_values(trails:metadata(Trail)),
+  Metadata = normalize_map_values(validate_metadata(trails:metadata(Trail))),
   swagger_paths(T, maps:put(Path, Metadata, Acc)).
 
 %% @private
@@ -120,3 +124,35 @@ normalize_list_values(List) ->
         [V | Acc]
       end,
   lists:foldl(F, [], List).
+
+%% @private
+validate_swagger_map([], Acc) ->
+  Acc;
+validate_swagger_map([K | T], Acc) ->
+  case maps:get(K, Acc, undefined) of
+    undefined ->
+      validate_swagger_map(T, Acc);
+    Val ->
+      Params = validate_swagger_map_params(maps:get(parameters, Val, []), []),
+      Responses = maps:from_list(validate_swagger_map_responses(
+        maps:to_list(maps:get(responses, Val, #{})), [])),
+      NewVal = Val#{parameters => Params, responses => Responses},
+      validate_swagger_map(T, maps:put(K, NewVal, Acc))
+  end.
+
+%% @private
+validate_swagger_map_params([], Acc) ->
+  Acc;
+validate_swagger_map_params([Param | T] = Params, Acc) ->
+  DefName = binary:list_to_bin(
+    [<<"param">>, integer_to_binary(length(Params))]),
+  Name = maps:get(name, Param, DefName),
+  In = maps:get(in, Param, <<"path">>),
+  validate_swagger_map_params(T, [Param#{name => Name, in => In} | Acc]).
+
+%% @private
+validate_swagger_map_responses([], Acc) ->
+  Acc;
+validate_swagger_map_responses([{K, ResObj} | T], Acc) ->
+  Desc = maps:get(description, ResObj, <<"">>),
+  validate_swagger_map_responses(T, [{K, ResObj#{description => Desc}} | Acc]).
