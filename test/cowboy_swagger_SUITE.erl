@@ -37,17 +37,13 @@ to_json_test(_Config) ->
               <<"name">> := <<"b">>,
               <<"required">> := false,
               <<"type">> := <<"string">>}
-          ]
+          ],
+          <<"responses">> := #{}
         },
         <<"get">> :=
         #{<<"description">> := <<"bla bla bla">>,
           <<"produces">> := [<<"application/json">>],
           <<"parameters">> := [
-            #{<<"description">> := <<"bla">>,
-              <<"in">> := <<"path">>,
-              <<"name">> := <<"d">>,
-              <<"required">> := false,
-              <<"type">> := <<"string">>},
             #{<<"description">> := <<"bla">>,
               <<"in">> := <<"path">>,
               <<"name">> := <<"c">>,
@@ -58,7 +54,8 @@ to_json_test(_Config) ->
               <<"name">> := <<"b">>,
               <<"required">> := false,
               <<"type">> := <<"string">>}
-          ]
+          ],
+          <<"responses">> := #{}
         },
         <<"post">> :=
         #{<<"description">> := <<"bla bla bla">>,
@@ -68,7 +65,8 @@ to_json_test(_Config) ->
               <<"name">> := <<"Request Body">>,
               <<"required">> := true,
               <<"type">> := <<"string">>}
-          ]
+          ],
+          <<"responses">> := #{<<"200">> := #{<<"description">> := <<"bla">>}}
         }
       },
       <<"/a/{b}/{c}/{d}">> :=
@@ -88,11 +86,6 @@ to_json_test(_Config) ->
           <<"parameters">> := [
             #{<<"description">> := <<"bla">>,
               <<"in">> := <<"path">>,
-              <<"name">> := <<"d">>,
-              <<"required">> := false,
-              <<"type">> := <<"string">>},
-            #{<<"description">> := <<"bla">>,
-              <<"in">> := <<"path">>,
               <<"name">> := <<"c">>,
               <<"required">> := false,
               <<"type">> := <<"string">>},
@@ -111,7 +104,8 @@ to_json_test(_Config) ->
               <<"name">> := <<"Request Body">>,
               <<"required">> := true,
               <<"type">> := <<"string">>}
-          ]
+          ],
+          <<"responses">> := #{<<"200">> := #{<<"description">> := <<"bla">>}}
         }
       }
     }
@@ -138,9 +132,7 @@ test_trails() ->
                    description => "bla",
                    required => false,
                    type => "string"},
-                 #{name => "d",
-                   in => "path",
-                   description => "bla",
+                 #{description => "bla",
                    required => false,
                    type => "string"}
                ]
@@ -161,9 +153,9 @@ test_trails() ->
                     description => <<"bla">>,
                     required => true,
                     type => <<"string">>}
-                ]
+                ],
+                responses => #{<<"200">> => #{description => "bla"}}
                }
      },
   [trails:trail("/a/[:b/[:c/[:d]]]", handler1, [], Metadata),
-   trails:trail("/a/:b/[:c]", handler2, [], Metadata),
-   trails:trail("/a/[:b]/:c/[:d]", handler3, [], Metadata)].
+   trails:trail("/a/:b/[:c]", handler2, [], Metadata)].
