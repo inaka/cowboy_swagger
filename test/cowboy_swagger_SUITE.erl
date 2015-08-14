@@ -46,17 +46,12 @@ to_json_test(_Config) ->
           <<"parameters">> := [
             #{<<"description">> := <<"bla">>,
               <<"in">> := <<"path">>,
-              <<"name">> := <<"b">>,
-              <<"required">> := false,
-              <<"type">> := <<"string">>},
-            #{<<"description">> := <<"bla">>,
-              <<"in">> := <<"path">>,
               <<"name">> := <<"c">>,
               <<"required">> := false,
               <<"type">> := <<"string">>},
             #{<<"description">> := <<"bla">>,
               <<"in">> := <<"path">>,
-              <<"name">> := <<"param1">>,
+              <<"name">> := <<"b">>,
               <<"required">> := false,
               <<"type">> := <<"string">>}
           ],
@@ -91,17 +86,12 @@ to_json_test(_Config) ->
           <<"parameters">> := [
             #{<<"description">> := <<"bla">>,
               <<"in">> := <<"path">>,
-              <<"name">> := <<"b">>,
-              <<"required">> := false,
-              <<"type">> := <<"string">>},
-            #{<<"description">> := <<"bla">>,
-              <<"in">> := <<"path">>,
               <<"name">> := <<"c">>,
               <<"required">> := false,
               <<"type">> := <<"string">>},
             #{<<"description">> := <<"bla">>,
               <<"in">> := <<"path">>,
-              <<"name">> := <<"param1">>,
+              <<"name">> := <<"b">>,
               <<"required">> := false,
               <<"type">> := <<"string">>}
           ]
