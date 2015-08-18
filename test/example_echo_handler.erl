@@ -45,12 +45,12 @@ trails() ->
 
 %% cowboy
 allowed_methods(Req, State) ->
-  {[<<"GET">>, <<"PUT">>,   <<"HEAD">>], Req, State}.
+  {[<<"GET">>, <<"PUT">>, <<"HEAD">>], Req, State}.
 
 %% internal
 handle_get(Req, State) ->
   Echo = application:get_env(example, echo, ""),
-  Body = [<<"You Get an echo! ">> , Echo],
+  Body = [<<"You Get an echo!">> , Echo],
   {Body, Req, State}.
 
 handle_put(Req, State) ->
