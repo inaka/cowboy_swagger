@@ -1,0 +1,13 @@
+*.beam
+*.log
+*.plt
+*pem
+.DS_Store
+all.coverdata
+bin
+deps
+ebin
+erl_crash.dump
+log
+logs
+.erlang.mk.packages.v2
