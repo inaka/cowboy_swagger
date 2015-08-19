@@ -74,7 +74,7 @@ trails:store(Trails),
 Dispatch = trails:single_host_compile(Trails),
 ```
 
-The snippet of code above, usually is placed when you start `cowboy`. Check it [here](./example/src/example.erl#31).
+The snippet of code above, usually is placed when you start `cowboy`. Check it [here](./example/src/example.erl#L31).
 
 Then add `cowboy_swagger` to the list of apps to be loaded in your `*.app.src` file.
 
