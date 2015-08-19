@@ -14,25 +14,25 @@ If you find any **bugs** or have a **problem** while using this library, please
 And you can check all of our open-source projects at [inaka.github.io](http://inaka.github.io).
 
 ## Why Cowboy Swagger?
-Simple, because there isn't a tool in Erlang to document Cowboy RESTful APIs, easy and fast,
-improving development productivity.
+Simple, because there isn't a tool in Erlang to document Cowboy RESTful APIs easy and fast,
+and to improve development productivity.
 
-With `cowboy_swagger` is possible to integrate Swagger to your Erlang projects, that use Cowboy as web server.
+With `cowboy_swagger` is possible to integrate Swagger to your Erlang projects that use Cowboy as a web server.
 It is extremely easy to use, and with just a few steps you'll have a nice Web documentation for your RESTful APIs.
 
 To learn a bit more about Swagger, please check this [blog post](http://inaka.net/blog/2015/06/23/erlang-swagger-2015/).
 
 ## How to Use it?
-This is the best part, is extremely easy.
+This is the best part. It is extremely easy.
 
 ### 1. Document each Cowboy Handler
 Because `cowboy_swagger` runs on top of `trails`, the first thing that you have to do
-is document all about you handler within the trails metadata. Keep in mind that
+is document all about your handler within the trails metadata. Keep in mind that
 all fields defined within each method into the metadata must be compliant with the
 [Swagger specification](http://swagger.io/specification).
 
 For example, suppose that you have `example_echo_handler`, so it must implement the `trails/0`
-callback from `trails_handler` behavior:
+callback from `trails_handler` behaviour:
 
 ```erlang
 trails() ->
@@ -58,7 +58,7 @@ trails() ->
   [trails:trail("/message/[:echo]", example_echo_handler, [], Metadata)].
 ```
 
-To get a better idea how your handler might seem, please check it [here](./example/src/example_echo_handler.erl).
+To get a better idea of how your handler should look like, please check [here](./example/src/example_echo_handler.erl).
 
 ### 2. Include cowboy_swagger in your app
 First, you need to include `cowboy_swagger_handler` module in your list of trails to be compiled.
@@ -74,7 +74,7 @@ trails:store(Trails),
 Dispatch = trails:single_host_compile(Trails),
 ```
 
-The snippet of code above, usually is placed when you start `cowboy`. Check it [here](./example/src/example.erl#L31).
+The snippet of code above is usually placed when you start `cowboy`. Check it [here](./example/src/example.erl#L31).
 
 Then add `cowboy_swagger` to the list of apps to be loaded in your `*.app.src` file.
 
@@ -99,7 +99,7 @@ Then add `cowboy_swagger` to the list of apps to be loaded in your `*.app.src` f
 }.
 ```
 
-And that's it, you got it. Now start your application and then you can access the API docs
+And that's it, you got it. Now start your application and then you will have access to the API docs
 under the path `/api-docs`. Supposing that you're running the app on `localhost:8080`,
 that will be [http://localhost:8080/api-docs](http://localhost:8080/api-docs).
 
