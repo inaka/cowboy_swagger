@@ -103,5 +103,40 @@ And that's it, you got it. Now start your application and then you will have acc
 under the path `/api-docs`. Supposing that you're running the app on `localhost:8080`,
 that will be [http://localhost:8080/api-docs](http://localhost:8080/api-docs).
 
+## Configuration
+
+Additionally, `cowboy_swagger` can be configured/customized from a `*.config` file:
+
+### app.config
+
+```erlang
+[
+ %% Other apps ...
+
+ %% cowboy_swagger config
+ {cowboy_swagger,
+  [
+   %% `static_files`: Static content directory. This is where Swagger-UI
+   %% is located. Default: `priv/swagger`.
+   %% Remember that Swagger-UI is embedded into `cowboy-swagger` project,
+   %% within `priv/swagger` folder. BUT you have to reference that path,
+   %% and depending on how you're using `cowboy-swagger` it will be different.
+   %% For example, assuming that you want to run your app which has
+   %% `cowboy-swagger` as dependency from the console, `static_files` will be:
+   {static_files, "./deps/cowboy_swagger/priv/swagger"},
+
+   %% `global_spec`: Global fields for Swagger specification.
+   %% If these fields are not set, `cowboy_swagger` will set default values.
+   {global_spec,
+    #{swagger => "2.0",
+      info => #{title => "Example API"},
+      basePath => "/api-docs"
+     }
+   }
+  ]
+ }
+].
+```
+
 ## Example
 For more information about `cowboy_swagger` and how to use it, please check this [Example](./example).
