@@ -1,3 +1,6 @@
+%%% @doc Cowboy Swagger Handler. This handler exposes a GET operation
+%%%      to enable that  `swagger.json' can be retrieved from embedded
+%%%      Swagger-UI (located in `priv/swagger' folder).
 -module(cowboy_swagger_handler).
 
 %% Cowboy callbacks
@@ -19,16 +22,19 @@
 %%% Cowboy Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%% @hidden
 -spec init({atom(), atom()}, cowboy_req:req(), state()) ->
   {upgrade, protocol, cowboy_rest}.
 init(_Transport, _Req, _Opts) ->
   {upgrade, protocol, cowboy_rest}.
 
+%% @hidden
 -spec rest_init(cowboy_req:req(), state()) ->
   {ok, cowboy_req:req(), term()}.
 rest_init(Req, _Opts) ->
   {ok, Req, #{}}.
 
+%% @hidden
 -spec content_types_provided(cowboy_req:req(), state()) ->
   {[term()], cowboy_req:req(), state()}.
 content_types_provided(Req, State) ->
@@ -48,6 +54,9 @@ handle_get(Req, State) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% @hidden
+%% @doc Implementets `trails_handler:trails/0' callback. This function returns
+%%      trails routes for both: static content (Swagger-UI) and this handler
+%%      that returns the `swagger.json'.
 trails() ->
   StaticFiles = application:get_env(
     cowboy_swagger, static_files, "priv/swagger"),

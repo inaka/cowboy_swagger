@@ -45,6 +45,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% @doc Returns the swagger json specification from given `trails'.
+%%      This function basically takes the metadata from each `trails:trail()'
+%%      (which must be compliant with Swagger specification) and builds the
+%%      required `swagger.json'.
 -spec to_json([trails:trail()]) -> iolist().
 to_json(Trails) ->
   Default = #{swagger => <<"2.0">>, info => #{title => <<"API-DOCS">>}},
@@ -57,10 +60,12 @@ to_json(Trails) ->
 %% Utilities.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%% @hidden
 -spec enc_json(jiffy:json_value()) -> iolist().
 enc_json(Json) ->
   jiffy:encode(Json, [uescape]).
 
+%% @hidden
 -spec dec_json(iodata()) -> jiffy:json_value().
 dec_json(Data) ->
   try jiffy:decode(Data, [return_maps])
@@ -69,10 +74,12 @@ dec_json(Data) ->
       throw(bad_json)
   end.
 
+%% @hidden
 -spec swagger_paths([trails:trail()]) -> map().
 swagger_paths(Trails) ->
   swagger_paths(Trails, #{}).
 
+%% @hidden
 -spec validate_metadata(trails:metadata()) -> trails:metadata().
 validate_metadata(Metadata) ->
   validate_swagger_map(Metadata).
