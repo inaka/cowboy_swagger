@@ -1,3 +1,6 @@
+_rel/
+relx
+*.d
 .eunit
 deps
 *.o
