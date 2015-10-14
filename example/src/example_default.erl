@@ -16,7 +16,7 @@ rest_init(Req, _Opts) ->
   {ok, Req, #{}}.
 
 content_types_accepted(Req, State) ->
-  {[{<<"text/plain">>, handle_put}], Req, State}.
+  {[{'*', handle_put}], Req, State}.
 
 content_types_provided(Req, State) ->
   {[{<<"text/plain">>, handle_get}], Req, State}.
