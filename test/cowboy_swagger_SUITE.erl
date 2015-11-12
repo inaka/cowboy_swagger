@@ -27,6 +27,7 @@ all() ->
 to_json_test(_Config) ->
   Trails = test_trails(),
   SwaggerJson = cowboy_swagger:to_json(Trails),
+  Result = jiffy:decode(SwaggerJson, [return_maps]),
   #{<<"paths">> :=
     #{<<"/a/{b}/{c}">> :=
       #{<<"delete">> :=
@@ -109,7 +110,9 @@ to_json_test(_Config) ->
         }
       }
     }
-  } = jiffy:decode(SwaggerJson, [return_maps]),
+  } = Result,
+  #{<<"paths">> := Paths} = Result,
+  2 = maps:size(Paths),
   {comment, ""}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -158,4 +161,6 @@ test_trails() ->
                }
      },
   [trails:trail("/a/[:b/[:c/[:d]]]", handler1, [], Metadata),
-   trails:trail("/a/:b/[:c]", handler2, [], Metadata)].
+    trails:trail("/a/:b/[:c]", handler2, [], Metadata),
+    trails:trail("/api-docs", cowboy_swagger_handler, [], Metadata),
+    trails:trail("/[...]", cowboy_swagger_handler, [], Metadata)].

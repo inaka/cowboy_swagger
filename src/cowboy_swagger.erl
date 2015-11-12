@@ -7,6 +7,7 @@
 %% Utilities
 -export([enc_json/1, dec_json/1]).
 -export([swagger_paths/1, validate_metadata/1]).
+-export([filter_cowboy_swagger_handler/1]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Types.
@@ -53,7 +54,8 @@ to_json(Trails) ->
   Default = #{swagger => <<"2.0">>, info => #{title => <<"API-DOCS">>}},
   GlobalSpec = normalize_map_values(
     application:get_env(cowboy_swagger, global_spec, Default)),
-  SwaggerSpec = GlobalSpec#{paths => swagger_paths(Trails)},
+  SanitizeTrails = filter_cowboy_swagger_handler(Trails),
+  SwaggerSpec = GlobalSpec#{paths => swagger_paths(SanitizeTrails)},
   enc_json(SwaggerSpec).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -83,6 +85,18 @@ swagger_paths(Trails) ->
 -spec validate_metadata(trails:metadata()) -> trails:metadata().
 validate_metadata(Metadata) ->
   validate_swagger_map(Metadata).
+
+%% @hidden
+-spec filter_cowboy_swagger_handler([trails:trail()]) -> [trails:trail()].
+filter_cowboy_swagger_handler(Trails) ->
+  F = fun(Trail) ->
+    case trails:handler(Trail) of
+      cowboy_swagger_handler  -> false;
+      cowboy_static           -> false;
+      _                       -> true
+    end
+  end,
+  lists:filter(F, Trails).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Private API.
