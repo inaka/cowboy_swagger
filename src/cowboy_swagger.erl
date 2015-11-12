@@ -87,7 +87,7 @@ validate_metadata(Metadata) ->
   validate_swagger_map(Metadata).
 
 %% @hidden
--spec filter_cowboy_swagger_handler(trails:trail()) -> trails:trail().
+-spec filter_cowboy_swagger_handler([trails:trail()]) -> [trails:trail()].
 filter_cowboy_swagger_handler(Trails) ->
   F = fun(Trail) ->
     case trails:handler(Trail) of
