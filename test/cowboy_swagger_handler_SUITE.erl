@@ -43,8 +43,9 @@ handler_test(_Config) ->
   Trails = trails:trails([example_echo_handler,
                           example_description_handler,
                           cowboy_swagger_handler]),
+  SanitizeTrails = cowboy_swagger:filter_cowboy_swagger_handler(Trails),
   ExpectedPaths = cowboy_swagger:dec_json(
-    cowboy_swagger:enc_json(cowboy_swagger:swagger_paths(Trails))),
+    cowboy_swagger:enc_json(cowboy_swagger:swagger_paths(SanitizeTrails))),
 
   %% GET swagger.json spec
   ct:comment("GET /api-docs/swagger.json should return 200 OK"),
