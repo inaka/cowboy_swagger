@@ -16,7 +16,7 @@
 
 ERLANG_MK_FILENAME := $(realpath $(lastword $(MAKEFILE_LIST)))
 
-ERLANG_MK_VERSION = 2.0.0-pre.1-13-gb581428
+ERLANG_MK_VERSION = 2.0.0-pre.1-38-gbd6e006
 
 # Core configuration.
 
@@ -429,7 +429,7 @@ pkg_bullet_name = bullet
 pkg_bullet_description = Simple, reliable, efficient streaming for Cowboy.
 pkg_bullet_homepage = http://ninenines.eu
 pkg_bullet_fetch = git
-pkg_bullet_repo = https://github.com/extend/bullet
+pkg_bullet_repo = https://github.com/ninenines/bullet
 pkg_bullet_commit = master
 
 PACKAGES += cache
@@ -759,14 +759,6 @@ pkg_confetti_homepage = https://github.com/jtendo/confetti
 pkg_confetti_fetch = git
 pkg_confetti_repo = https://github.com/jtendo/confetti
 pkg_confetti_commit = master
-
-PACKAGES += couch
-pkg_couch_name = couch
-pkg_couch_description = A embeddable document oriented database compatible with Apache CouchDB
-pkg_couch_homepage = https://github.com/benoitc/opencouch
-pkg_couch_fetch = git
-pkg_couch_repo = https://github.com/benoitc/opencouch
-pkg_couch_commit = master
 
 PACKAGES += couchbeam
 pkg_couchbeam_name = couchbeam
@@ -2048,6 +2040,14 @@ pkg_itweet_fetch = git
 pkg_itweet_repo = https://github.com/inaka/itweet
 pkg_itweet_commit = v2.0
 
+PACKAGES += jamdb_sybase
+pkg_jamdb_sybase_name = jamdb_sybase
+pkg_jamdb_sybase_description = Erlang driver for SAP Sybase ASE
+pkg_jamdb_sybase_homepage = https://github.com/erlangbureau/jamdb_sybase
+pkg_jamdb_sybase_fetch = git
+pkg_jamdb_sybase_repo = https://github.com/erlangbureau/jamdb_sybase
+pkg_jamdb_sybase_commit = 0.6.0
+
 PACKAGES += jerg
 pkg_jerg_name = jerg
 pkg_jerg_description = JSON Schema to Erlang Records Generator
@@ -2736,6 +2736,14 @@ pkg_oauth2c_fetch = git
 pkg_oauth2c_repo = https://github.com/kivra/oauth2_client
 pkg_oauth2c_commit = master
 
+PACKAGES += octopus
+pkg_octopus_name = octopus
+pkg_octopus_description = Small and flexible pool manager written in Erlang
+pkg_octopus_homepage = https://github.com/erlangbureau/octopus
+pkg_octopus_fetch = git
+pkg_octopus_repo = https://github.com/erlangbureau/octopus
+pkg_octopus_commit = 1.0.0
+
 PACKAGES += of_protocol
 pkg_of_protocol_name = of_protocol
 pkg_of_protocol_description = OpenFlow Protocol Library for Erlang
@@ -2743,6 +2751,14 @@ pkg_of_protocol_homepage = https://github.com/FlowForwarding/of_protocol
 pkg_of_protocol_fetch = git
 pkg_of_protocol_repo = https://github.com/FlowForwarding/of_protocol
 pkg_of_protocol_commit = master
+
+PACKAGES += opencouch
+pkg_opencouch_name = couch
+pkg_opencouch_description = A embeddable document oriented database compatible with Apache CouchDB
+pkg_opencouch_homepage = https://github.com/benoitc/opencouch
+pkg_opencouch_fetch = git
+pkg_opencouch_repo = https://github.com/benoitc/opencouch
+pkg_opencouch_commit = master
 
 PACKAGES += openflow
 pkg_openflow_name = openflow
@@ -4018,8 +4034,13 @@ export DEPS_DIR
 REBAR_DEPS_DIR = $(DEPS_DIR)
 export REBAR_DEPS_DIR
 
+dep_name = $(if $(dep_$(1)),$(1),$(if $(pkg_$(1)_name),$(pkg_$(1)_name),$(1)))
+dep_repo = $(patsubst git://github.com/%,https://github.com/%, \
+	$(if $(dep_$(1)),$(word 2,$(dep_$(1))),$(pkg_$(1)_repo)))
+dep_commit = $(if $(dep_$(1)_commit),$(dep_$(1)_commit),$(if $(dep_$(1)),$(word 3,$(dep_$(1))),$(pkg_$(1)_commit)))
+
 ALL_APPS_DIRS = $(if $(wildcard $(APPS_DIR)/),$(filter-out $(APPS_DIR),$(shell find $(APPS_DIR) -maxdepth 1 -type d)))
-ALL_DEPS_DIRS = $(addprefix $(DEPS_DIR)/,$(filter-out $(IGNORE_DEPS),$(BUILD_DEPS) $(DEPS)))
+ALL_DEPS_DIRS = $(addprefix $(DEPS_DIR)/,$(foreach dep,$(filter-out $(IGNORE_DEPS),$(BUILD_DEPS) $(DEPS)),$(call dep_name,$(dep))))
 
 ifeq ($(filter $(APPS_DIR) $(DEPS_DIR),$(subst :, ,$(ERL_LIBS))),)
 ifeq ($(ERL_LIBS),)
@@ -4114,7 +4135,8 @@ endef
 # Overwrite erlang.mk with the current file by default.
 ifeq ($(NO_AUTOPATCH_ERLANG_MK),)
 define dep_autopatch_erlang_mk
-	echo "include $(ERLANG_MK_FILENAME)" > $(DEPS_DIR)/$(1)/erlang.mk
+	echo "include $(call core_relpath,$(dir $(ERLANG_MK_FILENAME)),$(DEPS_DIR)/app)/erlang.mk" \
+		> $(DEPS_DIR)/$1/erlang.mk
 endef
 else
 define dep_autopatch_erlang_mk
@@ -4406,7 +4428,7 @@ define dep_autopatch_rebar.erl
 			end,
 			[PortSpec(S) || S <- PortSpecs]
 	end,
-	Write("\ninclude $(ERLANG_MK_FILENAME)"),
+	Write("\ninclude $(call core_relpath,$(dir $(ERLANG_MK_FILENAME)),$(DEPS_DIR)/app)/erlang.mk"),
 	RunPlugin = fun(Plugin, Step) ->
 		case erlang:function_exported(Plugin, Step, 2) of
 			false -> ok;
@@ -4491,6 +4513,10 @@ define dep_fetch_git
 	cd $(DEPS_DIR)/$(call dep_name,$(1)) && git checkout -q $(call dep_commit,$(1));
 endef
 
+define dep_fetch_git-submodule
+	git submodule update --init -- $(DEPS_DIR)/$1;
+endef
+
 define dep_fetch_hg
 	hg clone -q -U $(call dep_repo,$(1)) $(DEPS_DIR)/$(call dep_name,$(1)); \
 	cd $(DEPS_DIR)/$(call dep_name,$(1)) && hg update -q $(call dep_commit,$(1));
@@ -4543,26 +4569,23 @@ define dep_fetch
 			fail))
 endef
 
-dep_name = $(if $(dep_$(1)),$(1),$(pkg_$(1)_name))
-dep_repo = $(patsubst git://github.com/%,https://github.com/%, \
-	$(if $(dep_$(1)),$(word 2,$(dep_$(1))),$(pkg_$(1)_repo)))
-dep_commit = $(if $(dep_$(1)_commit),$(dep_$(1)_commit),$(if $(dep_$(1)),$(word 3,$(dep_$(1))),$(pkg_$(1)_commit)))
-
 define dep_target
-$(DEPS_DIR)/$(1):
-	$(verbose) if test -d $(APPS_DIR)/$1; then \
-		echo "Error: Dependency $1 conflicts with application found in $(APPS_DIR)/$1."; \
+$(DEPS_DIR)/$(call dep_name,$1):
+	$(eval DEP_NAME := $(call dep_name,$1))
+	$(eval DEP_STR := $(if $(filter-out $1,$(DEP_NAME)),$1,"$1 ($(DEP_NAME))"))
+	$(verbose) if test -d $(APPS_DIR)/$(DEP_NAME); then \
+		echo "Error: Dependency" $(DEP_STR) "conflicts with application found in $(APPS_DIR)/$(DEP_NAME)."; \
 		exit 17; \
 	fi
 	$(verbose) mkdir -p $(DEPS_DIR)
-	$(dep_verbose) $(call dep_fetch_$(strip $(call dep_fetch,$(1))),$(1))
-	$(verbose) if [ -f $(DEPS_DIR)/$(1)/configure.ac -o -f $(DEPS_DIR)/$(1)/configure.in ]; then \
-		echo " AUTO  " $(1); \
-		cd $(DEPS_DIR)/$(1) && autoreconf -Wall -vif -I m4; \
+	$(dep_verbose) $(call dep_fetch_$(strip $(call dep_fetch,$1)),$1)
+	$(verbose) if [ -f $(DEPS_DIR)/$(DEP_NAME)/configure.ac -o -f $(DEPS_DIR)/$(DEP_NAME)/configure.in ]; then \
+		echo " AUTO  " $(DEP_STR); \
+		cd $(DEPS_DIR)/$(DEP_NAME) && autoreconf -Wall -vif -I m4; \
 	fi
-	- $(verbose) if [ -f $(DEPS_DIR)/$(1)/configure ]; then \
-		echo " CONF  " $(1); \
-		cd $(DEPS_DIR)/$(1) && ./configure; \
+	- $(verbose) if [ -f $(DEPS_DIR)/$(DEP_NAME)/configure ]; then \
+		echo " CONF  " $(DEP_STR); \
+		cd $(DEPS_DIR)/$(DEP_NAME) && ./configure; \
 	fi
 ifeq ($(filter $(1),$(NO_AUTOPATCH)),)
 	$(verbose) if [ "$(1)" = "amqp_client" -a "$(RABBITMQ_CLIENT_PATCH)" ]; then \
@@ -4581,7 +4604,7 @@ ifeq ($(filter $(1),$(NO_AUTOPATCH)),)
 			git clone https://github.com/rabbitmq/rabbitmq-codegen.git $(DEPS_DIR)/rabbitmq-codegen; \
 		fi \
 	else \
-		$(call dep_autopatch,$(1)) \
+		$(call dep_autopatch,$(DEP_NAME)) \
 	fi
 endif
 endef
@@ -4843,6 +4866,10 @@ $(PROJECT).d:: $(ERL_FILES) $(call core_find,include/,*.hrl)
 	$(makedep_verbose) $(call erlang,$(call makedep.erl,$@))
 endif
 
+# Rebuild everything when the Makefile changes.
+$(ERL_FILES) $(CORE_FILES) $(ASN1_FILES) $(MIB_FILES) $(XRL_FILES) $(YRL_FILES):: $(MAKEFILE_LIST)
+	@touch $@
+
 -include $(PROJECT).d
 
 ebin/$(PROJECT).app:: ebin/
@@ -4855,8 +4882,9 @@ define compile_erl
 		-pa ebin/ -I include/ $(filter-out $(ERLC_EXCLUDE_PATHS),$(COMPILE_FIRST_PATHS) $(1))
 endef
 
-ebin/$(PROJECT).app:: $(ERL_FILES) $(CORE_FILES)
-	$(if $(strip $?),$(call compile_erl,$?))
+ebin/$(PROJECT).app:: $(ERL_FILES) $(CORE_FILES) $(wildcard src/$(PROJECT).app.src)
+	$(eval FILES_TO_COMPILE := $(filter-out src/$(PROJECT).app.src,$?))
+	$(if $(strip $(FILES_TO_COMPILE)),$(call compile_erl,$(FILES_TO_COMPILE)))
 	$(eval GITDESCRIBE := $(shell git describe --dirty --abbrev=7 --tags --always --first-parent 2>/dev/null || true))
 	$(eval MODULES := $(patsubst %,'%',$(sort $(notdir $(basename \
 		$(filter-out $(ERLC_EXCLUDE_PATHS),$(ERL_FILES) $(CORE_FILES) $(BEAM_FILES)))))))
@@ -5481,7 +5509,7 @@ ifdef LEGACY
 endif
 
 new:
-ifeq ($(wildcard src/),)
+ifeq ($(wildcard src/)$(in),)
 	$(error Error: src/ directory does not exist)
 endif
 ifndef t
@@ -5564,7 +5592,7 @@ clean::
 else
 
 ifeq ($(SOURCES),)
-SOURCES := $(sort $(call core_find,$(C_SRC_DIR)/,*.c *.C *.cc *.cpp))
+SOURCES := $(sort $(foreach pat,*.c *.C *.cc *.cpp,$(call core_find,$(C_SRC_DIR)/,$(pat))))
 endif
 OBJECTS = $(addsuffix .o, $(basename $(SOURCES)))
 
@@ -5618,6 +5646,101 @@ distclean-c_src-env:
 	$(gen_verbose) rm -f $(C_SRC_ENV)
 
 -include $(C_SRC_ENV)
+endif
+
+# Templates.
+
+define bs_c_nif
+#include "erl_nif.h"
+
+static int loads = 0;
+
+static int load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info)
+{
+	/* Initialize private data. */
+	*priv_data = NULL;
+
+	loads++;
+
+	return 0;
+}
+
+static int upgrade(ErlNifEnv* env, void** priv_data, void** old_priv_data, ERL_NIF_TERM load_info)
+{
+	/* Convert the private data to the new version. */
+	*priv_data = *old_priv_data;
+
+	loads++;
+
+	return 0;
+}
+
+static void unload(ErlNifEnv* env, void* priv_data)
+{
+	if (loads == 1) {
+		/* Destroy the private data. */
+	}
+
+	loads--;
+}
+
+static ERL_NIF_TERM hello(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+	if (enif_is_atom(env, argv[0])) {
+		return enif_make_tuple2(env,
+			enif_make_atom(env, "hello"),
+			argv[0]);
+	}
+
+	return enif_make_tuple2(env,
+		enif_make_atom(env, "error"),
+		enif_make_atom(env, "badarg"));
+}
+
+static ErlNifFunc nif_funcs[] = {
+	{"hello", 1, hello}
+};
+
+ERL_NIF_INIT($n, nif_funcs, load, NULL, upgrade, unload)
+endef
+
+define bs_erl_nif
+-module($n).
+
+-export([hello/1]).
+
+-on_load(on_load/0).
+on_load() ->
+	PrivDir = case code:priv_dir(?MODULE) of
+		{error, _} ->
+			AppPath = filename:dirname(filename:dirname(code:which(?MODULE))),
+			filename:join(AppPath, "priv");
+		Path ->
+			Path
+	end,
+	erlang:load_nif(filename:join(PrivDir, atom_to_list(?MODULE)), 0).
+
+hello(_) ->
+	erlang:nif_error({not_loaded, ?MODULE}).
+endef
+
+$(foreach template,bs_c_nif bs_erl_nif, \
+	$(eval _$(template) = $$(subst $$(tab),$$(WS),$$($(template)))) \
+	$(eval export _$(template)))
+
+new-nif:
+ifneq ($(wildcard $(C_SRC_DIR)/$n.c),)
+	$(error Error: $(C_SRC_DIR)/$n.c already exists)
+endif
+ifneq ($(wildcard src/$n.erl),)
+	$(error Error: src/$n.erl already exists)
+endif
+ifdef in
+	$(verbose) $(MAKE) -C $(APPS_DIR)/$(in)/ new-nif n=$n in=
+else
+	$(verbose) mkdir -p $(C_SRC_DIR) src/
+	$(call render_template,bs_c_nif,$(C_SRC_DIR)/$n.c)
+	$(call render_template,bs_erl_nif,src/$n.erl)
 endif
 
 # Copyright (c) 2015, Loïc Hoguin <essen@ninenines.eu>
@@ -5893,6 +6016,10 @@ else
 BEAM_FILES += $(addprefix ebin/,$(patsubst %.dtl,%_dtl.beam,$(notdir $(DTL_FILES))))
 endif
 
+# Rebuild templates when the Makefile changes.
+$(DTL_FILES): $(MAKEFILE_LIST)
+	@touch $@
+
 ebin/$(PROJECT).app:: $(DTL_FILES)
 	$(if $(strip $?),\
 		$(dtl_verbose) $(call erlang,$(call erlydtl_compile.erl,$?,-pa ebin/ $(DEPS_DIR)/erlydtl/ebin/)))
@@ -6085,13 +6212,15 @@ help::
 endif
 
 # Copyright (c) 2014, M Robert Martin <rob@version2beta.com>
+# Copyright (c) 2015, Loïc Hoguin <essen@ninenines.eu>
 # This file is contributed to erlang.mk and subject to the terms of the ISC License.
 
 .PHONY: shell
 
 # Configuration.
 
-SHELL_PATH ?= -pa $(CURDIR)/ebin $(DEPS_DIR)/*/ebin
+SHELL_ERL ?= erl
+SHELL_PATHS ?= $(CURDIR)/ebin $(APPS_DIR)/*/ebin $(DEPS_DIR)/*/ebin
 SHELL_OPTS ?=
 
 ALL_SHELL_DEPS_DIRS = $(addprefix $(DEPS_DIR)/,$(SHELL_DEPS))
@@ -6111,7 +6240,7 @@ build-shell-deps: $(ALL_SHELL_DEPS_DIRS)
 	$(verbose) for dep in $(ALL_SHELL_DEPS_DIRS) ; do $(MAKE) -C $$dep ; done
 
 shell: build-shell-deps
-	$(gen_verbose) erl $(SHELL_PATH) $(SHELL_OPTS)
+	$(gen_verbose) $(SHELL_ERL) -pa $(SHELL_PATHS) $(SHELL_OPTS)
 
 # Copyright (c) 2015, Loïc Hoguin <essen@ninenines.eu>
 # This file is part of erlang.mk and subject to the terms of the ISC License.
