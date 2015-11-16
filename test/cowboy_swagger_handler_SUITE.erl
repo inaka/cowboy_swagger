@@ -21,16 +21,16 @@ all() ->
   cowboy_swagger_test_utils:config()
 ) -> cowboy_swagger_test_utils:config().
 init_per_suite(Config) ->
-  shotgun:start(),
-  example:start(),
+  {ok, _} = shotgun:start(),
+  {ok, _} = example:start(),
   Config.
 
 -spec end_per_suite(
   cowboy_swagger_test_utils:config()
 ) -> cowboy_swagger_test_utils:config().
 end_per_suite(Config) ->
-  shotgun:stop(),
-  example:stop(),
+  _ = shotgun:stop(),
+  _ = example:stop(),
   Config.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
