@@ -82,7 +82,7 @@ swagger_paths(Trails) ->
   swagger_paths(Trails, #{}).
 
 %% @hidden
--spec validate_metadata(trails:metadata()) -> trails:metadata().
+-spec validate_metadata(trails:metadata(_)) -> metadata().
 validate_metadata(Metadata) ->
   validate_swagger_map(Metadata).
 
