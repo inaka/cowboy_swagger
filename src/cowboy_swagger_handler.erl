@@ -58,12 +58,10 @@ handle_get(Req, State) ->
 %%      trails routes for both: static content (Swagger-UI) and this handler
 %%      that returns the `swagger.json'.
 trails() ->
-  CowboySwaggerPriv = cowboy_swagger_priv(),
-  SwaggerPrivDir = filename:join(CowboySwaggerPriv, "swagger"),
   StaticFiles =
     case application:get_env(cowboy_swagger, static_files) of
       {ok, Val} -> Val;
-      _         -> SwaggerPrivDir
+      _         -> filename:join(cowboy_swagger_priv(), "swagger")
     end,
   Static1 = trails:trail(
     "/api-docs",
