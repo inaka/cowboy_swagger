@@ -62,4 +62,16 @@ handler_test(_Config) ->
   {ok, Index} = file:read_file("../../priv/swagger/index.html"),
   Index = Body1,
 
+  %% GET swagger-ui.js - test /api-docs/[...] trail
+  ct:comment("GET /api-docs/swagger-ui-js should return 200 OK"),
+  #{status_code := 200, body := SwaggerUIBody} =
+    cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger-ui.js"),
+  {ok, SwaggerUIBodySrc} = file:read_file("../../priv/swagger/swagger-ui.js"),
+  SwaggerUIBody = SwaggerUIBodySrc,
+
+  %% GET unknown-file.ext - test /api-docs/[...] trail
+  ct:comment("GET /api-docs/unknown-file.ext should return 404 NOT FOUND"),
+  #{status_code := 404} =
+    cowboy_swagger_test_utils:api_call(get, "/api-docs/unknown-file.ext"),
+
   {comment, ""}.

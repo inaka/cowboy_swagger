@@ -69,7 +69,7 @@ trails() ->
     {file, StaticFiles ++ "/index.html"},
     #{get => #{tags => ["static-content"], description => "index.html"}}),
   Static2 = trails:trail(
-    "/[...]",
+    "/api-docs/[...]",
     cowboy_static,
     {dir, StaticFiles, [{mimetypes, cow_mimetypes, all}]},
     #{get => #{tags => ["static-content"], description => "Static Content"}}),
