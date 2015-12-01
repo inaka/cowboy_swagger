@@ -7,7 +7,8 @@
         ]).
 
 %% Test cases
--export([handler_test/1]).
+-export([handler_test/1,
+         multiple_hosts_test/1]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Common test
@@ -23,6 +24,7 @@ all() ->
 init_per_suite(Config) ->
   {ok, _} = shotgun:start(),
   {ok, _} = example:start(),
+  {ok, _} = multiple_hosts_servers_example:start(),
   Config.
 
 -spec end_per_suite(
@@ -31,6 +33,7 @@ init_per_suite(Config) ->
 end_per_suite(Config) ->
   _ = shotgun:stop(),
   _ = example:stop(),
+  _ = multiple_hosts_servers_example:stop(),
   Config.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -42,7 +45,8 @@ handler_test(_Config) ->
   %% Expected result
   Trails = trails:trails([example_echo_handler,
                           example_description_handler,
-                          cowboy_swagger_handler]),
+                          cowboy_swagger_handler,
+                          host1_handler]),
   SanitizeTrails = cowboy_swagger:filter_cowboy_swagger_handler(Trails),
   ExpectedPaths = cowboy_swagger:dec_json(
     cowboy_swagger:enc_json(cowboy_swagger:swagger_paths(SanitizeTrails))),
@@ -73,5 +77,19 @@ handler_test(_Config) ->
   ct:comment("GET /api-docs/unknown-file.ext should return 404 NOT FOUND"),
   #{status_code := 404} =
     cowboy_swagger_test_utils:api_call(get, "/api-docs/unknown-file.ext"),
+  {comment, ""}.
 
+-spec multiple_hosts_test(_Config::cowboy_swagger_test_utils:config()) ->
+  {atom(), string()}.
+multiple_hosts_test(_Config) ->
+  %% GET /whoami
+  ct:comment("GET /whoami on host1 should return \"I am host1\" as its Body"),
+  #{status_code := 200, body := Host1Body} =
+    cowboy_swagger_test_utils:api_call(get,
+                                       "/whoami",
+                                       #{},
+                                       [],
+                                       multiple_hosts_servers_example,
+                                       api1),
+  Host1Body = "I am host1",
   {comment, ""}.

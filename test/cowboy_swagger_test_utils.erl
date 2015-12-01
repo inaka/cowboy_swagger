@@ -7,6 +7,8 @@
 -export([ api_call/2
         , api_call/3
         , api_call/4
+        , api_call/5
+        , api_call/6
         ]).
 
 -type config() :: proplists:proplist().
@@ -36,8 +38,21 @@ api_call(Method, Uri, Headers) ->
 
 -spec api_call(atom(), string(), #{}, iodata()) -> #{}.
 api_call(Method, Uri, Headers, Body) ->
-  Port = application:get_env(example, http_port, 8080),
-  {ok, Pid} = shotgun:open("localhost", Port),
+  api_call(Method, Uri, Headers, Body, 'example').
+
+api_call(Method, Uri, Headers, Body, AppConfig) ->
+  api_call(Method, Uri, Headers, Body, AppConfig, 'http_port').
+
+api_call(Method, Uri, Headers, Body, App, ConfigKey) ->
+  {ok, Pid} = case App of
+    example ->
+      Port = application:get_env(example, ConfigKey, 8080),
+      shotgun:open("localhost", Port);
+    _ ->
+      #{host := HostMatch, port := Port} =
+        application:get_env(App, ConfigKey, #{}),
+      shotgun:open(HostMatch, Port)
+  end,
   try
     {ok, Response} = shotgun:request(Pid, Method, Uri, Headers, Body, #{}),
     Response

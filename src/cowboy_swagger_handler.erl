@@ -14,7 +14,7 @@
 
 %% Trails
 -behaviour(trails_handler).
--export([trails/0]).
+-export([trails/0, trails/1]).
 
 -type state() :: #{}.
 
@@ -30,9 +30,9 @@ init(_Transport, _Req, _Opts) ->
 
 %% @hidden
 -spec rest_init(cowboy_req:req(), state()) ->
-  {ok, cowboy_req:req(), term()}.
-rest_init(Req, _Opts) ->
-  {ok, Req, #{}}.
+  {ok, cowboy_req:req(), state()}.
+rest_init(Req, Opts) ->
+  {ok, Req, Opts}.
 
 %% @hidden
 -spec content_types_provided(cowboy_req:req(), state()) ->
@@ -46,7 +46,8 @@ content_types_provided(Req, State) ->
 
 %% @hidden
 handle_get(Req, State) ->
-  Trails = trails:all(),
+  HostMatch = maps:get(host, State, '_'),
+  Trails = trails:all('_', HostMatch),
   {cowboy_swagger:to_json(Trails), Req, State}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -54,10 +55,13 @@ handle_get(Req, State) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% @hidden
-%% @doc Implementets `trails_handler:trails/0' callback. This function returns
+%% @doc Implements `trails_handler:trails/0' callback. This function returns
 %%      trails routes for both: static content (Swagger-UI) and this handler
 %%      that returns the `swagger.json'.
-trails() ->
+-spec trails() -> trails:trails().
+trails() -> trails(#{}).
+-spec trails(Options::map()) -> trails:trails().
+trails(Options) ->
   StaticFiles =
     case application:get_env(cowboy_swagger, static_files) of
       {ok, Val} -> Val;
@@ -81,7 +85,7 @@ trails() ->
       }
     },
   Handler = trails:trail(
-    "/api-docs/swagger.json", cowboy_swagger_handler, [], MD),
+    "/api-docs/swagger.json", cowboy_swagger_handler, Options, MD),
   [Static1, Handler, Static2].
 
 %% @private
