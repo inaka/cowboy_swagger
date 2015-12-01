@@ -3,8 +3,13 @@
   {description, "Cowboy Swagger Complex Example."},
   {vsn, "0.1"},
   {applications,
-    [kernel,
-      stdlib
+    [ kernel
+    , stdlib
+    , sasl
+
+    , cowboy
+    , trails
+    , cowboy_swagger
     ]},
   {modules, []},
   {mod, {multiple_hosts_servers_example, []}},
