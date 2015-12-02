@@ -55,7 +55,8 @@ to_json(Trails) ->
   GlobalSpec = normalize_map_values(
     application:get_env(cowboy_swagger, global_spec, Default)),
   SanitizeTrails = filter_cowboy_swagger_handler(Trails),
-  SwaggerSpec = GlobalSpec#{paths => swagger_paths(SanitizeTrails)},
+  SwaggerSpec = GlobalSpec#{paths => swagger_paths(SanitizeTrails),
+                            basePath => trails:api_root()},
   enc_json(SwaggerSpec).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
