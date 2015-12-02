@@ -17,6 +17,8 @@
 -export([trails/0, trails/1]).
 
 -type state() :: #{}.
+-type route_match() :: '_' | iodata().
+-type options() :: #{server => ranch:ref(), host => route_match()}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Cowboy Callbacks
@@ -46,8 +48,9 @@ content_types_provided(Req, State) ->
 
 %% @hidden
 handle_get(Req, State) ->
+  Server = maps:get(server, State, '_'),
   HostMatch = maps:get(host, State, '_'),
-  Trails = trails:all('_', HostMatch),
+  Trails = trails:all(Server, HostMatch),
   {cowboy_swagger:to_json(Trails), Req, State}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -60,7 +63,7 @@ handle_get(Req, State) ->
 %%      that returns the `swagger.json'.
 -spec trails() -> trails:trails().
 trails() -> trails(#{}).
--spec trails(Options::map()) -> trails:trails().
+-spec trails(Options::options()) -> trails:trails().
 trails(Options) ->
   StaticFiles =
     case application:get_env(cowboy_swagger, static_files) of

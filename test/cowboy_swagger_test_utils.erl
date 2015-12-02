@@ -5,10 +5,7 @@
         , end_per_suite/1
         ]).
 -export([ api_call/2
-        , api_call/3
         , api_call/4
-        , api_call/5
-        , api_call/6
         ]).
 
 -type config() :: proplists:proplist().
@@ -30,30 +27,18 @@ end_per_suite(Config) ->
 
 -spec api_call(atom(), string()) -> #{}.
 api_call(Method, Uri) ->
-  api_call(Method, Uri, #{}).
+  api_call(Method, Uri, "example", 8080).
 
--spec api_call(atom(), string(), #{}) -> #{}.
-api_call(Method, Uri, Headers) ->
-  api_call(Method, Uri, Headers, []).
-
--spec api_call(atom(), string(), #{}, iodata()) -> #{}.
-api_call(Method, Uri, Headers, Body) ->
-  api_call(Method, Uri, Headers, Body, 'example').
-
-api_call(Method, Uri, Headers, Body, AppConfig) ->
-  api_call(Method, Uri, Headers, Body, AppConfig, 'http_port').
-
-api_call(Method, Uri, Headers, Body, App, ConfigKey) ->
-  {ok, Pid} = case App of
-    example ->
-      Port = application:get_env(example, ConfigKey, 8080),
+-spec api_call(atom(), string(), string(), integer()) -> #{}.
+api_call(Method, Uri, HostMatch, Port) ->
+  {ok, Pid} = case HostMatch of
+    "example" ->
       shotgun:open("localhost", Port);
     _ ->
-      #{host := HostMatch, port := Port} =
-        application:get_env(App, ConfigKey, #{}),
       shotgun:open(HostMatch, Port)
   end,
   try
+    Headers = #{}, Body = [],
     {ok, Response} = shotgun:request(Pid, Method, Uri, Headers, Body, #{}),
     Response
   after
