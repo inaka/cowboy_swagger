@@ -96,10 +96,9 @@ trails(Options) ->
 cowboy_swagger_priv() ->
   case code:priv_dir(cowboy_swagger) of
     {error, bad_name} ->
-      filename:join(
-        [ filename:dirname(code:which(cowboy_swagger_handler))
-        , ".."
-        , "priv"
-        ]);
+      case code:which(cowboy_swagger_handler) of
+        cover_compiled -> "../../priv"; % required for tests to work
+        BeamPath -> filename:join([filename:dirname(BeamPath) , ".." , "priv"])
+      end;
     Path -> Path
   end.

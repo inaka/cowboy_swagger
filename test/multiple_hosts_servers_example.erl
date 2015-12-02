@@ -47,11 +47,7 @@ start_phase(start_multiple_hosts_servers_example_http, _StartType, []) ->
 
   trails:store(api1, Routes1),
   Dispatch1 = trails:compile(Routes1),
-  RanchOptions1 = [{port, Port1}],
-  CowboyOptions1 =
-    [{env, [{dispatch, Dispatch1}]}, {compress, true}, {timeout, 12000}],
-  {ok, _} =
-    cowboy:start_http(api1, ListenerCount, RanchOptions1, CowboyOptions1),
+  {ok, _} = start_cowboy(api1, ListenerCount, Dispatch1, Port1),
 
   Trails21 =
     trails:trails([host1_handler, example_echo_handler]) ++
@@ -59,9 +55,12 @@ start_phase(start_multiple_hosts_servers_example_http, _StartType, []) ->
 
   trails:store(api2, Trails21),
   Dispatch2 = trails:single_host_compile(Trails21),
-  RanchOptions2 = [{port, Port2}],
-  CowboyOptions2 =
-    [{env, [{dispatch, Dispatch2}]}, {compress, true}, {timeout, 12000}],
-  {ok, _} =
-    cowboy:start_http(api2, ListenerCount, RanchOptions2, CowboyOptions2),
+  {ok, _} = start_cowboy(api2, ListenerCount, Dispatch2, Port2),
   ok.
+
+%% @private
+start_cowboy(Server, ListenerCount, Dispatch, Port) ->
+  RanchOptions = [{port, Port}],
+  CowboyOptions =
+    [{env, [{dispatch, Dispatch}]}, {compress, true}, {timeout, 12000}],
+  cowboy:start_http(Server, ListenerCount, RanchOptions, CowboyOptions).

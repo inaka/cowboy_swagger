@@ -27,16 +27,11 @@ end_per_suite(Config) ->
 
 -spec api_call(atom(), string()) -> #{}.
 api_call(Method, Uri) ->
-  api_call(Method, Uri, "example", 8080).
+  api_call(Method, Uri, "localhost", 8080).
 
 -spec api_call(atom(), string(), string(), integer()) -> #{}.
 api_call(Method, Uri, HostMatch, Port) ->
-  {ok, Pid} = case HostMatch of
-    "example" ->
-      shotgun:open("localhost", Port);
-    _ ->
-      shotgun:open(HostMatch, Port)
-  end,
+  {ok, Pid} = shotgun:open(HostMatch, Port),
   try
     Headers = #{}, Body = [],
     {ok, Response} = shotgun:request(Pid, Method, Uri, Headers, Body, #{}),
