@@ -25,14 +25,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% @hidden
--spec init({atom(), atom()}, cowboy_req:req(), state()) ->
+-spec init({atom(), atom()}, cowboy_req:req(), options()) ->
   {upgrade, protocol, cowboy_rest}.
 init(_Transport, _Req, _Opts) ->
   {upgrade, protocol, cowboy_rest}.
 
 %% @hidden
--spec rest_init(cowboy_req:req(), state()) ->
-  {ok, cowboy_req:req(), state()}.
+-spec rest_init(cowboy_req:req(), options()) ->
+  {ok, cowboy_req:req(), options()}.
 rest_init(Req, Opts) ->
   {ok, Req, Opts}.
 

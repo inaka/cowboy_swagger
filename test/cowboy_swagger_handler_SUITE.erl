@@ -9,8 +9,8 @@
         ]).
 
 %% Test cases
--export([handler_test/1,
-         multiple_hosts_test/1]).
+-export([ handler_test/1
+        , multiple_hosts_test/1]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Common test
