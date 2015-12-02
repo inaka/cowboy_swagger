@@ -23,7 +23,7 @@ LOCAL_DEPS := tools compiler syntax_tools common_test inets test_server dialyzer
 TEST_ERLC_OPTS += +debug_info
 CT_OPTS = -cover test/cowboy_swagger.coverspec -erl_args -config ${CONFIG}
 
-SHELL_OPTS = -s sync
+SHELL_OPTS = -s sync -config ${CONFIG}
 
 quicktests: app
 	@$(MAKE) --no-print-directory app-build test-dir ERLC_OPTS="$(TEST_ERLC_OPTS)"

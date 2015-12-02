@@ -5,7 +5,6 @@
         , end_per_suite/1
         ]).
 -export([ api_call/2
-        , api_call/3
         , api_call/4
         ]).
 
@@ -28,17 +27,13 @@ end_per_suite(Config) ->
 
 -spec api_call(atom(), string()) -> #{}.
 api_call(Method, Uri) ->
-  api_call(Method, Uri, #{}).
+  api_call(Method, Uri, "localhost", 8080).
 
--spec api_call(atom(), string(), #{}) -> #{}.
-api_call(Method, Uri, Headers) ->
-  api_call(Method, Uri, Headers, []).
-
--spec api_call(atom(), string(), #{}, iodata()) -> #{}.
-api_call(Method, Uri, Headers, Body) ->
-  Port = application:get_env(example, http_port, 8080),
-  {ok, Pid} = shotgun:open("localhost", Port),
+-spec api_call(atom(), string(), string(), integer()) -> #{}.
+api_call(Method, Uri, HostMatch, Port) ->
+  {ok, Pid} = shotgun:open(HostMatch, Port),
   try
+    Headers = #{}, Body = [],
     {ok, Response} = shotgun:request(Pid, Method, Uri, Headers, Body, #{}),
     Response
   after

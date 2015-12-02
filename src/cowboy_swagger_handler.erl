@@ -14,25 +14,27 @@
 
 %% Trails
 -behaviour(trails_handler).
--export([trails/0]).
+-export([trails/0, trails/1]).
 
 -type state() :: #{}.
+-type route_match() :: '_' | iodata().
+-type options() :: #{server => ranch:ref(), host => route_match()}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Cowboy Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% @hidden
--spec init({atom(), atom()}, cowboy_req:req(), state()) ->
+-spec init({atom(), atom()}, cowboy_req:req(), options()) ->
   {upgrade, protocol, cowboy_rest}.
 init(_Transport, _Req, _Opts) ->
   {upgrade, protocol, cowboy_rest}.
 
 %% @hidden
--spec rest_init(cowboy_req:req(), state()) ->
-  {ok, cowboy_req:req(), term()}.
-rest_init(Req, _Opts) ->
-  {ok, Req, #{}}.
+-spec rest_init(cowboy_req:req(), options()) ->
+  {ok, cowboy_req:req(), options()}.
+rest_init(Req, Opts) ->
+  {ok, Req, Opts}.
 
 %% @hidden
 -spec content_types_provided(cowboy_req:req(), state()) ->
@@ -46,7 +48,9 @@ content_types_provided(Req, State) ->
 
 %% @hidden
 handle_get(Req, State) ->
-  Trails = trails:all(),
+  Server = maps:get(server, State, '_'),
+  HostMatch = maps:get(host, State, '_'),
+  Trails = trails:all(Server, HostMatch),
   {cowboy_swagger:to_json(Trails), Req, State}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -54,10 +58,13 @@ handle_get(Req, State) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% @hidden
-%% @doc Implementets `trails_handler:trails/0' callback. This function returns
+%% @doc Implements `trails_handler:trails/0' callback. This function returns
 %%      trails routes for both: static content (Swagger-UI) and this handler
 %%      that returns the `swagger.json'.
-trails() ->
+-spec trails() -> trails:trails().
+trails() -> trails(#{}).
+-spec trails(Options::options()) -> trails:trails().
+trails(Options) ->
   StaticFiles =
     case application:get_env(cowboy_swagger, static_files) of
       {ok, Val} -> Val;
@@ -81,7 +88,7 @@ trails() ->
       }
     },
   Handler = trails:trail(
-    "/api-docs/swagger.json", cowboy_swagger_handler, [], MD),
+    "/api-docs/swagger.json", cowboy_swagger_handler, Options, MD),
   [Static1, Handler, Static2].
 
 %% @private
@@ -89,10 +96,9 @@ trails() ->
 cowboy_swagger_priv() ->
   case code:priv_dir(cowboy_swagger) of
     {error, bad_name} ->
-      filename:join(
-        [ filename:dirname(code:which(cowboy_swagger_handler))
-        , ".."
-        , "priv"
-        ]);
+      case code:which(cowboy_swagger_handler) of
+        cover_compiled -> "../../priv"; % required for tests to work
+        BeamPath -> filename:join([filename:dirname(BeamPath) , ".." , "priv"])
+      end;
     Path -> Path
   end.
