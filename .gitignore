@@ -12,4 +12,5 @@ rel/example_project
 .concrete/DEV_MODE
 .rebar
 .erlang.mk
+log
 logs
