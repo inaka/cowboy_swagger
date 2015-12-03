@@ -161,6 +161,5 @@ test_trails() ->
                }
      },
   [trails:trail("/a/[:b/[:c/[:d]]]", handler1, [], Metadata),
-    trails:trail("/a/:b/[:c]", handler2, [], Metadata),
-    trails:trail("/api-docs", cowboy_swagger_handler, [], Metadata),
-    trails:trail("/[...]", cowboy_swagger_handler, [], Metadata)].
+   trails:trail("/a/:b/[:c]", handler2, [], Metadata) |
+   cowboy_swagger_handler:trails()].
