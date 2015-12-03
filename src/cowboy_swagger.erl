@@ -92,17 +92,18 @@ validate_metadata(Metadata) ->
 -spec filter_cowboy_swagger_handler([trails:trail()]) -> [trails:trail()].
 filter_cowboy_swagger_handler(Trails) ->
   F = fun(Trail) ->
-    case trails:handler(Trail) of
-      cowboy_swagger_handler  -> false;
-      cowboy_static           -> false;
-      _                       -> true
-    end
+    MD = trails:metadata(Trail),
+    maps:size(maps:filter(fun is_visible/2, MD)) /= 0
   end,
   lists:filter(F, Trails).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Private API.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% @private
+is_visible(_Method, Metadata) ->
+  not maps:get(hidden, Metadata, false).
 
 %% @private
 swagger_paths([], Acc) ->

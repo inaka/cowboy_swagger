@@ -3,55 +3,12 @@
 %%%      Swagger-UI (located in `priv/swagger' folder).
 -module(cowboy_swagger_handler).
 
-%% Cowboy callbacks
--export([ init/3
-        , rest_init/2
-        , content_types_provided/2
-        ]).
-
-%% Handlers
--export([handle_get/2]).
-
 %% Trails
 -behaviour(trails_handler).
 -export([trails/0, trails/1]).
 
--type state() :: #{}.
 -type route_match() :: '_' | iodata().
 -type options() :: #{server => ranch:ref(), host => route_match()}.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Cowboy Callbacks
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% @hidden
--spec init({atom(), atom()}, cowboy_req:req(), options()) ->
-  {upgrade, protocol, cowboy_rest}.
-init(_Transport, _Req, _Opts) ->
-  {upgrade, protocol, cowboy_rest}.
-
-%% @hidden
--spec rest_init(cowboy_req:req(), options()) ->
-  {ok, cowboy_req:req(), options()}.
-rest_init(Req, Opts) ->
-  {ok, Req, Opts}.
-
-%% @hidden
--spec content_types_provided(cowboy_req:req(), state()) ->
-  {[term()], cowboy_req:req(), state()}.
-content_types_provided(Req, State) ->
-  {[{<<"application/json">>, handle_get}], Req, State}.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Handlers
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% @hidden
-handle_get(Req, State) ->
-  Server = maps:get(server, State, '_'),
-  HostMatch = maps:get(host, State, '_'),
-  Trails = trails:all(Server, HostMatch),
-  {cowboy_swagger:to_json(Trails), Req, State}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Trails
@@ -70,26 +27,20 @@ trails(Options) ->
       {ok, Val} -> Val;
       _         -> filename:join(cowboy_swagger_priv(), "swagger")
     end,
-  Static1 = trails:trail(
+  Redirect = trails:trail(
     "/api-docs",
-    cowboy_static,
+    cowboy_swagger_redirect_handler,
     {file, StaticFiles ++ "/index.html"},
-    #{get => #{tags => ["static-content"], description => "index.html"}}),
-  Static2 = trails:trail(
+    #{get => #{hidden => true}}),
+  Static = trails:trail(
     "/api-docs/[...]",
     cowboy_static,
     {dir, StaticFiles, [{mimetypes, cow_mimetypes, all}]},
-    #{get => #{tags => ["static-content"], description => "Static Content"}}),
-  MD =
-    #{get =>
-      #{tags => ["api-docs"],
-        description => "Retrives swagger's specification.",
-        produces => ["application/json"]
-      }
-    },
+    #{get => #{hidden => true}}),
+  MD = #{get => #{hidden => true}},
   Handler = trails:trail(
-    "/api-docs/swagger.json", cowboy_swagger_handler, Options, MD),
-  [Static1, Handler, Static2].
+    "/api-docs/swagger.json", cowboy_swagger_json_handler, Options, MD),
+  [Redirect, Handler, Static].
 
 %% @private
 -spec cowboy_swagger_priv() -> string().
