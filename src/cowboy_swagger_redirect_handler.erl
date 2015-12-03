@@ -1,17 +1,13 @@
 -module(cowboy_swagger_redirect_handler).
 
 %% Cowboy callbacks
--export([ init/3
-        , rest_init/2
-        , content_types_provided/2
-        ]).
+-export([init/3]).
 
 %% Handlers
 -export([resource_exists/2, previously_existed/2, moved_permanently/2]).
 
 -type state() :: #{}.
--type route_match() :: '_' | iodata().
--type options() :: #{server => ranch:ref(), host => route_match()}.
+-type options() :: any().
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Cowboy Callbacks
@@ -22,18 +18,6 @@
   {upgrade, protocol, cowboy_rest}.
 init(_Transport, _Req, _Opts) ->
   {upgrade, protocol, cowboy_rest}.
-
-%% @hidden
--spec rest_init(cowboy_req:req(), options()) ->
-  {ok, cowboy_req:req(), options()}.
-rest_init(Req, Opts) ->
-  {ok, Req, Opts}.
-
-%% @hidden
--spec content_types_provided(cowboy_req:req(), state()) ->
-  {[term()], cowboy_req:req(), state()}.
-content_types_provided(Req, State) ->
-  {[{<<"application/json">>, handle_get}], Req, State}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Handlers
