@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.1.0-otp17.](https://github.com/inaka/cowboy-swagger/tree/0.1.0-otp17.) (2015-12-15)
+[Full Changelog](https://github.com/inaka/cowboy-swagger/compare/0.1.0...0.1.0-otp17.)
+
+**Closed issues:**
+
+- Location in response headers is not reading path values [\#43](https://github.com/inaka/cowboy-swagger/issues/43)
+
 ## [0.1.0](https://github.com/inaka/cowboy-swagger/tree/0.1.0) (2015-12-03)
 [Full Changelog](https://github.com/inaka/cowboy-swagger/compare/0.0.1...0.1.0)
 
@@ -15,12 +22,14 @@
 
 **Closed issues:**
 
+- Version Bump to 0.1.0 [\#37](https://github.com/inaka/cowboy-swagger/issues/37)
 - Allow more than one server running on the same node [\#34](https://github.com/inaka/cowboy-swagger/issues/34)
 - Add Meta Testing [\#30](https://github.com/inaka/cowboy-swagger/issues/30)
 - basePath should be considered part of the trails path [\#25](https://github.com/inaka/cowboy-swagger/issues/25)
 
 **Merged pull requests:**
 
+- \[Fix \#37\] Bump version to 0.1.0 [\#42](https://github.com/inaka/cowboy-swagger/pull/42) ([harenson](https://github.com/harenson))
 - \[Fix \#38\] Add redirect for /api-docs ... [\#41](https://github.com/inaka/cowboy-swagger/pull/41) ([harenson](https://github.com/harenson))
 - \[\#25\] Add basePath to swaggerSpec [\#40](https://github.com/inaka/cowboy-swagger/pull/40) ([harenson](https://github.com/harenson))
 - \[Fix \#34\] Allow more than one server running on the same node [\#39](https://github.com/inaka/cowboy-swagger/pull/39) ([harenson](https://github.com/harenson))

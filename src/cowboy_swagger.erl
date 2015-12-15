@@ -93,13 +93,16 @@ validate_metadata(Metadata) ->
 filter_cowboy_swagger_handler(Trails) ->
   F = fun(Trail) ->
     MD = trails:metadata(Trail),
-    maps:size(maps:filter(fun is_visible/2, MD)) /= 0
+    maps:size(maps_filter(fun is_visible/2, MD)) /= 0
   end,
   lists:filter(F, Trails).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Private API.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+maps_filter(Pred, Map) when is_function(Pred, 2), is_map(Map) ->
+    maps:from_list([{K, V} || {K, V} <- maps:to_list(Map), Pred(K, V)]).
 
 %% @private
 is_visible(_Method, Metadata) ->
