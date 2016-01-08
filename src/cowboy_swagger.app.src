@@ -9,6 +9,13 @@
     trails
    ]},
   {modules, []},
-  {registered, []}
+  {registered, []},
+  {maintainers,["Inaka"]},
+  {licenses,["Apache 2.0"]},
+  {links,[ {"Github","https://github.com/inaka/cowboy-swagger"},
+           {"Blog", "http://inaka.net/blog/2015/08/19/cowboy-swagger/"},
+           {"Example", "https://github.com/inaka/cowboy-swagger/tree/master/example"}
+         ]},
+  {build_tools,["make", "rebar"]}
  ]
 }.
