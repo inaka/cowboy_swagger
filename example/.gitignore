@@ -5,7 +5,14 @@
 .DS_Store
 all.coverdata
 bin
-deps
+/deps/cowboy
+/deps/cowlib
+/deps/hexer_mk
+/deps/inaka_mk
+/deps/jiffy
+/deps/mixer
+/deps/ranch
+/deps/trails
 ebin
 erl_crash.dump
 log

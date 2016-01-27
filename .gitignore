@@ -2,7 +2,7 @@ _rel/
 relx
 *.d
 .eunit
-deps
+/deps
 *.o
 *.beam
 *.plt
