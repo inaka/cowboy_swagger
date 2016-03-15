@@ -1,5 +1,34 @@
 # Change Log
 
+## [1.0.2](https://github.com/inaka/cowboy-swagger/tree/1.0.2) (2016-03-15)
+[Full Changelog](https://github.com/inaka/cowboy-swagger/compare/1.0.1...1.0.2)
+
+**Closed issues:**
+
+- Update repo and make it ready for hex.pm [\#53](https://github.com/inaka/cowboy-swagger/issues/53)
+- Wrong inaka\_mixer dependency [\#51](https://github.com/inaka/cowboy-swagger/issues/51)
+
+**Merged pull requests:**
+
+- \[Fix \#53\] Update dependencies; Update erlang.mk; Add ruleset to elvis config [\#54](https://github.com/inaka/cowboy-swagger/pull/54) ([harenson](https://github.com/harenson))
+- Example application uses local soruces [\#48](https://github.com/inaka/cowboy-swagger/pull/48) ([jeanparpaillon](https://github.com/jeanparpaillon))
+
+## [1.0.1](https://github.com/inaka/cowboy-swagger/tree/1.0.1) (2016-01-08)
+[Full Changelog](https://github.com/inaka/cowboy-swagger/compare/0.1.0-otp17...1.0.1)
+
+**Merged pull requests:**
+
+- \[\#quick\] upgrade hexer.mk [\#46](https://github.com/inaka/cowboy-swagger/pull/46) ([elbrujohalcon](https://github.com/elbrujohalcon))
+- Update deps in rebar.config according to Makefile [\#45](https://github.com/inaka/cowboy-swagger/pull/45) ([define-null](https://github.com/define-null))
+- Hex Package [\#33](https://github.com/inaka/cowboy-swagger/pull/33) ([elbrujohalcon](https://github.com/elbrujohalcon))
+
+## [0.1.0-otp17](https://github.com/inaka/cowboy-swagger/tree/0.1.0-otp17) (2015-12-15)
+[Full Changelog](https://github.com/inaka/cowboy-swagger/compare/0.1.0...0.1.0-otp17)
+
+**Closed issues:**
+
+- Location in response headers is not reading path values [\#43](https://github.com/inaka/cowboy-swagger/issues/43)
+
 ## [0.1.0](https://github.com/inaka/cowboy-swagger/tree/0.1.0) (2015-12-03)
 [Full Changelog](https://github.com/inaka/cowboy-swagger/compare/0.0.1...0.1.0)
 
@@ -15,12 +44,14 @@
 
 **Closed issues:**
 
+- Version Bump to 0.1.0 [\#37](https://github.com/inaka/cowboy-swagger/issues/37)
 - Allow more than one server running on the same node [\#34](https://github.com/inaka/cowboy-swagger/issues/34)
 - Add Meta Testing [\#30](https://github.com/inaka/cowboy-swagger/issues/30)
 - basePath should be considered part of the trails path [\#25](https://github.com/inaka/cowboy-swagger/issues/25)
 
 **Merged pull requests:**
 
+- \[Fix \#37\] Bump version to 0.1.0 [\#42](https://github.com/inaka/cowboy-swagger/pull/42) ([harenson](https://github.com/harenson))
 - \[Fix \#38\] Add redirect for /api-docs ... [\#41](https://github.com/inaka/cowboy-swagger/pull/41) ([harenson](https://github.com/harenson))
 - \[\#25\] Add basePath to swaggerSpec [\#40](https://github.com/inaka/cowboy-swagger/pull/40) ([harenson](https://github.com/harenson))
 - \[Fix \#34\] Allow more than one server running on the same node [\#39](https://github.com/inaka/cowboy-swagger/pull/39) ([harenson](https://github.com/harenson))
@@ -44,7 +75,7 @@
 **Merged pull requests:**
 
 - \[\#1\] Fixed documentation in modules. Fixed README. [\#21](https://github.com/inaka/cowboy-swagger/pull/21) ([cabol](https://github.com/cabol))
-- Make link text and href point at the same URL [\#18](https://github.com/inaka/cowboy-swagger/pull/18) ([lavrin](https://github.com/lavrin))
+- Make link text and href point at the same URL [\#18](https://github.com/inaka/cowboy-swagger/pull/18) ([erszcz](https://github.com/erszcz))
 - \[\#1\] fulfil open source list: README. [\#17](https://github.com/inaka/cowboy-swagger/pull/17) ([cabol](https://github.com/cabol))
 - \[\#1\] Fulfil the open-source check-list: implemented example. [\#15](https://github.com/inaka/cowboy-swagger/pull/15) ([cabol](https://github.com/cabol))
 -  \[\#9\] Validate mandatory fields in the metadata. [\#14](https://github.com/inaka/cowboy-swagger/pull/14) ([cabol](https://github.com/cabol))
