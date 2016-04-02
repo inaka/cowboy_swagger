@@ -123,7 +123,9 @@ normalize_path(Path) ->
 normalize_map_values(Map) when is_map(Map) ->
   normalize_map_values(maps:to_list(Map));
 normalize_map_values(Proplist) ->
-  F = fun({K, V}, Acc) when is_list(V) ->
+  F = fun({K, []}, Acc) ->
+        maps:put(K, normalize_list_values([]), Acc);
+      ({K, V}, Acc) when is_list(V) ->
         case io_lib:printable_list(V) of
           true  -> maps:put(K, list_to_binary(V), Acc);
           false -> maps:put(K, normalize_list_values(V), Acc)
