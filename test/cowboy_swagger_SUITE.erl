@@ -108,11 +108,16 @@ to_json_test(_Config) ->
           ],
           <<"responses">> := #{<<"200">> := #{<<"description">> := <<"bla">>}}
         }
-      }
+      },
+    <<"/a">> :=
+    #{<<"get">> := #{<<"description">> := <<"bla bla bla">>,
+      <<"parameters">> := [],
+      <<"produces">> := [<<"application/json">>],
+      <<"responses">> := #{<<"200">> := #{<<"description">> := <<"bla">>}}}}
     }
   } = Result,
   #{<<"paths">> := Paths} = Result,
-  2 = maps:size(Paths),
+  3 = maps:size(Paths),
   {comment, ""}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -160,6 +165,14 @@ test_trails() ->
                 responses => #{<<"200">> => #{description => "bla"}}
                }
      },
+  Metadata1 =
+    #{
+      get => #{description => <<"bla bla bla">>,
+        produces => ["application/json"],
+        responses => #{<<"200">> => #{description => "bla"}}
+      }
+    },
   [trails:trail("/a/[:b/[:c/[:d]]]", handler1, [], Metadata),
-   trails:trail("/a/:b/[:c]", handler2, [], Metadata) |
+   trails:trail("/a/:b/[:c]", handler2, [], Metadata),
+   trails:trail("/a", handler3, [], Metadata1)|
    cowboy_swagger_handler:trails()].
