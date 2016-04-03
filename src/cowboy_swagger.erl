@@ -6,7 +6,7 @@
 
 %% Utilities
 -export([enc_json/1, dec_json/1]).
--export([swagger_paths/1, validate_metadata/1]).
+-export([swagger_paths/1, validate_metadata_path/1]).
 -export([filter_cowboy_swagger_handler/1]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -57,6 +57,7 @@ to_json(Trails) ->
   SanitizeTrails = filter_cowboy_swagger_handler(Trails),
   ApiRoot = list_to_binary(trails:api_root()),
   SwaggerSpec = GlobalSpec#{paths => swagger_paths(SanitizeTrails),
+                            definitions => swagger_definitions(SanitizeTrails),
                             basePath => ApiRoot},
   enc_json(SwaggerSpec).
 
@@ -84,9 +85,19 @@ swagger_paths(Trails) ->
   swagger_paths(Trails, #{}).
 
 %% @hidden
--spec validate_metadata(trails:metadata(_)) -> metadata().
-validate_metadata(Metadata) ->
-  validate_swagger_map(Metadata).
+-spec swagger_definitions([trails:trail()]) -> map().
+swagger_definitions(Trails) ->
+  swagger_definitions(Trails, #{}).
+
+%% @hidden
+-spec validate_metadata_path(trails:metadata(_)) -> metadata().
+validate_metadata_path(Metadata) ->
+  validate_swagger_map_path(maps:remove(definitions, Metadata)).
+
+%% @hidden
+-spec validate_metadata_definitions(trails:metadata(_)) -> metadata().
+validate_metadata_definitions(Metadata) ->
+  maps:get(definitions, Metadata, #{}).
 
 %% @hidden
 -spec filter_cowboy_swagger_handler([trails:trail()]) -> [trails:trail()].
@@ -110,7 +121,7 @@ swagger_paths([], Acc) ->
   Acc;
 swagger_paths([Trail | T], Acc) ->
   Path = normalize_path(trails:path_match(Trail)),
-  Metadata = normalize_map_values(validate_metadata(trails:metadata(Trail))),
+  Metadata = normalize_map_values(validate_metadata_path(trails:metadata(Trail))),
   swagger_paths(T, maps:put(Path, Metadata, Acc)).
 
 %% @private
@@ -118,6 +129,13 @@ normalize_path(Path) ->
   re:replace(
     re:replace(Path, "\\:\\w+", "\\{&\\}", [global]),
     "\\[|\\]|\\:", "", [{return, binary}, global]).
+
+%% @private
+swagger_definitions([], Acc) ->
+  Acc;
+swagger_definitions([Trail | T], Acc) ->
+  Definitions = normalize_map_values(validate_metadata_definitions(trails:metadata(Trail))),
+  swagger_definitions(T, maps:merge(Definitions, Acc)).
 
 %% @private
 normalize_map_values(Map) when is_map(Map) ->
@@ -152,7 +170,7 @@ normalize_list_values(List) ->
   lists:foldl(F, [], List).
 
 %% @private
-validate_swagger_map(Map) ->
+validate_swagger_map_path(Map) ->
   F = fun(_K, V) ->
         Params = validate_swagger_map_params(maps:get(parameters, V, [])),
         Responses = validate_swagger_map_responses(maps:get(responses, V, #{})),
