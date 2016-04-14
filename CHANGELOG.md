@@ -1,15 +1,32 @@
 # Change Log
 
+## [1.0.3](https://github.com/inaka/cowboy-swagger/tree/1.0.3) (2016-04-14)
+[Full Changelog](https://github.com/inaka/cowboy-swagger/compare/1.0.2...1.0.3)
+
+**Fixed bugs:**
+
+- Use cp instead of symlink for example deps [\#59](https://github.com/inaka/cowboy-swagger/pull/59) ([elbrujohalcon](https://github.com/elbrujohalcon))
+
+**Closed issues:**
+
+- Switch build tools to erlang.mk and republish to hex.pm [\#47](https://github.com/inaka/cowboy-swagger/issues/47)
+
+**Merged pull requests:**
+
+- Handles the property parameter  as json list when it's empty [\#57](https://github.com/inaka/cowboy-swagger/pull/57) ([joaohf](https://github.com/joaohf))
+
 ## [1.0.2](https://github.com/inaka/cowboy-swagger/tree/1.0.2) (2016-03-15)
 [Full Changelog](https://github.com/inaka/cowboy-swagger/compare/1.0.1...1.0.2)
 
 **Closed issues:**
 
+- Bump version to 1.0.2 [\#55](https://github.com/inaka/cowboy-swagger/issues/55)
 - Update repo and make it ready for hex.pm [\#53](https://github.com/inaka/cowboy-swagger/issues/53)
 - Wrong inaka\_mixer dependency [\#51](https://github.com/inaka/cowboy-swagger/issues/51)
 
 **Merged pull requests:**
 
+- \[Fix \#55\] Bump version to 1.0.2 [\#56](https://github.com/inaka/cowboy-swagger/pull/56) ([harenson](https://github.com/harenson))
 - \[Fix \#53\] Update dependencies; Update erlang.mk; Add ruleset to elvis config [\#54](https://github.com/inaka/cowboy-swagger/pull/54) ([harenson](https://github.com/harenson))
 - Example application uses local soruces [\#48](https://github.com/inaka/cowboy-swagger/pull/48) ([jeanparpaillon](https://github.com/jeanparpaillon))
 
