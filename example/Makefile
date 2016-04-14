@@ -2,8 +2,8 @@ PROJECT = example
 
 DEPS = cowboy_swagger mixer
 
-dep_mixer          = git https://github.com/inaka/mixer.git      0.1.4
-dep_cowboy_swagger = git https://github.com/inaka/cowboy-swagger 0.0.1
+dep_mixer          = git https://github.com/inaka/mixer.git 0.1.4
+dep_cowboy_swagger = git https://github.com/inaka/cowboy-swagger.git
 
 include erlang.mk
 
