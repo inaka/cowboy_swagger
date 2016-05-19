@@ -6,7 +6,8 @@
   {applications,
    [kernel,
     stdlib,
-    trails
+    trails,
+    jiffy
    ]},
   {modules, []},
   {registered, []},
