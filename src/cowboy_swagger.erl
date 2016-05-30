@@ -2,7 +2,7 @@
 -module(cowboy_swagger).
 
 %% API
--export([to_json/1]).
+-export([to_json/1, add_definition/2]).
 
 %% Utilities
 -export([enc_json/1, dec_json/1]).
@@ -19,6 +19,7 @@
    , description => iodata()
    , required    => boolean()
    , type        => iodata()
+   , schema      => iodata()
    }.
 -export_type([parameter_obj/0]).
 
@@ -27,6 +28,20 @@
    }.
 -type responses_definitions() :: #{binary() => response_obj()}.
 -export_type([response_obj/0, responses_definitions/0]).
+
+-type parameter_definition_name () :: binary().
+-type property_obj() ::
+  #{binary() =>
+      #{ type => binary()
+       , description => binary()
+       , example => binary()
+       }}.
+-type parameters_definitions() ::
+  #{parameter_definition_name() =>
+      #{ type => binary()
+       , properties => property_obj()
+       }}.
+-export_type([parameter_definition_name/0, property_obj/0]).
 
 %% Swagger map spec
 -opaque swagger_map() ::
@@ -59,6 +74,19 @@ to_json(Trails) ->
   SwaggerSpec = GlobalSpec#{paths => swagger_paths(SanitizeTrails),
                             basePath => ApiRoot},
   enc_json(SwaggerSpec).
+
+-spec add_definition( Name::parameter_definition_name()
+                    , Properties::property_obj()
+                    ) ->
+  ok.
+add_definition(Name, Properties) ->
+  Definition = build_definition(Name, Properties),
+  CurrentSpec = application:get_env(cowboy_swagger, global_spec, #{}),
+  ExistingDefinitions = maps:get(definitions, CurrentSpec, #{}),
+  NewSpec = CurrentSpec#{definitions => maps:merge( ExistingDefinitions
+                                                  , Definition
+                                                  )},
+  application:set_env(cowboy_swagger, global_spec, NewSpec).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Utilities.
@@ -175,3 +203,13 @@ validate_swagger_map_params(Params) ->
 validate_swagger_map_responses(Responses) ->
   F = fun(_K, V) -> V#{description => maps:get(description, V, <<"">>)} end,
   maps:map(F, Responses).
+
+%% @private
+-spec build_definition( Name::parameter_definition_name()
+                      , Properties::property_obj()
+                      ) ->
+  parameters_definitions().
+build_definition(Name, Properties) ->
+  #{Name => #{ type => <<"object">>
+             , properties => Properties
+             }}.
