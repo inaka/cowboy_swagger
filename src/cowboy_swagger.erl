@@ -2,7 +2,7 @@
 -module(cowboy_swagger).
 
 %% API
--export([to_json/1, add_definition/2]).
+-export([to_json/1, add_definition/2, schema/1]).
 
 %% Utilities
 -export([enc_json/1, dec_json/1]).
@@ -87,6 +87,12 @@ add_definition(Name, Properties) ->
                                                   , Definition
                                                   )},
   application:set_env(cowboy_swagger, global_spec, NewSpec).
+
+-spec schema(DefinitionName::parameter_definition_name()) ->
+  binary().
+schema(DefinitionName) ->
+  #{<<"$ref">> => <<"#/definitions/", DefinitionName/binary>>}.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Utilities.

@@ -154,7 +154,7 @@ For adding definitions to your app, you have 2 choices:
 Let's say you want to describe a `POST` call to a `newspapers` endpoint that requires
 `name` and `description` fields only, you can do it like this:
 
-**Choice 1:**
+**Option 1:**
 ```erlang
 [ ... % other configurations
 , { cowboy_swagger
@@ -180,7 +180,7 @@ Let's say you want to describe a `POST` call to a `newspapers` endpoint that req
 ]
 ```
 
-**Choice2:**
+**Option 2:**
 
 For the second choice, you can do it for example in one or several `start_phases`,
 directly in your handler or any other place you want.
@@ -214,9 +214,8 @@ Now in your handler's trails callback function you can use it:
      , in => body
      , description => <<"request body (as json)">>
      , required => true
-     , schema => #{ % Note we are using the definitions here
-         <<"$ref">> => <<"#/definitions/RequestBody">>
-       }
+       % Use the previously created `RequestBody' definition
+     , schema => cowboy_swagger:schema(<<"RequestBody">>)
      },
   Metadata =
     #{ get =>
@@ -238,8 +237,8 @@ Now in your handler's trails callback function you can use it:
 ```
 
 What this does for you is add a nice `response`, `parameter` or `security`
-model in swagger-ui, so client developers can exactly know what parameters
-does the API expects for every endpoint.
+model in swagger-ui, so client developers will know exactly what parameters
+the API expects for every endpoint.
 
 ## Example
 For more information about `cowboy_swagger` and how to use it, please check this [Example](./example).
