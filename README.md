@@ -138,5 +138,107 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
 ].
 ```
 
+### Definitions
+
+[Definitions](http://swagger.io/specification/#definitionsObject) can be used for describing
+[parameters](http://swagger.io/specification/#parametersDefinitionsObject),
+[responses](http://swagger.io/specification/#responsesDefinitionsObject) and
+[security](http://swagger.io/specification/#securityDefinitionsObject) schemas.
+
+For adding definitions to your app, you have 2 choices:
+
+1. Add a `definitions` key to your cowboy_swagger `global_spec` map.
+2. Add them by calling `cowboy_swagger:add_definition/2` and send the
+   definition's name and properties.
+
+Let's say you want to describe a `POST` call to a `newspapers` endpoint that requires
+`name` and `description` fields only, you can do it like this:
+
+**Option 1:**
+```erlang
+[ ... % other configurations
+, { cowboy_swagger
+  , [ { global_spec
+      , #{ swagger => "2.0"
+         , info => #{title => "My app API"}
+         , definitions => #{
+             "RequestBody" =>
+               #{ "name" =>
+                   #{ "type" => "string"
+                    , "description" => "Newspaper name"
+                    }
+                , "description" =>
+                    #{ "type" => "string"
+                     , "description" => "Newspaper description"
+                     }
+                }
+           }
+         }
+      }
+    ]
+  }
+]
+```
+
+**Option 2:**
+
+For the second choice, you can do it for example in one or several `start_phases`,
+directly in your handler or any other place you want.
+
+```erlang
+-spec trails() -> trails:trails().
+trails() ->
+  DefinitionName = <<"RequestBody">>,
+  DefinitionProperties =
+    #{ <<"name">> =>
+         #{ type => <<"string">>
+          , description => <<"Newspaper name">>
+          }
+     , <<"description">> =>
+         #{ type => <<"string">>
+          , description => <<"Newspaper description">>
+          }
+     },
+  % Add the definition
+  ok = cowboy_swagger:add_definition(DefinitionName, DefinitionProperties),
+  ...
+```
+
+
+Now in your handler's trails callback function you can use it:
+
+```erlang
+...
+  RequestBody =
+    #{ name => <<"request body">>
+     , in => body
+     , description => <<"request body (as json)">>
+     , required => true
+       % Use the previously created `RequestBody' definition
+     , schema => cowboy_swagger:schema(<<"RequestBody">>)
+     },
+  Metadata =
+    #{ get =>
+       #{ tags => ["newspapers"]
+        , description => "Returns the list of newspapers"
+        , produces => ["application/json"]
+        }
+     , post =>
+       # { tags => ["newspapers"]
+         , description => "Creates a new newspaper"
+         , consumes => ["application/json"]
+         , produces => ["application/json"]
+         , parameters => [RequestBody] % and then use that parameter here
+         }
+     },
+  Path = "/newspapers",
+  Options = #{path => Path},
+  [trails:trail(Path, newspapers_handler, Options, Metadata)].
+```
+
+What this does for you is add a nice `response`, `parameter` or `security`
+model in swagger-ui, so client developers will know exactly what parameters
+the API expects for every endpoint.
+
 ## Example
 For more information about `cowboy_swagger` and how to use it, please check this [Example](./example).
