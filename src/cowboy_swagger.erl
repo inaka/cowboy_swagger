@@ -89,7 +89,7 @@ add_definition(Name, Properties) ->
   application:set_env(cowboy_swagger, global_spec, NewSpec).
 
 -spec schema(DefinitionName::parameter_definition_name()) ->
-  binary().
+  map().
 schema(DefinitionName) ->
   #{<<"$ref">> => <<"#/definitions/", DefinitionName/binary>>}.
 
