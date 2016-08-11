@@ -15,4 +15,4 @@
 
 -spec init_per_suite(config()) -> config().
 init_per_suite(Config) ->
-    [ {base_dir, "../.."} | Config].
+    [ {application, cowboy_swagger} | Config].

@@ -43,6 +43,8 @@ content_types_provided(Req, State) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% @hidden
+-spec handle_get(cowboy_req:req(), state()) ->
+  {iodata(), cowboy_req:req(), state()}.
 handle_get(Req, State) ->
   Server = maps:get(server, State, '_'),
   HostMatch = maps:get(host, State, '_'),
