@@ -1,5 +1,25 @@
 # Change Log
 
+## [1.1.0](https://github.com/inaka/cowboy-swagger/tree/1.1.0) (2016-08-11)
+[Full Changelog](https://github.com/inaka/cowboy-swagger/compare/1.0.3...1.1.0)
+
+**Fixed bugs:**
+
+- .app missing jiffy in applications section [\#64](https://github.com/inaka/cowboy-swagger/issues/64)
+
+**Closed issues:**
+
+- Move from erlang.mk to rebar3 [\#68](https://github.com/inaka/cowboy-swagger/issues/68)
+- Support for definitions and schemas [\#63](https://github.com/inaka/cowboy-swagger/issues/63)
+- Hello can this project support the cowboy REST part? [\#61](https://github.com/inaka/cowboy-swagger/issues/61)
+- Do whatever it takes to appears cowboy-swagger on "http://swagger.io/open-source-integrations/" [\#16](https://github.com/inaka/cowboy-swagger/issues/16)
+
+**Merged pull requests:**
+
+- \[Close \#68\] replace erlang.mk by rebar3 [\#69](https://github.com/inaka/cowboy-swagger/pull/69) ([Euen](https://github.com/Euen))
+- \[Fix \#63\] Add support for definitions and schemas [\#66](https://github.com/inaka/cowboy-swagger/pull/66) ([harenson](https://github.com/harenson))
+- Add missing jiffy app in .app.src [\#65](https://github.com/inaka/cowboy-swagger/pull/65) ([jeanparpaillon](https://github.com/jeanparpaillon))
+
 ## [1.0.3](https://github.com/inaka/cowboy-swagger/tree/1.0.3) (2016-04-14)
 [Full Changelog](https://github.com/inaka/cowboy-swagger/compare/1.0.2...1.0.3)
 
@@ -13,6 +33,7 @@
 
 **Merged pull requests:**
 
+- Version Bump to 1.0.3 [\#60](https://github.com/inaka/cowboy-swagger/pull/60) ([elbrujohalcon](https://github.com/elbrujohalcon))
 - Handles the property parameter  as json list when it's empty [\#57](https://github.com/inaka/cowboy-swagger/pull/57) ([joaohf](https://github.com/joaohf))
 
 ## [1.0.2](https://github.com/inaka/cowboy-swagger/tree/1.0.2) (2016-03-15)
