@@ -7,7 +7,7 @@
    [kernel,
     stdlib,
     trails,
-    jiffy
+    jsx
    ]},
   {modules, []},
   {registered, []},

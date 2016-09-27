@@ -27,7 +27,7 @@ all() ->
 to_json_test(_Config) ->
   Trails = test_trails(),
   SwaggerJson = cowboy_swagger:to_json(Trails),
-  Result = jiffy:decode(SwaggerJson, [return_maps]),
+  Result = jsx:decode(SwaggerJson, [return_maps]),
   #{<<"paths">> :=
     #{<<"/a/{b}/{c}">> :=
       #{<<"delete">> :=

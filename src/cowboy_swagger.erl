@@ -99,14 +99,14 @@ schema(DefinitionName) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% @hidden
--spec enc_json(jiffy:json_value()) -> iolist().
+-spec enc_json(jiffy:json_term()) -> iolist().
 enc_json(Json) ->
-  jiffy:encode(Json, [uescape]).
+  jsx:encode(Json, [uescape]).
 
 %% @hidden
--spec dec_json(iodata()) -> jiffy:json_value().
+-spec dec_json(iodata()) -> jiffy:json_term().
 dec_json(Data) ->
-  try jiffy:decode(Data, [return_maps])
+  try jsx:decode(Data, [return_maps])
   catch
     _:{error, _} ->
       throw(bad_json)

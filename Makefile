@@ -2,12 +2,12 @@ PROJECT = cowboy_swagger
 
 CONFIG ?= test/test.config
 
-DEPS = jiffy trails
+DEPS = jsx trails
 SHELL_DEPS = sync
 TEST_DEPS = katana_test mixer shotgun
 BUILD_DEPS = inaka_mk hexer_mk
 
-dep_jiffy       = hex 0.14.7
+dep_jsx         = hex 2.8.0
 dep_trails      = git https://github.com/inaka/cowboy-trails.git bc92848
 dep_sync        = git https://github.com/rustyio/sync.git        11df81d
 dep_mixer       = git https://github.com/inaka/mixer.git         0.1.5
