@@ -64,7 +64,7 @@
 %%      This function basically takes the metadata from each `trails:trail()'
 %%      (which must be compliant with Swagger specification) and builds the
 %%      required `swagger.json'.
--spec to_json([trails:trail()]) -> iolist().
+-spec to_json([trails:trail()]) -> jsx:json_text().
 to_json(Trails) ->
   Default = #{swagger => <<"2.0">>, info => #{title => <<"API-DOCS">>}},
   GlobalSpec = normalize_map_values(
@@ -99,14 +99,14 @@ schema(DefinitionName) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% @hidden
--spec enc_json(jiffy:json_value()) -> iolist().
+-spec enc_json(jsx:json_term()) -> jsx:json_text().
 enc_json(Json) ->
-  jiffy:encode(Json, [uescape]).
+  jsx:encode(Json, [uescape]).
 
 %% @hidden
--spec dec_json(iodata()) -> jiffy:json_value().
+-spec dec_json(iodata()) -> jsx:json_term().
 dec_json(Data) ->
-  try jiffy:decode(Data, [return_maps])
+  try jsx:decode(Data, [return_maps])
   catch
     _:{error, _} ->
       throw(bad_json)

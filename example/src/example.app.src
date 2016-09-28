@@ -5,7 +5,7 @@
   {applications,
    [kernel,
     stdlib,
-    jiffy,
+    jsx,
     cowboy,
     trails,
     cowboy_swagger
