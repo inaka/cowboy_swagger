@@ -8,6 +8,13 @@
         , api_call/4
         ]).
 
+-type response() :: #{ status_code => integer()
+                     , headers => [tuple()]
+                     , body => binary()
+                     }.
+
+-type result()   :: {ok, reference() | response()} | {error, term()}.
+
 -type config() :: proplists:proplist().
 -export_type([config/0]).
 
@@ -25,11 +32,11 @@ init_per_suite(Config) ->
 end_per_suite(Config) ->
   Config.
 
--spec api_call(atom(), string()) -> #{}.
+-spec api_call(atom(), string()) -> response().
 api_call(Method, Uri) ->
   api_call(Method, Uri, "localhost", 8080).
 
--spec api_call(atom(), string(), string(), integer()) -> #{}.
+-spec api_call(atom(), string(), string(), integer()) -> response().
 api_call(Method, Uri, HostMatch, Port) ->
   {ok, Pid} = shotgun:open(HostMatch, Port),
   try
