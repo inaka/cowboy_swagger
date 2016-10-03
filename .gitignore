@@ -16,3 +16,4 @@ log
 logs
 doc
 _build
+example/compile_commands.json
