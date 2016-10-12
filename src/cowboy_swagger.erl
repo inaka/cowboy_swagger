@@ -30,12 +30,13 @@
 -export_type([response_obj/0, responses_definitions/0]).
 
 -type parameter_definition_name () :: binary().
--type property_obj() ::
-  #{binary() =>
-      #{ type => binary()
-       , description => binary()
-       , example => binary()
-       }}.
+-type property_desc() ::
+  #{ type => binary()
+  , description => binary()
+  , example => binary()
+  , items => property_desc()
+  }.
+-type property_obj() :: #{binary() => property_desc()}.
 -type parameters_definitions() ::
   #{parameter_definition_name() =>
       #{ type => binary()
