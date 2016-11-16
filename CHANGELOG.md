@@ -1,5 +1,23 @@
 # Change Log
 
+## [1.2.0](https://github.com/inaka/cowboy-swagger/tree/1.2.0) (2016-11-16)
+[Full Changelog](https://github.com/inaka/cowboy-swagger/compare/1.1.0...1.2.0)
+
+**Fixed bugs:**
+
+- Broken implementation of jsx [\#79](https://github.com/inaka/cowboy-swagger/issues/79)
+
+**Closed issues:**
+
+- Definitions description in README [\#73](https://github.com/inaka/cowboy-swagger/issues/73)
+- Update example to rebar3 [\#72](https://github.com/inaka/cowboy-swagger/issues/72)
+
+**Merged pull requests:**
+
+- fixed dialyser error 'no local return' then definition includes an array [\#80](https://github.com/inaka/cowboy-swagger/pull/80) ([freke](https://github.com/freke))
+- \[Close \#72\] update example build tool to rebar3 [\#77](https://github.com/inaka/cowboy-swagger/pull/77) ([Euen](https://github.com/Euen))
+- Replace jiffy by jsx [\#76](https://github.com/inaka/cowboy-swagger/pull/76) ([BernardNotarianni](https://github.com/BernardNotarianni))
+
 ## [1.1.0](https://github.com/inaka/cowboy-swagger/tree/1.1.0) (2016-08-11)
 [Full Changelog](https://github.com/inaka/cowboy-swagger/compare/1.0.3...1.1.0)
 
@@ -9,6 +27,7 @@
 
 **Closed issues:**
 
+- Version Bump to 1.1.0 [\#70](https://github.com/inaka/cowboy-swagger/issues/70)
 - Move from erlang.mk to rebar3 [\#68](https://github.com/inaka/cowboy-swagger/issues/68)
 - Support for definitions and schemas [\#63](https://github.com/inaka/cowboy-swagger/issues/63)
 - Hello can this project support the cowboy REST part? [\#61](https://github.com/inaka/cowboy-swagger/issues/61)
@@ -16,6 +35,7 @@
 
 **Merged pull requests:**
 
+- \[Close \#70\] version bump 1.1.0 [\#71](https://github.com/inaka/cowboy-swagger/pull/71) ([Euen](https://github.com/Euen))
 - \[Close \#68\] replace erlang.mk by rebar3 [\#69](https://github.com/inaka/cowboy-swagger/pull/69) ([Euen](https://github.com/Euen))
 - \[Fix \#63\] Add support for definitions and schemas [\#66](https://github.com/inaka/cowboy-swagger/pull/66) ([harenson](https://github.com/harenson))
 - Add missing jiffy app in .app.src [\#65](https://github.com/inaka/cowboy-swagger/pull/65) ([jeanparpaillon](https://github.com/jeanparpaillon))
