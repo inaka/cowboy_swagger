@@ -1,18 +1,34 @@
 # Change Log
 
+## [1.2.2](https://github.com/inaka/cowboy_swagger/tree/1.2.2) (2017-01-27)
+[Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.2.1...1.2.2)
+
+**Closed issues:**
+
+- Update to the latest Swagger-UI assets [\#89](https://github.com/inaka/cowboy_swagger/issues/89)
+- remove Makefile from the example [\#86](https://github.com/inaka/cowboy_swagger/issues/86)
+
+**Merged pull requests:**
+
+- \[\#89\] upgrade Swagger-UI to 2.2.8 [\#91](https://github.com/inaka/cowboy_swagger/pull/91) ([ferigis](https://github.com/ferigis))
+- \[\#86\] Fixing Example [\#90](https://github.com/inaka/cowboy_swagger/pull/90) ([ferigis](https://github.com/ferigis))
+
 ## [1.2.1](https://github.com/inaka/cowboy_swagger/tree/1.2.1) (2017-01-17)
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.2.0...1.2.1)
 
 **Closed issues:**
 
-- Update dependencies [\#83](https://github.com/inaka/cowboy_swagger/issues/83)
 - This project should be moved to cowboy\_swagger [\#75](https://github.com/inaka/cowboy_swagger/issues/75)
+- Version Bump to 1.2.1 [\#84](https://github.com/inaka/cowboy_swagger/issues/84)
+- Update dependencies [\#83](https://github.com/inaka/cowboy_swagger/issues/83)
+- hex.pm package is broken [\#82](https://github.com/inaka/cowboy_swagger/issues/82)
 - CowboySwagger should support either binaries or io\_lists for descriptions [\#67](https://github.com/inaka/cowboy_swagger/issues/67)
 - Update cowboy-swager dependency version in the example [\#50](https://github.com/inaka/cowboy_swagger/issues/50)
 - Update documentation [\#44](https://github.com/inaka/cowboy_swagger/issues/44)
 
 **Merged pull requests:**
 
+- \[\#84\] Version Bump to 1.2.1 [\#88](https://github.com/inaka/cowboy_swagger/pull/88) ([ferigis](https://github.com/ferigis))
 - \[\#44\] Adding 'Requirements' to README [\#87](https://github.com/inaka/cowboy_swagger/pull/87) ([ferigis](https://github.com/ferigis))
 - \[\#83\] updating dependencies on rebar3 config file [\#85](https://github.com/inaka/cowboy_swagger/pull/85) ([ferigis](https://github.com/ferigis))
 
