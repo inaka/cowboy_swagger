@@ -89,7 +89,7 @@ Then add `cowboy_swagger` to the list of apps to be loaded in your `*.app.src` f
   {applications,
    [kernel,
     stdlib,
-    jiffy,
+    jsx,
     cowboy,
     trails,
     cowboy_swagger

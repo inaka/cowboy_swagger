@@ -9,7 +9,6 @@ bin
 /deps/cowlib
 /deps/hexer_mk
 /deps/inaka_mk
-/deps/jiffy
 /deps/mixer
 /deps/ranch
 /deps/trails
