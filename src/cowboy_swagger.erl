@@ -184,7 +184,7 @@ normalize_list_values(List) ->
       (V, Acc) ->
         [V | Acc]
       end,
-  lists:foldl(F, [], List).
+  lists:foldr(F, [], List).
 
 %% @private
 validate_swagger_map(Map) ->
