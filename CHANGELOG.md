@@ -1,5 +1,21 @@
 # Change Log
 
+## [1.2.3](https://github.com/inaka/cowboy_swagger/tree/1.2.3) (2017-06-13)
+[Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.2.2...1.2.3)
+
+**Closed issues:**
+
+- Version Bump to 1.2.2 [\#92](https://github.com/inaka/cowboy_swagger/issues/92)
+
+**Merged pull requests:**
+
+- Use minified version of swagger-ui.js [\#102](https://github.com/inaka/cowboy_swagger/pull/102) ([egobrain](https://github.com/egobrain))
+- Maintain original order in lists [\#101](https://github.com/inaka/cowboy_swagger/pull/101) ([jfacorro](https://github.com/jfacorro))
+- Revert to local schema as default [\#100](https://github.com/inaka/cowboy_swagger/pull/100) ([lucafavatella](https://github.com/lucafavatella))
+- Clean leftovers from jiffy -\> jsx transition [\#99](https://github.com/inaka/cowboy_swagger/pull/99) ([lucafavatella](https://github.com/lucafavatella))
+- Plant CI [\#97](https://github.com/inaka/cowboy_swagger/pull/97) ([lucafavatella](https://github.com/lucafavatella))
+- \[\#95\] update sync by rebar3\_auto [\#96](https://github.com/inaka/cowboy_swagger/pull/96) ([Euen](https://github.com/Euen))
+
 ## [1.2.2](https://github.com/inaka/cowboy_swagger/tree/1.2.2) (2017-01-27)
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.2.1...1.2.2)
 
@@ -10,6 +26,7 @@
 
 **Merged pull requests:**
 
+- \[\#92\] Version Bump to 1.2.2 [\#94](https://github.com/inaka/cowboy_swagger/pull/94) ([ferigis](https://github.com/ferigis))
 - \[\#89\] upgrade Swagger-UI to 2.2.8 [\#91](https://github.com/inaka/cowboy_swagger/pull/91) ([ferigis](https://github.com/ferigis))
 - \[\#86\] Fixing Example [\#90](https://github.com/inaka/cowboy_swagger/pull/90) ([ferigis](https://github.com/ferigis))
 
