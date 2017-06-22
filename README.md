@@ -13,6 +13,9 @@ If you find any **bugs** or have a **problem** while using this library, please
 
 And you can check all of our open-source projects at [inaka.github.io](http://inaka.github.io).
 
+## Requirements
+Cowboy Swagger requires Erlang 18+ after 0.1.0 version
+
 ## Why Cowboy Swagger?
 Simple, because there isn't a tool in Erlang to document Cowboy RESTful APIs easy and fast,
 and to improve development productivity.
@@ -86,7 +89,7 @@ Then add `cowboy_swagger` to the list of apps to be loaded in your `*.app.src` f
   {applications,
    [kernel,
     stdlib,
-    jiffy,
+    jsx,
     cowboy,
     trails,
     cowboy_swagger
