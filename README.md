@@ -4,14 +4,9 @@
 [Swagger](http://swagger.io/) integration for [Cowboy](https://github.com/ninenines/cowboy) (built on [trails](https://github.com/inaka/cowboy-trails)).
 
 ## Contact Us
-For **questions** or **general comments** regarding the use of this library,
-please use our public [hipchat room](http://inaka.net/hipchat).
-
 If you find any **bugs** or have a **problem** while using this library, please
 [open an issue](https://github.com/inaka/elvis/issues/new) in this repo
 (or a pull request :)).
-
-And you can check all of our open-source projects at [inaka.github.io](http://inaka.github.io).
 
 ## Requirements
 Cowboy Swagger requires Erlang 18+ after 0.1.0 version
