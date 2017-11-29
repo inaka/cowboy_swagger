@@ -4,8 +4,7 @@
 -module(cowboy_swagger_json_handler).
 
 %% Cowboy callbacks
--export([ init/3
-        , rest_init/2
+-export([ init/2
         , content_types_provided/2
         ]).
 
@@ -13,24 +12,16 @@
 -export([handle_get/2]).
 
 -type state() :: #{}.
--type route_match() :: '_' | iodata().
--type options() :: #{server => ranch:ref(), host => route_match()}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Cowboy Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% @hidden
--spec init({atom(), atom()}, cowboy_req:req(), options()) ->
-  {upgrade, protocol, cowboy_rest}.
-init(_Transport, _Req, _Opts) ->
-  {upgrade, protocol, cowboy_rest}.
-
-%% @hidden
--spec rest_init(cowboy_req:req(), options()) ->
-  {ok, cowboy_req:req(), options()}.
-rest_init(Req, Opts) ->
-  {ok, Req, Opts}.
+-spec init(cowboy_req:req(), state()) ->
+  {cowboy_rest, cowboy_req:req(), state()}.
+init(Req, State) ->
+  {cowboy_rest, Req, State}.
 
 %% @hidden
 -spec content_types_provided(cowboy_req:req(), state()) ->

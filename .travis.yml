@@ -1,8 +1,8 @@
 sudo: false
 language: erlang
 otp_release:
-  - 19.2
-  - 18.3
+  - 20.1
+  - 19.3
 before_install:
   - ./ci before_install "${PWD:?}"/rebar3
 install:

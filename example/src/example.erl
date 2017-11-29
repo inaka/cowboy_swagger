@@ -27,22 +27,16 @@ stop(_State) ->
 -spec start_phase(atom(), application:start_type(), []) -> ok | {error, term()}.
 start_phase(start_trails_http, _StartType, []) ->
   {ok, Port} = application:get_env(example, http_port),
-  {ok, ListenerCount} = application:get_env(example, http_listener_count),
   Trails = trails:trails([example_echo_handler,
                           example_description_handler,
                           cowboy_swagger_handler]),
   trails:store(Trails),
-  Dispatch = trails:single_host_compile(Trails),
-  RanchOptions = [{port, Port}],
-  CowboyOptions =
-    [
-     {env,
-      [
-       {dispatch, Dispatch}
-      ]},
-     {compress, true},
-     {timeout, 12000}
-    ],
-  {ok, _} =
-    cowboy:start_http(example_http, ListenerCount, RanchOptions, CowboyOptions),
+  Dispatch      = trails:single_host_compile(Trails),
+  RanchOptions  = [{port, Port}],
+  CowboyOptions = #{ env      => #{dispatch => Dispatch}
+                   , compress => true
+                   , timeout  => 12000
+                   },
+
+  {ok, _} = cowboy:start_clear(example_http, RanchOptions, CowboyOptions),
   ok.
