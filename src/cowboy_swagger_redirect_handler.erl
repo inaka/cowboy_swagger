@@ -1,23 +1,22 @@
 -module(cowboy_swagger_redirect_handler).
 
 %% Cowboy callbacks
--export([init/3]).
+-export([init/2]).
 
 %% Handlers
 -export([resource_exists/2, previously_existed/2, moved_permanently/2]).
 
 -type state() :: #{}.
--type options() :: any().
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Cowboy Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% @hidden
--spec init({atom(), atom()}, cowboy_req:req(), options()) ->
-  {upgrade, protocol, cowboy_rest}.
-init(_Transport, _Req, _Opts) ->
-  {upgrade, protocol, cowboy_rest}.
+-spec init(cowboy_req:req(), state()) ->
+  {cowboy_rest, cowboy_req:req(), state()}.
+init(Req, State) ->
+  {cowboy_rest, Req, State}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Handlers
