@@ -1,14 +1,30 @@
 # Change Log
 
+## [2.0.0](https://github.com/inaka/cowboy_swagger/tree/2.0.0)
+
+[Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.2.3...2.0.0)
+
+**Closed issues:**
+
+- Public hipchat room [\#105](https://github.com/inaka/cowboy_swagger/issues/105)
+- Consider upgrading to cowboy 2 API [\#49](https://github.com/inaka/cowboy_swagger/issues/49)
+
+**Merged pull requests:**
+
+- \[Closes \#49\] Update to Cowboy 2 [\#107](https://github.com/inaka/cowboy_swagger/pull/107) ([jfacorro](https://github.com/jfacorro))
+- Update README.md [\#106](https://github.com/inaka/cowboy_swagger/pull/106) ([igaray](https://github.com/igaray))
+
 ## [1.2.3](https://github.com/inaka/cowboy_swagger/tree/1.2.3) (2017-06-13)
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.2.2...1.2.3)
 
 **Closed issues:**
 
+- Bump Version to 1.2.3 [\#103](https://github.com/inaka/cowboy_swagger/issues/103)
 - Version Bump to 1.2.2 [\#92](https://github.com/inaka/cowboy_swagger/issues/92)
 
 **Merged pull requests:**
 
+- \[Close \#103\] Version Bump to 1.2.3 [\#104](https://github.com/inaka/cowboy_swagger/pull/104) ([Euen](https://github.com/Euen))
 - Use minified version of swagger-ui.js [\#102](https://github.com/inaka/cowboy_swagger/pull/102) ([egobrain](https://github.com/egobrain))
 - Maintain original order in lists [\#101](https://github.com/inaka/cowboy_swagger/pull/101) ([jfacorro](https://github.com/jfacorro))
 - Revert to local schema as default [\#100](https://github.com/inaka/cowboy_swagger/pull/100) ([lucafavatella](https://github.com/lucafavatella))
