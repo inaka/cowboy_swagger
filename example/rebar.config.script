@@ -1,0 +1,6 @@
+%% To avoid specifying a version we add cowboy_swagger in the
+%% _checkouts directory.
+os:cmd("mkdir _checkouts; ln -s $PWD/.. _checkouts/cowboy_swagger").
+
+%% Return the original rebar3 configuration.
+CONFIG.

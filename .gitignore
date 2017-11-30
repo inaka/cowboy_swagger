@@ -16,4 +16,6 @@ log
 logs
 doc
 _build
+.rebar3/
 example/compile_commands.json
+example/_checkouts/
