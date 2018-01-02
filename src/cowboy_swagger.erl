@@ -2,7 +2,7 @@
 -module(cowboy_swagger).
 
 %% API
--export([to_json/1, add_definition/2, schema/1]).
+-export([to_json/1, add_definition/2, add_definition/3, schema/1]).
 
 %% Utilities
 -export([enc_json/1, dec_json/1]).
@@ -220,3 +220,22 @@ build_definition(Name, Properties) ->
   #{Name => #{ type => <<"object">>
              , properties => Properties
              }}.
+
+
+add_definition(Name, Properties, ReqFieldsList) ->
+  Definition = build_definition(Name, Properties, ReqFieldsList),
+  CurrentSpec = application:get_env(cowboy_swagger, global_spec, #{}),
+  ExistingDefinitions = maps:get(definitions, CurrentSpec, #{}),
+  NewSpec = CurrentSpec#{definitions => maps:merge( ExistingDefinitions
+                                                  , Definition
+                                                  )},
+  application:set_env(cowboy_swagger, global_spec, NewSpec).
+
+
+  build_definition(Name, Properties, ReqFieldsList) ->
+  #{Name => #{ type => <<"object">>
+             , properties => Properties
+             , required   => ReqFieldsList
+             }}.
+
+
