@@ -6,6 +6,8 @@
   {applications,
    [kernel,
     stdlib,
+    ranch,
+    cowboy,
     trails,
     jsx
    ]},

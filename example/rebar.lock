@@ -1,16 +1,16 @@
 {"1.1.0",
-[{<<"cowboy">>,{pkg,<<"cowboy">>,<<"2.1.0">>},2},
- {<<"cowlib">>,{pkg,<<"cowlib">>,<<"2.0.1">>},3},
- {<<"jsx">>,{pkg,<<"jsx">>,<<"2.8.1">>},1},
- {<<"mixer">>,{pkg,<<"inaka_mixer">>,<<"0.1.5">>},0},
- {<<"ranch">>,{pkg,<<"ranch">>,<<"1.4.0">>},2},
- {<<"trails">>,{pkg,<<"trails">>,<<"2.0.0">>},1}]}.
+[{<<"cowboy">>,{pkg,<<"cowboy">>,<<"2.3.0">>},2},
+ {<<"cowlib">>,{pkg,<<"cowlib">>,<<"2.2.1">>},3},
+ {<<"jsx">>,{pkg,<<"jsx">>,<<"2.9.0">>},1},
+ {<<"mixer">>,{pkg,<<"inaka_mixer">>,<<"1.0.0">>},0},
+ {<<"ranch">>,{pkg,<<"ranch">>,<<"1.4.0">>},3},
+ {<<"trails">>,{pkg,<<"trails">>,<<"2.1.0">>},1}]}.
 [
 {pkg_hash,[
- {<<"cowboy">>, <<"69F9DB3B23C24AB6B3A169A6357130C16B39CDA1A1F8C582F818883EE552589D">>},
- {<<"cowlib">>, <<"4DFFFB1DB296EAB9F2E8B95EE3017007F674BC920CE30AEB5A53BBDA82FC38C0">>},
- {<<"jsx">>, <<"1453B4EB3615ACB3E2CD0A105D27E6761E2ED2E501AC0B390F5BBEC497669846">>},
- {<<"mixer">>, <<"754630C0E60221B23E4D83ADF6E789A8B283855E23F9391EEC40980E6E800486">>},
+ {<<"cowboy">>, <<"268429481D6F41AD5564ADE4A2439C284B569083FCA0D19078AD4F56B4624724">>},
+ {<<"cowlib">>, <<"1AFA5B233CEE8F642C153EC6F1DC48DB0DD9A43E2114BC8B43E9D59636F6AE1F">>},
+ {<<"jsx">>, <<"D2F6E5F069C00266CAD52FB15D87C428579EA4D7D73A33669E12679E203329DD">>},
+ {<<"mixer">>, <<"B991687E1D7750CAB5906800F9F451E96594F77F8F0FFA304602DF92E7A58607">>},
  {<<"ranch">>, <<"10272F95DA79340FA7E8774BA7930B901713D272905D0012B06CA6D994F8826B">>},
- {<<"trails">>, <<"40125994045FBDB07909D0778E12004B3B7722E25AAE292EC83019630BA66E7E">>}]}
+ {<<"trails">>, <<"D51D7F065F2B692654C611C663BFAC377D47EAFF9D38D0C17ECD031D1A59399A">>}]}
 ].

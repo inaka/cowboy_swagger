@@ -1,5 +1,5 @@
 %%% @doc Cowboy Swagger Handler. This handler exposes a GET operation
-%%%      to enable that  `swagger.json' can be retrieved from embedded
+%%%      to enable `swagger.json' to be retrieved from embedded
 %%%      Swagger-UI (located in `priv/swagger' folder).
 -module(cowboy_swagger_json_handler).
 
@@ -8,24 +8,33 @@
         , content_types_provided/2
         ]).
 
+-behaviour(cowboy_rest).
+
 %% Handlers
 -export([handle_get/2]).
 
--type state() :: #{}.
+-type options() :: #{ server => ranch:ref()
+                    , host   => cowboy_swagger_handler:route_match()
+                    , _ => _
+                    }.
+-export_type([options/0]).
+
+-type state() :: options().
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Cowboy Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% @hidden
--spec init(cowboy_req:req(), state()) ->
+-spec init(cowboy_req:req(), options()) ->
   {cowboy_rest, cowboy_req:req(), state()}.
-init(Req, State) ->
+init(Req, Opts) ->
+  State = Opts,
   {cowboy_rest, Req, State}.
 
 %% @hidden
 -spec content_types_provided(cowboy_req:req(), state()) ->
-  {[term()], cowboy_req:req(), state()}.
+  {[{binary(), atom()}], cowboy_req:req(), state()}.
 content_types_provided(Req, State) ->
   {[{<<"application/json">>, handle_get}], Req, State}.
 
