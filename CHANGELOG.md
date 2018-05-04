@@ -1,7 +1,19 @@
 # Change Log
 
-## [2.0.0](https://github.com/inaka/cowboy_swagger/tree/2.0.0)
+## [2.1.0](https://github.com/inaka/cowboy_swagger/tree/2.1.0) (2018-05-04)
+[Full Changelog](https://github.com/inaka/cowboy_swagger/compare/2.0.0...2.1.0)
 
+**Closed issues:**
+
+- Update sync by rebar3\_auto [\#95](https://github.com/inaka/cowboy_swagger/issues/95)
+
+**Merged pull requests:**
+
+- Update from @freke [\#113](https://github.com/inaka/cowboy_swagger/pull/113) ([elbrujohalcon](https://github.com/elbrujohalcon))
+- Update Dependencies [\#111](https://github.com/inaka/cowboy_swagger/pull/111) ([elbrujohalcon](https://github.com/elbrujohalcon))
+- Add rebar3 to root path to fix travis builds [\#110](https://github.com/inaka/cowboy_swagger/pull/110) ([elbrujohalcon](https://github.com/elbrujohalcon))
+
+## [2.0.0](https://github.com/inaka/cowboy_swagger/tree/2.0.0) (2017-11-30)
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.2.3...2.0.0)
 
 **Closed issues:**
@@ -11,6 +23,7 @@
 
 **Merged pull requests:**
 
+- Bump version to 2.0.0 [\#108](https://github.com/inaka/cowboy_swagger/pull/108) ([jfacorro](https://github.com/jfacorro))
 - \[Closes \#49\] Update to Cowboy 2 [\#107](https://github.com/inaka/cowboy_swagger/pull/107) ([jfacorro](https://github.com/jfacorro))
 - Update README.md [\#106](https://github.com/inaka/cowboy_swagger/pull/106) ([igaray](https://github.com/igaray))
 
