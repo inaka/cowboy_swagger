@@ -1,10 +1,12 @@
 -module(example_description_handler).
 
+-behaviour(cowboy_rest).
+
 -include_lib("mixer/include/mixer.hrl").
 -mixin([
         {example_default,
          [
-          init/3,
+          init/2,
           rest_init/2,
           content_types_accepted/2,
           content_types_provided/2,

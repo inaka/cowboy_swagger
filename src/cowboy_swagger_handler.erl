@@ -1,5 +1,5 @@
 %%% @doc Cowboy Swagger Handler. This handler exposes a GET operation
-%%%      to enable that  `swagger.json' can be retrieved from embedded
+%%%      to enable `swagger.json' to be retrieved from embedded
 %%%      Swagger-UI (located in `priv/swagger' folder).
 -module(cowboy_swagger_handler).
 
@@ -8,7 +8,7 @@
 -export([trails/0, trails/1]).
 
 -type route_match() :: '_' | iodata().
--type options() :: #{server => ranch:ref(), host => route_match()}.
+-export_type([route_match/0]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Trails
@@ -20,7 +20,7 @@
 %%      that returns the `swagger.json'.
 -spec trails() -> trails:trails().
 trails() -> trails(#{}).
--spec trails(Options::options()) -> trails:trails().
+-spec trails(cowboy_swagger_json_handler:options()) -> trails:trails().
 trails(Options) ->
   StaticFiles =
     case application:get_env(cowboy_swagger, static_files) of

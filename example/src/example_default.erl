@@ -1,6 +1,8 @@
 -module(example_default).
 
--export([ init/3
+-behaviour(cowboy_rest).
+
+-export([ init/2
         , rest_init/2
         , content_types_accepted/2
         , content_types_provided/2
@@ -9,8 +11,8 @@
         ]).
 
 %% cowboy
-init(_Transport, _Req, _Opts) ->
-  {upgrade, protocol, cowboy_rest}.
+init(Req, _Opts) ->
+  {cowboy_rest, Req, #{}}.
 
 rest_init(Req, _Opts) ->
   {ok, Req, #{}}.
