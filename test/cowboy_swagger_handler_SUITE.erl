@@ -98,7 +98,7 @@ handler_test(_Config) ->
   #{status_code := 200, body := SwaggerUIBody} =
     cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger-ui.js"),
   {ok, SwaggerUIBodySrc} =
-    file:read_file("../../../../priv/swagger/swagger-ui.js"),
+    file:read_file("../../../../priv/swagger2/swagger-ui.js"),
   SwaggerUIBody = SwaggerUIBodySrc,
 
   %% GET unknown-file.ext - test /api-docs/[...] trail

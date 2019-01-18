@@ -25,7 +25,8 @@ trails(Options) ->
   StaticFiles =
     case application:get_env(cowboy_swagger, static_files) of
       {ok, Val} -> Val;
-      _         -> filename:join(cowboy_swagger_priv(), "swagger")
+      _ -> GlobalSpec = application:get_env(cowboy_swagger, global_spec, #{}),
+           filename:join(cowboy_swagger_priv(), get_swagger_version(GlobalSpec))
     end,
   Redirect = trails:trail(
     "/api-docs",
@@ -53,3 +54,10 @@ cowboy_swagger_priv() ->
       end;
     Path -> Path
   end.
+
+%% @private
+-spec get_swagger_version(map()) -> string().
+get_swagger_version(#{openapi := _Version} = _GlobalSpec) ->
+  "swagger3";
+get_swagger_version(_GlobalSpec) ->
+  "swagger2".
