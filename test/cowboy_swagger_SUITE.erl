@@ -9,7 +9,8 @@
        ]).
 
 -export([all/0]).
--export([to_json_test/1, add_definition_test/1]).
+-export([ to_json_test/1
+        , add_definition_test/1]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Common test
@@ -28,94 +29,102 @@ to_json_test(_Config) ->
   Trails = test_trails(),
   SwaggerJson = cowboy_swagger:to_json(Trails),
   Result = jsx:decode(SwaggerJson, [return_maps]),
-  #{<<"paths">> :=
-    #{<<"/a/{b}/{c}">> :=
-      #{<<"delete">> :=
-        #{<<"description">> := <<"bla bla bla">>,
-          <<"parameters">> := [
-            #{<<"description">> := <<"bla">>,
-              <<"in">> := <<"path">>,
-              <<"name">> := <<"b">>,
-              <<"required">> := false,
-              <<"type">> := <<"string">>}
-          ],
-          <<"responses">> := #{}
-        },
-        <<"get">> :=
-        #{<<"description">> := <<"bla bla bla">>,
-          <<"produces">> := [<<"application/json">>],
-          <<"parameters">> := [
-            #{<<"description">> := <<"bla">>,
-              <<"in">> := <<"path">>,
-              <<"name">> := <<"b">>,
-              <<"required">> := false,
-              <<"type">> := <<"string">>},
-            #{<<"description">> := <<"bla">>,
-              <<"in">> := <<"path">>,
-              <<"name">> := <<"c">>,
-              <<"required">> := false,
-              <<"type">> := <<"string">>}
-          ],
-          <<"responses">> := #{}
-        },
-        <<"post">> :=
-        #{<<"description">> := <<"bla bla bla">>,
-          <<"parameters">> := [
-            #{<<"description">> := <<"bla">>,
-              <<"in">> := <<"body">>,
-              <<"name">> := <<"Request Body">>,
-              <<"required">> := true,
-              <<"type">> := <<"string">>}
-          ],
-          <<"responses">> := #{<<"200">> := #{<<"description">> := <<"bla">>}}
-        }
-      },
-      <<"/a/{b}/{c}/{d}">> :=
-      #{<<"delete">> :=
-        #{<<"description">> := <<"bla bla bla">>,
-          <<"parameters">> := [
-            #{<<"description">> := <<"bla">>,
-              <<"in">> := <<"path">>,
-              <<"name">> := <<"b">>,
-              <<"required">> := false,
-              <<"type">> := <<"string">>}
-          ]
-        },
-        <<"get">> :=
-        #{<<"description">> := <<"bla bla bla">>,
-          <<"produces">> := [<<"application/json">>],
-          <<"parameters">> := [
-            #{<<"description">> := <<"bla">>,
-              <<"in">> := <<"path">>,
-              <<"name">> := <<"b">>,
-              <<"required">> := false,
-              <<"type">> := <<"string">>},
-            #{<<"description">> := <<"bla">>,
-              <<"in">> := <<"path">>,
-              <<"name">> := <<"c">>,
-              <<"required">> := false,
-              <<"type">> := <<"string">>}
-          ]
-        },
-        <<"post">> :=
-        #{<<"description">> := <<"bla bla bla">>,
-          <<"parameters">> := [
-            #{<<"description">> := <<"bla">>,
-              <<"in">> := <<"body">>,
-              <<"name">> := <<"Request Body">>,
-              <<"required">> := true,
-              <<"type">> := <<"string">>}
-          ],
-          <<"responses">> := #{<<"200">> := #{<<"description">> := <<"bla">>}}
-        }
-      },
-    <<"/a">> :=
-    #{<<"get">> := #{<<"description">> := <<"bla bla bla">>,
+  #{<<"basePath">> := [],
+    <<"info">> := #{<<"title">> := <<"Example API">>},
+    <<"openapi">> := <<"3.0.0">>,
+    <<"paths">> :=
+    #{<<"/a">> :=
+    #{<<"get">> :=
+    #{<<"description">> := <<"bla bla bla">>,
       <<"parameters">> := [],
       <<"produces">> := [<<"application/json">>],
-      <<"responses">> := #{<<"200">> := #{<<"description">> := <<"bla">>}}}}
-    }
-  } = Result,
+      <<"responses">> :=
+      #{<<"200">> :=
+      #{<<"description">> := <<"bla">>}}}},
+      <<"/a/{b}/{c}">> :=
+      #{<<"delete">> :=
+      #{<<"description">> := <<"bla bla bla">>,
+        <<"parameters">> :=
+        [#{<<"description">> := <<"bla">>,
+          <<"in">> := <<"path">>,<<"name">> := <<"b">>,
+          <<"required">> := false,
+          <<"schema">> := #{<<"type">> := <<"string">>}}],
+        <<"responses">> := #{}},
+        <<"get">> :=
+        #{<<"description">> := <<"bla bla bla">>,
+          <<"parameters">> :=
+          [#{<<"description">> := <<"bla">>,
+            <<"in">> := <<"path">>,<<"name">> := <<"b">>,
+            <<"required">> := false,
+            <<"schema">> := #{<<"type">> := <<"string">>}},
+            #{<<"description">> := <<"bla">>,
+              <<"in">> := <<"path">>,<<"name">> := <<"c">>,
+              <<"required">> := false,
+              <<"schema">> :=
+              #{<<"example">> := <<"c">>,
+                <<"type">> := <<"string">>}}],
+          <<"responses">> :=
+          #{<<"200">> :=
+          #{<<"content">> :=
+          #{<<"application/json">> :=
+          #{<<"schema">> :=
+          #{<<"title">> := <<"bla">>,
+            <<"type">> :=
+            <<"string">>}}},
+            <<"description">> := <<"200 OK">>}}},
+        <<"post">> :=
+        #{<<"description">> := <<"bla bla bla">>,
+          <<"parameters">> :=
+          [#{<<"description">> := <<"bla">>,
+            <<"in">> := <<"body">>,
+            <<"name">> := <<"Request Body">>,
+            <<"required">> := true,
+            <<"schema">> := #{<<"type">> := <<"string">>}}],
+          <<"responses">> :=
+          #{<<"200">> :=
+          #{<<"description">> := <<"bla">>}}}},
+      <<"/a/{b}/{c}/{d}">> :=
+      #{<<"delete">> :=
+      #{<<"description">> := <<"bla bla bla">>,
+        <<"parameters">> :=
+        [#{<<"description">> := <<"bla">>,
+          <<"in">> := <<"path">>,<<"name">> := <<"b">>,
+          <<"required">> := false,
+          <<"schema">> := #{<<"type">> := <<"string">>}}],
+        <<"responses">> := #{}},
+        <<"get">> :=
+        #{<<"description">> := <<"bla bla bla">>,
+          <<"parameters">> :=
+          [#{<<"description">> := <<"bla">>,
+            <<"in">> := <<"path">>,<<"name">> := <<"b">>,
+            <<"required">> := false,
+            <<"schema">> := #{<<"type">> := <<"string">>}},
+            #{<<"description">> := <<"bla">>,
+              <<"in">> := <<"path">>,<<"name">> := <<"c">>,
+              <<"required">> := false,
+              <<"schema">> :=
+              #{<<"example">> := <<"c">>,
+                <<"type">> := <<"string">>}}],
+          <<"responses">> :=
+          #{<<"200">> :=
+          #{<<"content">> :=
+          #{<<"application/json">> :=
+          #{<<"schema">> :=
+          #{<<"title">> := <<"bla">>,
+            <<"type">> :=
+            <<"string">>}}},
+            <<"description">> := <<"200 OK">>}}},
+        <<"post">> :=
+        #{<<"description">> := <<"bla bla bla">>,
+          <<"parameters">> :=
+          [#{<<"description">> := <<"bla">>,
+            <<"in">> := <<"body">>,
+            <<"name">> := <<"Request Body">>,
+            <<"required">> := true,
+            <<"schema">> := #{<<"type">> := <<"string">>}}],
+          <<"responses">> :=
+          #{<<"200">> :=
+          #{<<"description">> := <<"bla">>}}}}}} = Result,
   #{<<"paths">> := Paths} = Result,
   3 = maps:size(Paths),
   {comment, ""}.
@@ -138,8 +147,6 @@ add_definition_test(_Config) ->
          }
     },
   ok = cowboy_swagger:add_definition(Name1, Properties1),
-  {ok, SwaggerSpec} = application:get_env(cowboy_swagger, global_spec),
-  Definition1 = maps:get(definitions, SwaggerSpec),
 
   ct:comment("Add second definition"),
   Name2 = <<"CarDefinition">>,
@@ -170,22 +177,36 @@ add_definition_test(_Config) ->
 test_trails() ->
   Metadata =
     #{get => #{description => <<"bla bla bla">>,
-               produces => ["application/json"],
                parameters => [
                  #{name => "b",
                    in => "path",
                    description => "bla",
-                   required => false,
-                   type => "string"},
+                   schema => #{
+                     type => string
+                   },
+                   required => false},
                  #{name => "c",
                    in => "path",
                    description => "bla",
-                   required => false,
-                   type => "string"},
-                 #{description => "bla",
-                   required => false,
-                   type => "string"}
-               ]
+                   schema => #{
+                     type => string,
+                     example => <<"c">>
+                   },
+                   required => false}
+               ],
+               responses => #{
+                 <<"200">> =>
+                   #{description => <<"200 OK">>,
+                     content =>
+                     #{'application/json' =>
+                       #{schema =>
+                         #{type => string,
+                           title => <<"bla">>
+                         }
+                       }
+                     }
+                   }
+                 }
               },
       delete => #{description => <<"bla bla bla">>,
                   parameters => [
@@ -193,7 +214,10 @@ test_trails() ->
                       in => <<"path">>,
                       description => <<"bla">>,
                       required => false,
-                      type => <<"string">>}
+                      schema => #{
+                        type => string
+                      }
+                    }
                   ]
                  },
       post => #{description => <<"bla bla bla">>,
@@ -202,7 +226,10 @@ test_trails() ->
                     in => <<"body">>,
                     description => <<"bla">>,
                     required => true,
-                    type => <<"string">>}
+                    schema => #{
+                      type => string
+                    }
+                  }
                 ],
                 responses => #{<<"200">> => #{description => "bla"}}
                }

@@ -1,6 +1,6 @@
 {application, example,
  [
-  {description, "Cowboy Swagger Basic Example."},
+  {description, "Cowboy Swagger OpenAPI 3.0.0 Basic Example."},
   {vsn, "0.1"},
   {applications,
    [kernel,

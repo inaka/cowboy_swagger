@@ -24,7 +24,18 @@ trails() ->
     #{get =>
       #{tags => ["whoami"],
         description => "Get hostname",
-        produces => ["text/plain"]
+        responses => #{
+          <<"200">> => #{
+            description => <<"Get hostname 200 OK">>,
+            content => #{
+              'text/plain' =>
+                #{schema => #{
+                    type => string
+                  }
+                }
+            }
+          }
+        }
       }
     },
   [trails:trail(

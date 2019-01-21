@@ -28,18 +28,32 @@ trails() ->
     #{get =>
       #{tags => ["echo"],
         description => "Gets echo var from the server",
-        produces => ["text/plain"]
+        responses => #{
+          <<"200">> => #{
+            description => <<"Gets echo var from the server 200 OK">>,
+            content => #{
+              'text/plain' =>
+                #{schema => #{
+                    type => string
+                  }
+                }
+            }
+          }
+        }
       },
       put =>
       #{tags => ["echo"],
         description => "Sets echo var in the server",
-        produces => ["text/plain"],
         parameters => [
           #{name => <<"echo">>,
             description => <<"Echo message">>,
             in => <<"path">>,
             required => false,
-            type => <<"string">>}
+            schema =>
+              #{type => string,
+                example => <<"Hello, World!">>
+              }
+          }
         ]
       }
     },

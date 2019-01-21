@@ -81,7 +81,7 @@ handler_test(_Config) ->
   ct:comment("GET /api-docs/swagger.json should return 200 OK"),
   #{status_code := 200, body := Body0} =
     cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger.json"),
-  #{<<"swagger">> := <<"2.0">>,
+  #{<<"openapi">> := <<"3.0.0">>,
     <<"info">> := #{<<"title">> := <<"Example API">>},
     <<"paths">> := ExpectedPaths} = cowboy_swagger:dec_json(Body0),
 
@@ -98,7 +98,7 @@ handler_test(_Config) ->
   #{status_code := 200, body := SwaggerUIBody} =
     cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger-ui.js"),
   {ok, SwaggerUIBodySrc} =
-    file:read_file("../../../../priv/swagger2/swagger-ui.js"),
+    file:read_file("../../../../priv/swagger/swagger-ui.js"),
   SwaggerUIBody = SwaggerUIBodySrc,
 
   %% GET unknown-file.ext - test /api-docs/[...] trail
@@ -120,7 +120,7 @@ multiple_hosts_test(_Config) ->
                                        "/api-docs/swagger.json",
                                        "localhost",
                                        8383),
-  #{<<"swagger">> := <<"2.0">>,
+  #{<<"openapi">> := <<"3.0.0">>,
     <<"info">> := #{<<"title">> := <<"Example API">>},
     <<"paths">> := ExpectedPaths11} = cowboy_swagger:dec_json(Body11),
   %% api1 - host2
@@ -133,7 +133,7 @@ multiple_hosts_test(_Config) ->
                                        "/api-docs/swagger.json",
                                        "127.0.0.1",
                                        8383),
-  #{<<"swagger">> := <<"2.0">>,
+  #{<<"openapi">> := <<"3.0.0">>,
     <<"info">> := #{<<"title">> := <<"Example API">>},
     <<"paths">> := ExpectedPaths12} = cowboy_swagger:dec_json(Body12),
   %% api2 - host1
@@ -146,7 +146,7 @@ multiple_hosts_test(_Config) ->
                                        "/api-docs/swagger.json",
                                        "localhost",
                                        8282),
-  #{<<"swagger">> := <<"2.0">>,
+  #{<<"openapi">> := <<"3.0.0">>,
     <<"info">> := #{<<"title">> := <<"Example API">>},
     <<"paths">> := ExpectedPaths21} = cowboy_swagger:dec_json(Body21),
   {comment, ""}.

@@ -1,4 +1,4 @@
-# Cowboy Swagger Example
+# Cowboy Swagger OpenAPI 3.0.0 Example
 
 To try this example, you need GNU `rebar3` , `git` and `Erlang` in your PATH.
 
