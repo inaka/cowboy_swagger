@@ -39,6 +39,6 @@ allowed_methods(Req, State) ->
 
 %% internal
 handle_get(Req, State) ->
-  {Host, Req1} = cowboy_req:host(Req),
+  Host = cowboy_req:host(Req),
   Body = <<"I am ", Host/binary>>,
-  {Body, Req1, State}.
+  {Body, Req, State}.

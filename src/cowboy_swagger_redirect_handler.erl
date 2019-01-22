@@ -1,5 +1,7 @@
 -module(cowboy_swagger_redirect_handler).
 
+-behaviour(cowboy_rest).
+
 %% Cowboy callbacks
 -export([init/2]).
 
@@ -35,6 +37,6 @@ previously_existed(Req, State) ->
 
 %% @hidden
 -spec moved_permanently(Req::cowboy_req:req(), State::state()) ->
-  {{boolean(), string()}, cowboy_req:req(), state()}.
+  {{true, iodata()}, cowboy_req:req(), state()}.
 moved_permanently(Req, State) ->
   {{true, "/api-docs/index.html"}, Req, State}.
