@@ -188,7 +188,7 @@ normalize_list_values(List) ->
 create_swagger_spec(#{openapi := _Version} = GlobalSpec, SanitizeTrails) ->
   GlobalSpec#{paths => swagger_paths(SanitizeTrails)};
 create_swagger_spec(GlobalSpec, SanitizeTrails) ->
-  create_swagger_spec(GlobalSpec#{openapi => "3.0.0"}, SanitizeTrails).
+  create_swagger_spec(GlobalSpec#{openapi => <<"3.0.0">>}, SanitizeTrails).
 
 %% @private
 validate_swagger_map(Map) ->
