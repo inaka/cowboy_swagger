@@ -50,7 +50,7 @@ to_json_test(_Config) ->
       #{<<"description">> := <<"bla bla bla">>,
         <<"parameters">> :=
         [#{<<"description">> := <<"bla">>,
-          <<"in">> := <<"path">>,<<"name">> := <<"b">>,
+          <<"in">> := <<"path">>, <<"name">> := <<"b">>,
           <<"required">> := false,
           <<"schema">> := #{<<"type">> := <<"string">>}}],
         <<"responses">> := #{}},
@@ -58,11 +58,11 @@ to_json_test(_Config) ->
         #{<<"description">> := <<"bla bla bla">>,
           <<"parameters">> :=
           [#{<<"description">> := <<"bla">>,
-            <<"in">> := <<"path">>,<<"name">> := <<"b">>,
+            <<"in">> := <<"path">>, <<"name">> := <<"b">>,
             <<"required">> := false,
             <<"schema">> := #{<<"type">> := <<"string">>}},
             #{<<"description">> := <<"bla">>,
-              <<"in">> := <<"path">>,<<"name">> := <<"c">>,
+              <<"in">> := <<"path">>, <<"name">> := <<"c">>,
               <<"required">> := false,
               <<"schema">> :=
               #{<<"example">> := <<"c">>,
@@ -92,7 +92,7 @@ to_json_test(_Config) ->
       #{<<"description">> := <<"bla bla bla">>,
         <<"parameters">> :=
         [#{<<"description">> := <<"bla">>,
-          <<"in">> := <<"path">>,<<"name">> := <<"b">>,
+          <<"in">> := <<"path">>, <<"name">> := <<"b">>,
           <<"required">> := false,
           <<"schema">> := #{<<"type">> := <<"string">>}}],
         <<"responses">> := #{}},
@@ -100,11 +100,11 @@ to_json_test(_Config) ->
         #{<<"description">> := <<"bla bla bla">>,
           <<"parameters">> :=
           [#{<<"description">> := <<"bla">>,
-            <<"in">> := <<"path">>,<<"name">> := <<"b">>,
+            <<"in">> := <<"path">>, <<"name">> := <<"b">>,
             <<"required">> := false,
             <<"schema">> := #{<<"type">> := <<"string">>}},
             #{<<"description">> := <<"bla">>,
-              <<"in">> := <<"path">>,<<"name">> := <<"c">>,
+              <<"in">> := <<"path">>, <<"name">> := <<"c">>,
               <<"required">> := false,
               <<"schema">> :=
               #{<<"example">> := <<"c">>,
