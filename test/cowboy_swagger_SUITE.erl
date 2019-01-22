@@ -29,18 +29,22 @@ to_json_test(_Config) ->
   Trails = test_trails(),
   SwaggerJson = cowboy_swagger:to_json(Trails),
   Result = jsx:decode(SwaggerJson, [return_maps]),
-  #{<<"basePath">> := [],
-    <<"info">> := #{<<"title">> := <<"Example API">>},
+  #{<<"info">> := #{<<"title">> := <<"Example API">>},
     <<"openapi">> := <<"3.0.0">>,
     <<"paths">> :=
     #{<<"/a">> :=
     #{<<"get">> :=
     #{<<"description">> := <<"bla bla bla">>,
       <<"parameters">> := [],
-      <<"produces">> := [<<"application/json">>],
       <<"responses">> :=
       #{<<"200">> :=
-      #{<<"description">> := <<"bla">>}}}},
+      #{<<"content">> :=
+      #{<<"application/json">> :=
+      #{<<"schema">> :=
+      #{<<"title">> := <<"bla">>,
+        <<"type">> :=
+        <<"string">>}}},
+        <<"description">> := <<"200 OK">>}}}},
       <<"/a/{b}/{c}">> :=
       #{<<"delete">> :=
       #{<<"description">> := <<"bla bla bla">>,
@@ -237,8 +241,19 @@ test_trails() ->
   Metadata1 =
     #{
       get => #{description => <<"bla bla bla">>,
-        produces => ["application/json"],
-        responses => #{<<"200">> => #{description => "bla"}}
+        responses => #{
+          <<"200">> =>
+          #{description => <<"200 OK">>,
+            content =>
+              #{'application/json' =>
+                #{schema =>
+                  #{type => string,
+                    title => <<"bla">>
+                  }
+                }
+              }
+          }
+        }
       }
     },
   [trails:trail("/a/[:b/[:c/[:d]]]", handler1, [], Metadata),
