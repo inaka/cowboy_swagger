@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.2.4](https://github.com/inaka/cowboy_swagger/tree/1.2.4) (2019-02-21)
+[Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.2.3...1.2.4)
+
+**Merged pull requests:**
+
+ - Fix unknown type cowboy_route:route_match, via cowboy-trails, + static analysis [\#116](https://github.com/inaka/cowboy_swagger/pull/116) ([paulo-ferraz-oliveira](https://github.com/paulo-ferraz-oliveira)) 
+
 ## [1.2.3](https://github.com/inaka/cowboy_swagger/tree/1.2.3) (2017-06-13)
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.2.2...1.2.3)
 

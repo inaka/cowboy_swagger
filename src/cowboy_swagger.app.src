@@ -2,7 +2,7 @@
  [
   {description,
    "Swagger for Cowboy Erlang projects"},
-  {vsn, "1.2.3"},
+  {vsn, "1.2.4"},
   {applications,
    [kernel,
     stdlib,
