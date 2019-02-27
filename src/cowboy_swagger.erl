@@ -92,7 +92,7 @@ add_definition(Name, Properties) ->
 -spec schema(DefinitionName::parameter_definition_name()) ->
   #{binary() => binary()}.
 schema(DefinitionName) ->
-  #{<<<<"$ref">>/binary>> => <<<<"#/definitions/">>/binary, DefinitionName/binary>>}.
+  #{<<"$ref">> => <<"#/definitions/", DefinitionName/binary>>}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
