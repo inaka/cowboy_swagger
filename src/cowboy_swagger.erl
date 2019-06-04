@@ -67,13 +67,11 @@
 %%      required `swagger.json'.
 -spec to_json([trails:trail()]) -> jsx:json_text().
 to_json(Trails) ->
-  Default = #{swagger => <<"2.0">>, info => #{title => <<"API-DOCS">>}},
+  Default = #{info => #{title => <<"API-DOCS">>}},
   GlobalSpec = normalize_map_values(
     application:get_env(cowboy_swagger, global_spec, Default)),
   SanitizeTrails = filter_cowboy_swagger_handler(Trails),
-  ApiRoot = list_to_binary(trails:api_root()),
-  SwaggerSpec = GlobalSpec#{paths => swagger_paths(SanitizeTrails),
-                            basePath => ApiRoot},
+  SwaggerSpec = create_swagger_spec(GlobalSpec, SanitizeTrails),
   enc_json(SwaggerSpec).
 
 -spec add_definition( Name::parameter_definition_name()
@@ -185,6 +183,12 @@ normalize_list_values(List) ->
         [V | Acc]
       end,
   lists:foldr(F, [], List).
+
+%% @private
+create_swagger_spec(#{openapi := _Version} = GlobalSpec, SanitizeTrails) ->
+  GlobalSpec#{paths => swagger_paths(SanitizeTrails)};
+create_swagger_spec(GlobalSpec, SanitizeTrails) ->
+  create_swagger_spec(GlobalSpec#{openapi => <<"3.0.0">>}, SanitizeTrails).
 
 %% @private
 validate_swagger_map(Map) ->

@@ -25,7 +25,18 @@ trails() ->
     #{get =>
       #{tags => ["example"],
         description => "Retrives trails's server description",
-        produces => ["text/plain"]
+        responses => #{
+          <<"200">> => #{
+            description => <<"Retrives trails's server description 200 OK">>,
+            content => #{
+              'text/plain' =>
+                #{schema => #{
+                    type => string
+                  }
+                }
+            }
+          }
+        }
       }
     },
   [trails:trail("/description", example_description_handler, [], Metadata)].
