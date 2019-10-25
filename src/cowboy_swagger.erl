@@ -9,12 +9,6 @@
 -export([swagger_paths/1, validate_metadata/1]).
 -export([filter_cowboy_swagger_handler/1]).
 
-%% xref constraints
--ignore_xref([to_json/1, add_definition/2, schema/1]).
--ignore_xref([enc_json/1, dec_json/1]).
--ignore_xref([swagger_paths/1, validate_metadata/1]).
--ignore_xref([filter_cowboy_swagger_handler/1]).
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Types.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
