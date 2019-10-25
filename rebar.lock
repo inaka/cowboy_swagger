@@ -1,14 +1,14 @@
 {"1.1.0",
-[{<<"cowboy">>,{pkg,<<"cowboy">>,<<"2.3.0">>},0},
- {<<"cowlib">>,{pkg,<<"cowlib">>,<<"2.2.1">>},1},
+[{<<"cowboy">>,{pkg,<<"cowboy">>,<<"2.5.0">>},0},
+ {<<"cowlib">>,{pkg,<<"cowlib">>,<<"2.6.0">>},1},
  {<<"jsx">>,{pkg,<<"jsx">>,<<"2.9.0">>},0},
- {<<"ranch">>,{pkg,<<"ranch">>,<<"1.4.0">>},1},
+ {<<"ranch">>,{pkg,<<"ranch">>,<<"1.6.2">>},0},
  {<<"trails">>,{pkg,<<"trails">>,<<"2.1.0">>},0}]}.
 [
 {pkg_hash,[
- {<<"cowboy">>, <<"268429481D6F41AD5564ADE4A2439C284B569083FCA0D19078AD4F56B4624724">>},
- {<<"cowlib">>, <<"1AFA5B233CEE8F642C153EC6F1DC48DB0DD9A43E2114BC8B43E9D59636F6AE1F">>},
+ {<<"cowboy">>, <<"4EF3AE066EE10FE01EA3272EDC8F024347A0D3EB95F6FBB9AED556DACBFC1337">>},
+ {<<"cowlib">>, <<"8AA629F81A0FC189F261DC98A42243FA842625FEEA3C7EC56C48F4CCDB55490F">>},
  {<<"jsx">>, <<"D2F6E5F069C00266CAD52FB15D87C428579EA4D7D73A33669E12679E203329DD">>},
- {<<"ranch">>, <<"10272F95DA79340FA7E8774BA7930B901713D272905D0012B06CA6D994F8826B">>},
+ {<<"ranch">>, <<"6DB93C78F411EE033DBB18BA8234C5574883ACB9A75AF0FB90A9B82EA46AFA00">>},
  {<<"trails">>, <<"D51D7F065F2B692654C611C663BFAC377D47EAFF9D38D0C17ECD031D1A59399A">>}]}
 ].

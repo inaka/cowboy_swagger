@@ -13,8 +13,6 @@
                      , body => binary()
                      }.
 
--type result()   :: {ok, reference() | response()} | {error, term()}.
-
 -type config() :: proplists:proplist().
 -export_type([config/0]).
 
