@@ -42,6 +42,13 @@
       #{ type => binary()
        , properties => property_obj()
        }}.
+-type parameters_definition_array() ::
+  #{parameter_definition_name() =>
+      #{ type => binary()
+       , items => #{ type => binary()
+                   , properties => property_obj()
+                   }
+       }}.
 -export_type([parameter_definition_name/0, property_obj/0]).
 
 %% Swagger map spec
@@ -90,7 +97,9 @@ add_definition(Name, Properties) ->
   Definition = build_definition(Name, Properties),
   add_definition(Definition).
 
--spec add_definition( Definition :: parameters_definitions()) ->
+-spec add_definition( Definition :: parameters_definitions()
+                                  | parameters_definition_array()
+                    ) ->
   ok.
 add_definition(Definition) ->
   CurrentSpec = application:get_env(cowboy_swagger, global_spec, #{}),
@@ -242,7 +251,7 @@ build_definition(Name, Properties) ->
 -spec build_definition_array( Name::parameter_definition_name()
                             , Properties::property_obj()
                             ) ->
-  parameters_definitions().
+  parameters_definition_array().
 build_definition_array(Name, Properties) ->
   #{Name => #{ type => <<"array">>
              , items => #{ type => <<"object">>
