@@ -159,7 +159,7 @@ add_definition_test(_Config) ->
   %% Then
   %%
   {ok, SwaggerSpec1} = application:get_env(cowboy_swagger, global_spec),
-  JsonDefinitions = maps:get(definitions, SwaggerSpec1),
+  JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1),
   true = maps:is_key(Name1, JsonDefinitions),
   true = maps:is_key(Name2, JsonDefinitions),
 
@@ -189,7 +189,7 @@ add_definition_array_test(_Config) ->
   %% Then
   %%
   {ok, SwaggerSpec1} = application:get_env(cowboy_swagger, global_spec),
-  JsonDefinitions = maps:get(definitions, SwaggerSpec1),
+  JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1),
   true = maps:is_key(items, maps:get(Name1, JsonDefinitions)),
   true = maps:is_key(items, maps:get(Name2, JsonDefinitions)),
   <<"array">> = maps:get(type, maps:get(Name1, JsonDefinitions)),
