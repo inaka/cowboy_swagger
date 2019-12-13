@@ -49,7 +49,11 @@
                    , properties => property_obj()
                    }
        }}.
--export_type([parameter_definition_name/0, property_obj/0]).
+-export_type([ parameter_definition_name/0
+             , property_obj/0
+             , parameters_definitions/0
+             , parameters_definition_array/0
+             ]).
 
 %% Swagger map spec
 -opaque swagger_map() ::
