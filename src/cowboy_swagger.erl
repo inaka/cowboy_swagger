@@ -2,7 +2,7 @@
 -module(cowboy_swagger).
 
 %% API
--export([to_json/1, add_definition/2, schema/1]).
+-export([to_json/1, add_definition/2, add_definition_array/2, schema/1]).
 
 %% Utilities
 -export([enc_json/1, dec_json/1]).
@@ -42,7 +42,18 @@
       #{ type => binary()
        , properties => property_obj()
        }}.
--export_type([parameter_definition_name/0, property_obj/0]).
+-type parameters_definition_array() ::
+  #{parameter_definition_name() =>
+      #{ type => binary()
+       , items => #{ type => binary()
+                   , properties => property_obj()
+                   }
+       }}.
+-export_type([ parameter_definition_name/0
+             , property_obj/0
+             , parameters_definitions/0
+             , parameters_definition_array/0
+             ]).
 
 %% Swagger map spec
 -opaque swagger_map() ::
@@ -74,12 +85,27 @@ to_json(Trails) ->
   SwaggerSpec = create_swagger_spec(GlobalSpec, SanitizeTrails),
   enc_json(SwaggerSpec).
 
+-spec add_definition_array( Name::parameter_definition_name()
+                          , Properties::property_obj()
+                          ) ->
+  ok.
+add_definition_array(Name, Properties) ->
+  DefinitionArray = build_definition_array(Name, Properties),
+  add_definition(DefinitionArray).
+
 -spec add_definition( Name::parameter_definition_name()
                     , Properties::property_obj()
                     ) ->
   ok.
 add_definition(Name, Properties) ->
   Definition = build_definition(Name, Properties),
+  add_definition(Definition).
+
+-spec add_definition( Definition :: parameters_definitions()
+                                  | parameters_definition_array()
+                    ) ->
+  ok.
+add_definition(Definition) ->
   CurrentSpec = application:get_env(cowboy_swagger, global_spec, #{}),
   ExistingDefinitions = maps:get(definitions, CurrentSpec, #{}),
   NewSpec = CurrentSpec#{definitions => maps:merge( ExistingDefinitions
@@ -224,3 +250,16 @@ build_definition(Name, Properties) ->
   #{Name => #{ type => <<"object">>
              , properties => Properties
              }}.
+
+%% @private
+-spec build_definition_array( Name::parameter_definition_name()
+                            , Properties::property_obj()
+                            ) ->
+  parameters_definition_array().
+build_definition_array(Name, Properties) ->
+  #{Name => #{ type => <<"array">>
+             , items => #{ type => <<"object">>
+                         , properties => Properties
+                         }
+             }}.
+

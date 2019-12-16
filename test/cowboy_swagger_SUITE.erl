@@ -10,7 +10,9 @@
 
 -export([all/0]).
 -export([ to_json_test/1
-        , add_definition_test/1]).
+        , add_definition_test/1
+        , add_definition_array_test/1
+        ]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Common test
@@ -136,40 +138,62 @@ to_json_test(_Config) ->
 -spec add_definition_test(Config::cowboy_swagger_test_utils:config()) ->
   {comment, string()}.
 add_definition_test(_Config) ->
+  %%
+  %% Given
+  %%
   ct:comment("Add first definition"),
   Name1 = <<"CostumerDefinition">>,
-  Properties1 =
-    #{ <<"first_name">> =>
-        #{ type => <<"string">>
-         , description => <<"User first name">>
-         , example => <<"Pepito">>
-         }
-    , <<"last_name">> =>
-        #{ type => <<"string">>
-         , description => <<"User last name">>
-         , example => <<"Perez">>
-         }
-    },
-  ok = cowboy_swagger:add_definition(Name1, Properties1),
+  Properties1 = test_properties_one(),
 
   ct:comment("Add second definition"),
   Name2 = <<"CarDefinition">>,
-  Properties2 =
-    #{ <<"brand">> =>
-        #{ type => <<"string">>
-         , description => <<"Car brand">>
-         }
-    , <<"year">> =>
-        #{ type => <<"string">>
-         , description => <<"Production time">>
-         , example => <<"1995">>
-         }
-    },
+  Properties2 = test_properties_two(),
+
+  %%
+  %% When
+  %%
+  ok = cowboy_swagger:add_definition(Name1, Properties1),
   ok = cowboy_swagger:add_definition(Name2, Properties2),
+
+  %%
+  %% Then
+  %%
   {ok, SwaggerSpec1} = application:get_env(cowboy_swagger, global_spec),
   JsonDefinitions = maps:get(definitions, SwaggerSpec1),
   true = maps:is_key(Name1, JsonDefinitions),
   true = maps:is_key(Name2, JsonDefinitions),
+
+  {comment, ""}.
+
+-spec add_definition_array_test(Config::cowboy_swagger_test_utils:config()) ->
+  {comment, string()}.
+add_definition_array_test(_Config) ->
+  %%
+  %% Given
+  %%
+  ct:comment("Add first definition"),
+  Name1 = <<"CostumerDefinition">>,
+  Properties1 = test_properties_one(),
+
+  ct:comment("Add second definition"),
+  Name2 = <<"CarDefinition">>,
+  Properties2 = test_properties_two(),
+
+  %%
+  %% When
+  %%
+  ok = cowboy_swagger:add_definition_array(Name1, Properties1),
+  ok = cowboy_swagger:add_definition_array(Name2, Properties2),
+
+  %%
+  %% Then
+  %%
+  {ok, SwaggerSpec1} = application:get_env(cowboy_swagger, global_spec),
+  JsonDefinitions = maps:get(definitions, SwaggerSpec1),
+  true = maps:is_key(items, maps:get(Name1, JsonDefinitions)),
+  true = maps:is_key(items, maps:get(Name2, JsonDefinitions)),
+  <<"array">> = maps:get(type, maps:get(Name1, JsonDefinitions)),
+  <<"array">> = maps:get(type, maps:get(Name2, JsonDefinitions)),
 
   {comment, ""}.
 
@@ -260,3 +284,28 @@ test_trails() ->
    trails:trail("/a/:b/[:c]", handler2, [], Metadata),
    trails:trail("/a", handler3, [], Metadata1)|
    cowboy_swagger_handler:trails()].
+
+test_properties_one() ->
+  #{ <<"first_name">> =>
+      #{ type => <<"string">>
+       , description => <<"User first name">>
+       , example => <<"Pepito">>
+       }
+   , <<"last_name">> =>
+      #{ type => <<"string">>
+       , description => <<"User last name">>
+       , example => <<"Perez">>
+       }
+   }.
+
+test_properties_two() ->
+  #{ <<"brand">> =>
+      #{ type => <<"string">>
+       , description => <<"Car brand">>
+       }
+   , <<"year">> =>
+      #{ type => <<"string">>
+       , description => <<"Production time">>
+       , example => <<"1995">>
+       }
+   }.
