@@ -8,6 +8,7 @@
 -export([enc_json/1, dec_json/1]).
 -export([swagger_paths/1, validate_metadata/1]).
 -export([filter_cowboy_swagger_handler/1]).
+-export([get_existing_definitions/1]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Types.
@@ -68,6 +69,10 @@
 -type metadata() :: trails:metadata(swagger_map()).
 -export_type([swagger_map/0, metadata/0]).
 
+-type swagger_version() :: swagger_2_0
+                         | openapi_3_0_0.
+-export_type([swagger_version/0]).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Public API.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -107,16 +112,21 @@ add_definition(Name, Properties) ->
   ok.
 add_definition(Definition) ->
   CurrentSpec = application:get_env(cowboy_swagger, global_spec, #{}),
-  ExistingDefinitions = maps:get(definitions, CurrentSpec, #{}),
-  NewSpec = CurrentSpec#{definitions => maps:merge( ExistingDefinitions
-                                                  , Definition
-                                                  )},
+  NewDefinitions = maps:merge( get_existing_definitions(CurrentSpec)
+                             , Definition
+                             ),
+  NewSpec = prepare_new_global_spec(CurrentSpec, NewDefinitions),
   application:set_env(cowboy_swagger, global_spec, NewSpec).
 
 -spec schema(DefinitionName::parameter_definition_name()) ->
   map().
 schema(DefinitionName) ->
-  #{<<"$ref">> => <<"#/definitions/", DefinitionName/binary>>}.
+  case swagger_version() of
+    swagger_2_0 ->
+      #{<<"$ref">> => <<"#/definitions/", DefinitionName/binary>>};
+    openapi_3_0_0 ->
+      #{<<"$ref">> => <<"#/components/schemas/", DefinitionName/binary>>}
+  end.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -156,9 +166,33 @@ filter_cowboy_swagger_handler(Trails) ->
   end,
   lists:filter(F, Trails).
 
+-spec get_existing_definitions(CurrentSpec :: map()) ->
+  Definition :: parameters_definitions()
+              | parameters_definition_array().
+get_existing_definitions(CurrentSpec) ->
+  case swagger_version() of
+    swagger_2_0 ->
+      maps:get(definitions, CurrentSpec, #{});
+    openapi_3_0_0 ->
+      case CurrentSpec of
+        #{components :=
+            #{schemas := Schemas }} -> Schemas;
+        _Other                      -> #{}
+      end
+  end.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Private API.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% @private
+-spec swagger_version() -> swagger_version().
+swagger_version() ->
+  case application:get_env(cowboy_swagger, global_spec, #{}) of
+    #{openapi := "3.0.0"} -> openapi_3_0_0;
+    #{swagger := "2.0"}   -> swagger_2_0;
+    _Other                -> swagger_2_0
+  end.
 
 %% @private
 is_visible(_Method, Metadata) ->
@@ -263,3 +297,20 @@ build_definition_array(Name, Properties) ->
                          }
              }}.
 
+%% @private
+-spec prepare_new_global_spec( CurrentSpec :: map()
+                             , Definitions :: parameters_definitions()
+                                            | parameters_definition_array()
+                             ) ->
+  NewSpec :: map().
+prepare_new_global_spec(CurrentSpec, Definitions) ->
+  case swagger_version() of
+    swagger_2_0 ->
+      CurrentSpec#{definitions => Definitions
+                  };
+    openapi_3_0_0 ->
+      CurrentSpec#{components =>
+                    #{ schemas => Definitions
+                     }
+                  }
+  end.
