@@ -69,10 +69,8 @@
 -type metadata() :: trails:metadata(swagger_map()).
 -export_type([swagger_map/0, metadata/0]).
 
--define(SWAGGER_2_0, swagger_2_0).
--define(OPENAPI_3_0_0, openapi_3_0_0).
--type swagger_version() :: ?SWAGGER_2_0
-                         | ?OPENAPI_3_0_0.
+-type swagger_version() :: swagger_2_0
+                         | openapi_3_0_0.
 -export_type([swagger_version/0]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -124,9 +122,9 @@ add_definition(Definition) ->
   map().
 schema(DefinitionName) ->
   case swagger_version() of
-    ?SWAGGER_2_0 ->
+    swagger_2_0 ->
       #{<<"$ref">> => <<"#/definitions/", DefinitionName/binary>>};
-    ?OPENAPI_3_0_0 ->
+    openapi_3_0_0 ->
       #{<<"$ref">> => <<"#/components/schemas/", DefinitionName/binary>>}
   end.
 
@@ -173,9 +171,9 @@ filter_cowboy_swagger_handler(Trails) ->
               | parameters_definition_array().
 get_existing_definitions(CurrentSpec) ->
   case swagger_version() of
-    ?SWAGGER_2_0 ->
+    swagger_2_0 ->
       maps:get(definitions, CurrentSpec, #{});
-    ?OPENAPI_3_0_0 ->
+    openapi_3_0_0 ->
       case CurrentSpec of
         #{components :=
             #{schemas := Schemas }} -> Schemas;
@@ -191,9 +189,9 @@ get_existing_definitions(CurrentSpec) ->
 -spec swagger_version() -> swagger_version().
 swagger_version() ->
   case application:get_env(cowboy_swagger, global_spec, #{}) of
-    #{openapi := "3.0.0"} -> ?OPENAPI_3_0_0;
-    #{swagger := "2.0"}   -> ?SWAGGER_2_0;
-    _Other                -> ?SWAGGER_2_0
+    #{openapi := "3.0.0"} -> openapi_3_0_0;
+    #{swagger := "2.0"}   -> swagger_2_0;
+    _Other                -> swagger_2_0
   end.
 
 %% @private
@@ -307,10 +305,10 @@ build_definition_array(Name, Properties) ->
   NewSpec :: map().
 prepare_new_global_spec(CurrentSpec, Definitions) ->
   case swagger_version() of
-    ?SWAGGER_2_0 ->
+    swagger_2_0 ->
       CurrentSpec#{definitions => Definitions
                   };
-    ?OPENAPI_3_0_0 ->
+    openapi_3_0_0 ->
       CurrentSpec#{components =>
                     #{ schemas => Definitions
                      }
