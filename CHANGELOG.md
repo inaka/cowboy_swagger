@@ -1,6 +1,30 @@
-# Change Log
+# Changelog
+
+## [2.2.0](https://github.com/inaka/cowboy_swagger/tree/2.2.0) (2020-05-26)
+
+[Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.2.4...2.2.0)
+
+**Closed issues:**
+
+- Unknown type cowboy\_router:route\_match [\#115](https://github.com/inaka/cowboy_swagger/issues/115)
+
+**Merged pull requests:**
+
+- Support 'components' section in openapi 3.0.0 [\#119](https://github.com/inaka/cowboy_swagger/pull/119) ([brucify](https://github.com/brucify))
+- New function add\_definition\_array/2 in cowboy\_swagger [\#118](https://github.com/inaka/cowboy_swagger/pull/118) ([brucify](https://github.com/brucify))
+- Fix/for xref and dialyzer [\#117](https://github.com/inaka/cowboy_swagger/pull/117) ([paulo-ferraz-oliveira](https://github.com/paulo-ferraz-oliveira))
+- handle openapi 3.0 format, use new swagger-ui [\#114](https://github.com/inaka/cowboy_swagger/pull/114) ([szlartibartfaszt79](https://github.com/szlartibartfaszt79))
+
+## [1.2.4](https://github.com/inaka/cowboy_swagger/tree/1.2.4) (2019-02-27)
+
+[Full Changelog](https://github.com/inaka/cowboy_swagger/compare/2.1.0...1.2.4)
+
+**Merged pull requests:**
+
+- Fix a few static analysis warnings [\#116](https://github.com/inaka/cowboy_swagger/pull/116) ([paulo-ferraz-oliveira](https://github.com/paulo-ferraz-oliveira))
 
 ## [2.1.0](https://github.com/inaka/cowboy_swagger/tree/2.1.0) (2018-05-04)
+
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/2.0.0...2.1.0)
 
 **Closed issues:**
@@ -10,10 +34,12 @@
 **Merged pull requests:**
 
 - Update from @freke [\#113](https://github.com/inaka/cowboy_swagger/pull/113) ([elbrujohalcon](https://github.com/elbrujohalcon))
+- Bump Version to 2.1.0 [\#112](https://github.com/inaka/cowboy_swagger/pull/112) ([elbrujohalcon](https://github.com/elbrujohalcon))
 - Update Dependencies [\#111](https://github.com/inaka/cowboy_swagger/pull/111) ([elbrujohalcon](https://github.com/elbrujohalcon))
 - Add rebar3 to root path to fix travis builds [\#110](https://github.com/inaka/cowboy_swagger/pull/110) ([elbrujohalcon](https://github.com/elbrujohalcon))
 
 ## [2.0.0](https://github.com/inaka/cowboy_swagger/tree/2.0.0) (2017-11-30)
+
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.2.3...2.0.0)
 
 **Closed issues:**
@@ -28,6 +54,7 @@
 - Update README.md [\#106](https://github.com/inaka/cowboy_swagger/pull/106) ([igaray](https://github.com/igaray))
 
 ## [1.2.3](https://github.com/inaka/cowboy_swagger/tree/1.2.3) (2017-06-13)
+
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.2.2...1.2.3)
 
 **Closed issues:**
@@ -46,6 +73,7 @@
 - \[\#95\] update sync by rebar3\_auto [\#96](https://github.com/inaka/cowboy_swagger/pull/96) ([Euen](https://github.com/Euen))
 
 ## [1.2.2](https://github.com/inaka/cowboy_swagger/tree/1.2.2) (2017-01-27)
+
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.2.1...1.2.2)
 
 **Closed issues:**
@@ -60,6 +88,7 @@
 - \[\#86\] Fixing Example [\#90](https://github.com/inaka/cowboy_swagger/pull/90) ([ferigis](https://github.com/ferigis))
 
 ## [1.2.1](https://github.com/inaka/cowboy_swagger/tree/1.2.1) (2017-01-17)
+
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.2.0...1.2.1)
 
 **Closed issues:**
@@ -79,6 +108,7 @@
 - \[\#83\] updating dependencies on rebar3 config file [\#85](https://github.com/inaka/cowboy_swagger/pull/85) ([ferigis](https://github.com/ferigis))
 
 ## [1.2.0](https://github.com/inaka/cowboy_swagger/tree/1.2.0) (2016-11-16)
+
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.1.0...1.2.0)
 
 **Fixed bugs:**
@@ -99,6 +129,7 @@
 - Replace jiffy by jsx [\#76](https://github.com/inaka/cowboy_swagger/pull/76) ([BernardNotarianni](https://github.com/BernardNotarianni))
 
 ## [1.1.0](https://github.com/inaka/cowboy_swagger/tree/1.1.0) (2016-08-11)
+
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.0.3...1.1.0)
 
 **Fixed bugs:**
@@ -121,6 +152,7 @@
 - Add missing jiffy app in .app.src [\#65](https://github.com/inaka/cowboy_swagger/pull/65) ([jeanparpaillon](https://github.com/jeanparpaillon))
 
 ## [1.0.3](https://github.com/inaka/cowboy_swagger/tree/1.0.3) (2016-04-14)
+
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.0.2...1.0.3)
 
 **Fixed bugs:**
@@ -137,6 +169,7 @@
 - Handles the property parameter  as json list when it's empty [\#57](https://github.com/inaka/cowboy_swagger/pull/57) ([joaohf](https://github.com/joaohf))
 
 ## [1.0.2](https://github.com/inaka/cowboy_swagger/tree/1.0.2) (2016-03-15)
+
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.0.1...1.0.2)
 
 **Closed issues:**
@@ -152,15 +185,16 @@
 - Example application uses local soruces [\#48](https://github.com/inaka/cowboy_swagger/pull/48) ([jeanparpaillon](https://github.com/jeanparpaillon))
 
 ## [1.0.1](https://github.com/inaka/cowboy_swagger/tree/1.0.1) (2016-01-08)
+
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/0.1.0-otp17...1.0.1)
 
 **Merged pull requests:**
 
 - \[\#quick\] upgrade hexer.mk [\#46](https://github.com/inaka/cowboy_swagger/pull/46) ([elbrujohalcon](https://github.com/elbrujohalcon))
-- Update deps in rebar.config according to Makefile [\#45](https://github.com/inaka/cowboy_swagger/pull/45) ([define-null](https://github.com/define-null))
 - Hex Package [\#33](https://github.com/inaka/cowboy_swagger/pull/33) ([elbrujohalcon](https://github.com/elbrujohalcon))
 
 ## [0.1.0-otp17](https://github.com/inaka/cowboy_swagger/tree/0.1.0-otp17) (2015-12-15)
+
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/0.1.0...0.1.0-otp17)
 
 **Closed issues:**
@@ -168,6 +202,7 @@
 - Location in response headers is not reading path values [\#43](https://github.com/inaka/cowboy_swagger/issues/43)
 
 ## [0.1.0](https://github.com/inaka/cowboy_swagger/tree/0.1.0) (2015-12-03)
+
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/0.0.1...0.1.0)
 
 **Fixed bugs:**
@@ -200,6 +235,9 @@
 - Ferigis.23.ignore swagger trails [\#29](https://github.com/inaka/cowboy_swagger/pull/29) ([ferigis](https://github.com/ferigis))
 
 ## [0.0.1](https://github.com/inaka/cowboy_swagger/tree/0.0.1) (2015-09-14)
+
+[Full Changelog](https://github.com/inaka/cowboy_swagger/compare/8ea2dca534154b7453789eb6ed10cd6074385405...0.0.1)
+
 **Closed issues:**
 
 - Validate and/or set default values of `cowboy\_swagger:metadata\(\)`, according with swagger schema. [\#9](https://github.com/inaka/cowboy_swagger/issues/9)
@@ -224,4 +262,4 @@
 
 
 
-\* *This Change Log was automatically generated by [github_changelog_generator](https://github.com/skywinder/Github-Changelog-Generator)*
+\* *This Changelog was automatically generated by [github_changelog_generator](https://github.com/github-changelog-generator/github-changelog-generator)*
