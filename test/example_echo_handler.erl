@@ -21,6 +21,7 @@
 -behaviour(trails_handler).
 -export([trails/0]).
 
+-spec trails() -> [trails:trail()].
 trails() ->
   Metadata =
     #{get =>
@@ -70,15 +71,18 @@ trails() ->
   [trails:trail("/message/[:echo]", example_echo_handler, [], Metadata)].
 
 %% cowboy
+-spec allowed_methods(Req, State) -> {[binary(), ...], Req, State}.
 allowed_methods(Req, State) ->
   {[<<"GET">>, <<"PUT">>, <<"HEAD">>], Req, State}.
 
 %% internal
+-spec handle_get(Req, State) -> {[binary(), ...], Req, State}.
 handle_get(Req, State) ->
   Echo = application:get_env(example, echo, ""),
   Body = [<<"You Get an echo!">> , Echo],
   {Body, Req, State}.
 
+-spec handle_put(cowboy_req:req(), State) -> {true, cowboy_req:req(), State}.
 handle_put(Req, State) ->
   {Echo, Req1} = cowboy_req:binding(echo, Req, ""),
   application:set_env(example, echo, Echo),

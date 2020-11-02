@@ -19,6 +19,7 @@
 -behaviour(trails_handler).
 -export([trails/0]).
 
+-spec trails() -> [trails:trail()].
 trails() ->
   Metadata =
     #{get =>
@@ -45,10 +46,12 @@ trails() ->
     Metadata)].
 
 %% cowboy
+-spec allowed_methods(Req, State) -> {[binary(), ...], Req, State}.
 allowed_methods(Req, State) ->
   {[<<"GET">>], Req, State}.
 
 %% internal
+-spec handle_get(Req, State) -> {binary(), Req, State}.
 handle_get(Req, State) ->
   Host = cowboy_req:host(Req),
   Body = <<"I am ", Host/binary>>,
