@@ -3,7 +3,7 @@
 # cowboy-swagger
 [Swagger](http://swagger.io/) integration for [Cowboy](https://github.com/ninenines/cowboy) (built on [trails](https://github.com/inaka/cowboy-trails)).
 
-![CI for cowboy_swagger](https://github.com/inaka/cowboy_swagger/workflows/CI%20for%20cowboy_swagger/badge.svg)
+![build](https://github.com/inaka/cowboy_swagger/workflows/build/badge.svg)
 
 ## Contact Us
 If you find any **bugs** or have a **problem** while using this library, please
