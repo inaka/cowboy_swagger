@@ -1,5 +1,31 @@
 # Changelog
 
+## [2.2.1](https://github.com/inaka/cowboy_swagger/tree/2.2.1) (2021-02-08)
+
+[Full Changelog](https://github.com/inaka/cowboy_swagger/compare/2.2.0...2.2.1)
+
+**Implemented enhancements:**
+
+- Add support to others json libraries [\#52](https://github.com/inaka/cowboy_swagger/issues/52)
+- The `cowboy\_swagger\_handler` should return also `swagger.yaml`. [\#20](https://github.com/inaka/cowboy_swagger/issues/20)
+
+**Fixed bugs:**
+
+- Actually run on different Erlang versions [\#125](https://github.com/inaka/cowboy_swagger/pull/125) ([paulo-ferraz-oliveira](https://github.com/paulo-ferraz-oliveira))
+
+**Closed issues:**
+
+- Move from Travis CI to GitHub Actions? [\#122](https://github.com/inaka/cowboy_swagger/issues/122)
+- Fix current resource path `/api-docs` according with Swagger 2.0 conventions \(`/swagger.json`\) [\#19](https://github.com/inaka/cowboy_swagger/issues/19)
+
+**Merged pull requests:**
+
+- Update dep.s to adapt to OTP 24 [\#127](https://github.com/inaka/cowboy_swagger/pull/127) ([paulo-ferraz-oliveira](https://github.com/paulo-ferraz-oliveira))
+- Bump OTP-24 -ready dep.s \(at least at the compilation level\) [\#126](https://github.com/inaka/cowboy_swagger/pull/126) ([paulo-ferraz-oliveira](https://github.com/paulo-ferraz-oliveira))
+- README.md: show `build` instead of `CI for cowboy\_swagger` [\#124](https://github.com/inaka/cowboy_swagger/pull/124) ([paulo-ferraz-oliveira](https://github.com/paulo-ferraz-oliveira))
+- Replace Travis CI with GitHub Actions [\#123](https://github.com/inaka/cowboy_swagger/pull/123) ([paulo-ferraz-oliveira](https://github.com/paulo-ferraz-oliveira))
+- Modernize CI [\#121](https://github.com/inaka/cowboy_swagger/pull/121) ([paulo-ferraz-oliveira](https://github.com/paulo-ferraz-oliveira))
+
 ## [2.2.0](https://github.com/inaka/cowboy_swagger/tree/2.2.0) (2020-05-26)
 
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/1.2.4...2.2.0)
@@ -10,6 +36,7 @@
 
 **Merged pull requests:**
 
+- Release request [\#120](https://github.com/inaka/cowboy_swagger/pull/120) ([paulo-ferraz-oliveira](https://github.com/paulo-ferraz-oliveira))
 - Support 'components' section in openapi 3.0.0 [\#119](https://github.com/inaka/cowboy_swagger/pull/119) ([brucify](https://github.com/brucify))
 - New function add\_definition\_array/2 in cowboy\_swagger [\#118](https://github.com/inaka/cowboy_swagger/pull/118) ([brucify](https://github.com/brucify))
 - Fix/for xref and dialyzer [\#117](https://github.com/inaka/cowboy_swagger/pull/117) ([paulo-ferraz-oliveira](https://github.com/paulo-ferraz-oliveira))
