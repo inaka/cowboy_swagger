@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.2.2](https://github.com/inaka/cowboy_swagger/tree/2.2.2) (2021-07-01)
+
+[Full Changelog](https://github.com/inaka/cowboy_swagger/compare/2.2.1...2.2.2)
+
+**Closed issues:**
+
+- GlobalSpec not work [\#132](https://github.com/inaka/cowboy_swagger/issues/132)
+- cowboy and ranch version not compatible ? [\#130](https://github.com/inaka/cowboy_swagger/issues/130)
+
+**Merged pull requests:**
+
+- fix: swagger & openapi root field [\#133](https://github.com/inaka/cowboy_swagger/pull/133) ([DDDHuang](https://github.com/DDDHuang))
+- Update example app's rebar.lock [\#131](https://github.com/inaka/cowboy_swagger/pull/131) ([zmstone](https://github.com/zmstone))
+- Increase consumer confidence [\#129](https://github.com/inaka/cowboy_swagger/pull/129) ([paulo-ferraz-oliveira](https://github.com/paulo-ferraz-oliveira))
+- Move to a GitHub action \(instead of container-based\) CI approach [\#128](https://github.com/inaka/cowboy_swagger/pull/128) ([paulo-ferraz-oliveira](https://github.com/paulo-ferraz-oliveira))
+
 ## [2.2.1](https://github.com/inaka/cowboy_swagger/tree/2.2.1) (2021-02-08)
 
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/2.2.0...2.2.1)
