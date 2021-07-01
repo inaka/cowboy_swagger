@@ -245,6 +245,8 @@ normalize_list_values(List) ->
   lists:foldr(F, [], List).
 
 %% @private
+create_swagger_spec(#{swagger := _Version} = GlobalSpec, SanitizeTrails) ->
+    GlobalSpec#{paths => swagger_paths(SanitizeTrails)};
 create_swagger_spec(#{openapi := _Version} = GlobalSpec, SanitizeTrails) ->
   GlobalSpec#{paths => swagger_paths(SanitizeTrails)};
 create_swagger_spec(GlobalSpec, SanitizeTrails) ->
