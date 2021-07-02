@@ -150,7 +150,12 @@ dec_json(Data) ->
 %% @hidden
 -spec swagger_paths([trails:trail()]) -> map().
 swagger_paths(Trails) ->
-  swagger_paths(Trails, #{}).
+  swagger_paths(Trails, undefined).
+
+-spec swagger_paths([trails:trail()], binary() | string() | undefined) -> map().
+swagger_paths(Trails, BasePath) ->
+    Paths = trans_swagger_paths(Trails, #{}),
+    refactor_base_path(Paths, BasePath).
 
 %% @hidden
 -spec validate_metadata(trails:metadata(_)) -> metadata().
@@ -199,12 +204,37 @@ is_visible(_Method, Metadata) ->
   not maps:get(hidden, Metadata, false).
 
 %% @private
-swagger_paths([], Acc) ->
+trans_swagger_paths([], Acc) ->
   Acc;
-swagger_paths([Trail | T], Acc) ->
+trans_swagger_paths([Trail | T], Acc) ->
   Path = normalize_path(trails:path_match(Trail)),
   Metadata = normalize_map_values(validate_metadata(trails:metadata(Trail))),
-  swagger_paths(T, maps:put(Path, Metadata, Acc)).
+  trans_swagger_paths(T, maps:put(Path, Metadata, Acc)).
+
+%% @private
+refactor_base_path(PathMap, undefined) ->
+  PathMap;
+refactor_base_path(PathMap, BasePath) when is_list(BasePath) ->
+  refactor_base_path(PathMap, list_to_binary(BasePath));
+refactor_base_path(PathMap, BasePath) ->
+  Fun =
+    fun(Path, NextPathMap) ->
+      maps:put(remove_base_path(Path, BasePath), maps:get(Path, PathMap), NextPathMap)
+    end,
+  lists:foldl(Fun, #{}, maps:keys(PathMap)).
+
+%% /base_path/api -> /api
+%% @private
+-spec(remove_base_path(binary(), binary()) -> binary()).
+remove_base_path(Path, BasePath) ->
+  BasePathLength = erlang:size(BasePath),
+  MatchLength = BasePathLength + 1,
+  case binary:match(Path, <<BasePath/binary, "/">>) of
+    {0, MatchLength} ->
+      binary:part(Path, BasePathLength, erlang:size(Path) - BasePathLength);
+    _ ->
+      Path
+  end.
 
 %% @private
 normalize_path(Path) ->
@@ -246,11 +276,21 @@ normalize_list_values(List) ->
 
 %% @private
 create_swagger_spec(#{swagger := _Version} = GlobalSpec, SanitizeTrails) ->
-    GlobalSpec#{paths => swagger_paths(SanitizeTrails)};
+  BasePath =  maps:get(basePath, GlobalSpec, undefined),
+  SwaggerPaths = swagger_paths(SanitizeTrails, BasePath),
+  GlobalSpec#{paths => SwaggerPaths};
 create_swagger_spec(#{openapi := _Version} = GlobalSpec, SanitizeTrails) ->
-  GlobalSpec#{paths => swagger_paths(SanitizeTrails)};
+  BasePath = deconstruct_openapi_url(GlobalSpec),
+  SwaggerPaths = swagger_paths(SanitizeTrails, BasePath),
+  GlobalSpec#{paths => SwaggerPaths};
 create_swagger_spec(GlobalSpec, SanitizeTrails) ->
   create_swagger_spec(GlobalSpec#{openapi => <<"3.0.0">>}, SanitizeTrails).
+
+%% @private
+deconstruct_openapi_url(GlobalSpec) ->
+    Servers = maps:get(servers, GlobalSpec, [#{}]),
+    Url = maps:get(url, hd(Servers), <<"">>),
+    maps:get(path, uri_string:parse(Url)).
 
 %% @private
 validate_swagger_map(Map) ->
