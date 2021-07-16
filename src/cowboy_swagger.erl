@@ -351,8 +351,9 @@ prepare_new_global_spec(CurrentSpec, Definitions) ->
       CurrentSpec#{definitions => Definitions
                   };
     openapi_3_0_0 ->
+      Components = maps:get(components, CurrentSpec, #{}),
       CurrentSpec#{components =>
-                    #{ schemas => Definitions
+                        Components#{ schemas => Definitions
                      }
                   }
   end.
