@@ -2,7 +2,7 @@
 -module(cowboy_swagger).
 
 %% API
--export([to_json/1, add_definition/2, add_definition_array/2, schema/1]).
+-export([to_json/1, add_definition/1, add_definition/2, add_definition_array/2, schema/1]).
 
 %% Utilities
 -export([enc_json/1, dec_json/1]).
