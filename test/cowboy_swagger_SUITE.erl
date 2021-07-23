@@ -211,7 +211,7 @@ perform_add_completed_definition_test() ->
   JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1),
   true = maps:is_key(Name1, JsonDefinitions),
   true = maps:is_key(Name2, JsonDefinitions),
-  ok.
+  {comment, ""}.
 
 %% @private
 perform_add_definition_test() ->
