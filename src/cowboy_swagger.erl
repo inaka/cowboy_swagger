@@ -1,6 +1,7 @@
 %%% @doc cowboy-swagger main interface.
 -module(cowboy_swagger).
 
+-ignore_xref([{?MODULE, add_definition, 1}]).
 %% API
 -export([to_json/1, add_definition/1, add_definition/2, add_definition_array/2, schema/1]).
 
@@ -154,7 +155,7 @@ swagger_paths(Trails) ->
 
 -spec swagger_paths([trails:trail()], binary() | string() | undefined) -> map().
 swagger_paths(Trails, BasePath) ->
-    Paths = trans_swagger_paths(Trails, #{}),
+    Paths = translate_swagger_paths(Trails, #{}),
     refactor_base_path(Paths, BasePath).
 
 %% @hidden
@@ -204,12 +205,12 @@ is_visible(_Method, Metadata) ->
   not maps:get(hidden, Metadata, false).
 
 %% @private
-trans_swagger_paths([], Acc) ->
+translate_swagger_paths([], Acc) ->
   Acc;
-trans_swagger_paths([Trail | T], Acc) ->
+translate_swagger_paths([Trail | T], Acc) ->
   Path = normalize_path(trails:path_match(Trail)),
   Metadata = normalize_map_values(validate_metadata(trails:metadata(Trail))),
-  trans_swagger_paths(T, maps:put(Path, Metadata, Acc)).
+  translate_swagger_paths(T, maps:put(Path, Metadata, Acc)).
 
 %% @private
 refactor_base_path(PathMap, undefined) ->

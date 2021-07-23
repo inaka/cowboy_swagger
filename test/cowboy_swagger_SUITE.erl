@@ -29,11 +29,13 @@ all() ->
 
 -spec to_json_test(cowboy_swagger_test_utils:config()) -> {atom(), string()}.
 to_json_test(_Config) ->
+  set_openapi_url("/basepath"),
   Trails = test_trails(),
   SwaggerJson = cowboy_swagger:to_json(Trails),
   Result = jsx:decode(SwaggerJson, [return_maps]),
   #{<<"info">> := #{<<"title">> := <<"Example API">>},
     <<"openapi">> := <<"3.0.0">>,
+    <<"servers">> := [#{<<"url">> := <<"/basepath">>}],
     <<"paths">> :=
     #{<<"/a">> :=
     #{<<"get">> :=
@@ -141,9 +143,11 @@ to_json_test(_Config) ->
 add_definition_test(_Config) ->
   set_swagger_version(swagger_2_0),
   perform_add_definition_test(),
+  perform_add_completed_definition_test(),
 
   set_swagger_version(openapi_3_0_0),
   perform_add_definition_test(),
+  perform_add_completed_definition_test(),
 
   {comment, ""}.
 
@@ -172,6 +176,42 @@ schema_test(_Config) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Internal functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+perform_add_completed_definition_test() ->
+  %%
+  %% Given
+  %%
+  ct:comment("Add first definition"),
+  Name1 = <<"CostumerDefinition">>,
+  Properties1 = test_properties_one(),
+  Definition1 =
+    #{ Name1 =>
+      #{ type => <<"object">>
+       , properties => Properties1}
+    },
+
+  ct:comment("Add second definition"),
+  Name2 = <<"CarDefinition">>,
+  Properties2 = test_properties_two(),
+  Definition2 =
+    #{ Name1 =>
+      #{ type => <<"object">>
+       , properties => Properties2}
+    },
+  %%
+  %% When
+  %%
+  ok = cowboy_swagger:add_definition(Definition1),
+  ok = cowboy_swagger:add_definition(Definition2),
+
+  %%
+  %% Then
+  %%
+  {ok, SwaggerSpec1} = application:get_env(cowboy_swagger, global_spec),
+  JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1),
+  true = maps:is_key(Name1, JsonDefinitions),
+  true = maps:is_key(Name2, JsonDefinitions),
+  ok.
 
 %% @private
 perform_add_definition_test() ->
@@ -349,3 +389,8 @@ set_swagger_version(swagger_2_0) ->
 set_swagger_version(openapi_3_0_0) ->
   Spec0 = maps:remove(swagger, application:get_env(cowboy_swagger, global_spec, #{})),
   application:set_env(cowboy_swagger, global_spec, Spec0#{openapi => "3.0.0"}).
+
+set_openapi_url(Url) ->
+  Spec0 = maps:remove(swagger, application:get_env(cowboy_swagger, global_spec, #{})),
+  application:set_env(cowboy_swagger, global_spec,
+    Spec0#{openapi => "3.0.0", servers => [#{url => Url}]}).
