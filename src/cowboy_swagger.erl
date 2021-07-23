@@ -289,8 +289,8 @@ create_swagger_spec(GlobalSpec, SanitizeTrails) ->
 
 %% @private
 deconstruct_openapi_url(GlobalSpec) ->
-    Servers = maps:get(servers, GlobalSpec, [#{}]),
-    Url = maps:get(url, hd(Servers), <<"">>),
+    [Server|_] = maps:get(servers, GlobalSpec, [#{}]),
+    Url = maps:get(url, Server, <<"">>),
     maps:get(path, uri_string:parse(Url)).
 
 %% @private
