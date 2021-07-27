@@ -21,7 +21,4 @@ jobs:
         with:
           otp-version: ${{matrix.otp_vsn}}
           rebar3-version: '3.14'
-      - run: rebar3 xref
-      - run: rebar3 lint
-      - run: rebar3 dialyzer
-      - run: rebar3 ct
+      - run: rebar3 test
