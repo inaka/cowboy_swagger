@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.3.0](https://github.com/inaka/cowboy_swagger/tree/2.3.0) (2021-07-28)
+
+[Full Changelog](https://github.com/inaka/cowboy_swagger/compare/2.2.2...2.3.0)
+
+**Closed issues:**
+
+- Open API servers field & swagger basePath filed [\#134](https://github.com/inaka/cowboy_swagger/issues/134)
+
+**Merged pull requests:**
+
+- Allow for analysis under rebar3\_hank [\#137](https://github.com/inaka/cowboy_swagger/pull/137) ([paulo-ferraz-oliveira](https://github.com/paulo-ferraz-oliveira))
+- basePath & servers support; support more schema type  [\#135](https://github.com/inaka/cowboy_swagger/pull/135) ([DDDHuang](https://github.com/DDDHuang))
+
 ## [2.2.2](https://github.com/inaka/cowboy_swagger/tree/2.2.2) (2021-07-01)
 
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/2.2.1...2.2.2)
