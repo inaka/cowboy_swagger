@@ -327,9 +327,18 @@ validate_swagger_map_responses(Responses) ->
                       ) ->
   parameters_definitions().
 build_definition(Name, Properties) ->
-  #{Name => #{ type => <<"object">>
-             , properties => Properties
-             }}.
+  RequiredKey = maps:is_key('$required', Properties),
+  case RequiredKey of
+    false ->
+      #{Name => #{ type => <<"object">>
+         , properties => Properties
+            }};
+    true ->
+      #{Name => #{ type => <<"object">>
+         , properties => maps:without(['$required'], Properties)
+         , required => maps:get('$required', Properties)
+            }}
+    end.
 
 %% @private
 -spec build_definition_array( Name::parameter_definition_name()
