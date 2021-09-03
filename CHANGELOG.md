@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.4.0](https://github.com/inaka/cowboy_swagger/tree/2.4.0) (2021-09-03)
+
+[Full Changelog](https://github.com/inaka/cowboy_swagger/compare/2.3.0...2.4.0)
+
+**Closed issues:**
+
+- New swagger UI version [\#136](https://github.com/inaka/cowboy_swagger/issues/136)
+
+**Merged pull requests:**
+
+- Swagger UI [\#139](https://github.com/inaka/cowboy_swagger/pull/139) ([DDDHuang](https://github.com/DDDHuang))
+
 ## [2.3.0](https://github.com/inaka/cowboy_swagger/tree/2.3.0) (2021-07-28)
 
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/2.2.2...2.3.0)
