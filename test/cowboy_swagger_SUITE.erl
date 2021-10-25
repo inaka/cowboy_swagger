@@ -13,6 +13,7 @@
         , add_definition_test/1
         , add_definition_array_test/1
         , schema_test/1
+        , parameters_ref_test/1
         ]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -173,6 +174,20 @@ schema_test(_Config) ->
 
   {comment, ""}.
 
+-spec parameters_ref_test(Config::cowboy_swagger_test_utils:config()) ->
+  {comment, string()}.
+parameters_ref_test(_Config) ->
+  set_swagger_version(openapi_3_0_0),
+  cowboy_swagger:add_definition(
+    #{<<"page">> =>
+      #{description => <<"results per page (max 100)">>, example => 1,
+         in => query, name => per_page,
+         schema => #{example => 1, maximum => 100, minimum => 1, type => integer}}}),
+  {ok, SwaggerSpec1} = application:get_env(cowboy_swagger, global_spec),
+  JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1, parameters),
+  true = maps:is_key(<<"page">>, JsonDefinitions),
+  {comment, ""}.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Internal functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -208,7 +223,7 @@ perform_add_completed_definition_test() ->
   %% Then
   %%
   {ok, SwaggerSpec1} = application:get_env(cowboy_swagger, global_spec),
-  JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1),
+  JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1, schemas),
   true = maps:is_key(Name1, JsonDefinitions),
   true = maps:is_key(Name2, JsonDefinitions),
   ok.
@@ -236,7 +251,7 @@ perform_add_definition_test() ->
   %% Then
   %%
   {ok, SwaggerSpec1} = application:get_env(cowboy_swagger, global_spec),
-  JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1),
+  JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1, schemas),
   true = maps:is_key(Name1, JsonDefinitions),
   true = maps:is_key(Name2, JsonDefinitions),
   ok.
@@ -264,7 +279,7 @@ perform_add_definition_array_test() ->
   %% Then
   %%
   {ok, SwaggerSpec1} = application:get_env(cowboy_swagger, global_spec),
-  JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1),
+  JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1, schemas),
   true = maps:is_key(items, maps:get(Name1, JsonDefinitions)),
   true = maps:is_key(items, maps:get(Name2, JsonDefinitions)),
   <<"array">> = maps:get(type, maps:get(Name1, JsonDefinitions)),

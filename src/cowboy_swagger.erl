@@ -9,7 +9,7 @@
 -export([enc_json/1, dec_json/1]).
 -export([swagger_paths/1, validate_metadata/1]).
 -export([filter_cowboy_swagger_handler/1]).
--export([get_existing_definitions/1]).
+-export([get_existing_definitions/2]).
 
 % is_visible is used as a maps:filter/2 predicate, which requires a /2 arity function
 -hank([{unnecessary_function_arguments, [is_visible/2]}]).
@@ -116,11 +116,19 @@ add_definition(Name, Properties) ->
   ok.
 add_definition(Definition) ->
   CurrentSpec = application:get_env(cowboy_swagger, global_spec, #{}),
-  NewDefinitions = maps:merge( get_existing_definitions(CurrentSpec)
+  Type = definition_type(Definition),
+  NewDefinitions = maps:merge( get_existing_definitions(CurrentSpec, Type)
                              , Definition
                              ),
-  NewSpec = prepare_new_global_spec(CurrentSpec, NewDefinitions),
+  NewSpec = prepare_new_global_spec(CurrentSpec, NewDefinitions, Type),
   application:set_env(cowboy_swagger, global_spec, NewSpec).
+
+definition_type(Definition) ->
+  case maps:values(Definition) of
+    [#{in := In}] when In =:= query orelse In =:= path orelse In =:= header ->
+      parameters;
+       _ -> schemas
+  end.
 
 -spec schema(DefinitionName::parameter_definition_name()) ->
   map().
@@ -175,18 +183,18 @@ filter_cowboy_swagger_handler(Trails) ->
   end,
   lists:filter(F, Trails).
 
--spec get_existing_definitions(CurrentSpec :: map()) ->
+-spec get_existing_definitions(CurrentSpec :: map(), Type :: scheams | parameters) ->
   Definition :: parameters_definitions()
               | parameters_definition_array().
-get_existing_definitions(CurrentSpec) ->
+get_existing_definitions(CurrentSpec, Type) ->
   case swagger_version() of
     swagger_2_0 ->
       maps:get(definitions, CurrentSpec, #{});
     openapi_3_0_0 ->
       case CurrentSpec of
         #{components :=
-            #{schemas := Schemas }} -> Schemas;
-        _Other                      -> #{}
+            #{Type := Def }} -> Def;
+        _Other               -> #{}
       end
   end.
 
@@ -310,7 +318,7 @@ validate_swagger_map_params(Params) ->
   ValidateParams =
     fun(E) ->
       case maps:get(name, E, undefined) of
-        undefined -> false;
+        undefined ->  maps:is_key(<<"$ref">>, E);
         _         -> {true, E#{in => maps:get(in, E, <<"path">>)}}
       end
     end,
@@ -356,9 +364,10 @@ build_definition_array(Name, Properties) ->
 -spec prepare_new_global_spec( CurrentSpec :: map()
                              , Definitions :: parameters_definitions()
                                             | parameters_definition_array()
+                             , Type ::schemas|parameters
                              ) ->
   NewSpec :: map().
-prepare_new_global_spec(CurrentSpec, Definitions) ->
+prepare_new_global_spec(CurrentSpec, Definitions, Type) ->
   case swagger_version() of
     swagger_2_0 ->
       CurrentSpec#{definitions => Definitions
@@ -366,7 +375,7 @@ prepare_new_global_spec(CurrentSpec, Definitions) ->
     openapi_3_0_0 ->
       Components = maps:get(components, CurrentSpec, #{}),
       CurrentSpec#{components =>
-                        Components#{ schemas => Definitions
+                        Components#{ Type => Definitions
                      }
                   }
   end.

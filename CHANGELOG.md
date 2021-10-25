@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.5.0](https://github.com/inaka/cowboy_swagger/tree/2.5.0) (2021-09-23)
+
+[Full Changelog](https://github.com/inaka/cowboy_swagger/compare/2.4.0...2.5.0)
+
+**Merged pull requests:**
+
+- support component parameters [\#140](https://github.com/inaka/cowboy_swagger/pull/140) ([zhongwencool](https://github.com/zhongwencool))
+
 ## [2.4.0](https://github.com/inaka/cowboy_swagger/tree/2.4.0) (2021-09-03)
 
 [Full Changelog](https://github.com/inaka/cowboy_swagger/compare/2.3.0...2.4.0)
