@@ -280,10 +280,10 @@ perform_add_definition_array_test() ->
   %%
   {ok, SwaggerSpec1} = application:get_env(cowboy_swagger, global_spec),
   JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1, schemas),
-  true = maps:is_key(items, maps:get(Name1, JsonDefinitions)),
-  true = maps:is_key(items, maps:get(Name2, JsonDefinitions)),
-  <<"array">> = maps:get(type, maps:get(Name1, JsonDefinitions)),
-  <<"array">> = maps:get(type, maps:get(Name2, JsonDefinitions)),
+  true = maps:is_key(<<"items">>, maps:get(Name1, JsonDefinitions)),
+  true = maps:is_key(<<"items">>, maps:get(Name2, JsonDefinitions)),
+  <<"array">> = maps:get(<<"type">>, maps:get(Name1, JsonDefinitions)),
+  <<"array">> = maps:get(<<"type">>, maps:get(Name2, JsonDefinitions)),
   ok.
 
 %% @private
@@ -399,13 +399,13 @@ test_properties_two() ->
 
 %% @private
 set_swagger_version(swagger_2_0) ->
-  Spec0 = maps:remove(openapi, application:get_env(cowboy_swagger, global_spec, #{})),
-  application:set_env(cowboy_swagger, global_spec, Spec0#{swagger => "2.0"});
+  Spec0 = maps:remove(<<"openapi">>, cowboy_swagger:get_global_spec()),
+  cowboy_swagger:set_global_spec(Spec0#{swagger => "2.0"});
 set_swagger_version(openapi_3_0_0) ->
-  Spec0 = maps:remove(swagger, application:get_env(cowboy_swagger, global_spec, #{})),
-  application:set_env(cowboy_swagger, global_spec, Spec0#{openapi => "3.0.0"}).
+  Spec0 = maps:remove(<<"swagger">>, cowboy_swagger:get_global_spec()),
+  cowboy_swagger:set_global_spec(Spec0#{openapi => "3.0.0"}).
 
 set_openapi_url(Url) ->
-  Spec0 = maps:remove(swagger, application:get_env(cowboy_swagger, global_spec, #{})),
-  application:set_env(cowboy_swagger, global_spec,
-    Spec0#{openapi => "3.0.0", servers => [#{url => Url}]}).
+  Spec0 = maps:remove(<<"swagger">>, cowboy_swagger:get_global_spec()),
+  cowboy_swagger:set_global_spec(Spec0#{openapi => "3.0.0",
+                                        servers => [#{url => Url}]}).
