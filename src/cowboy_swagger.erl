@@ -364,7 +364,7 @@ validate_swagger_map_params(Params) ->
     fun(E) ->
       case maps:get(<<"name">>, E, undefined) of
         undefined ->  maps:is_key(<<"$ref">>, E);
-        _         -> {true, E#{in => maps:get(<<"in">>, E, <<"path">>)}}
+        _         -> {true, E#{<<"in">> => maps:get(<<"in">>, E, <<"path">>)}}
       end
     end,
   lists:filtermap(ValidateParams, Params).
