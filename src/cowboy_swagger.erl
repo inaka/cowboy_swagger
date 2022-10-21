@@ -234,6 +234,8 @@ validate_metadata(Metadata) ->
 %% @hidden
 -spec filter_cowboy_swagger_handler([trails:trail()]) -> [trails:trail()].
 filter_cowboy_swagger_handler(Trails) ->
+  %% Keeps only trails with at least one non-hidden method.
+  %% (All the cowboy_swagger_handler methdods are marked as hidden.)
   F = fun(Trail) ->
     MD = get_metadata(Trail),
     maps:size(maps:filter(fun is_visible/2, MD)) /= 0
@@ -289,8 +291,11 @@ swagger_version() ->
   end.
 
 %% @private
-is_visible(_Method, Metadata) ->
-  not maps:get(<<"hidden">>, Metadata, false).
+is_visible(_Key, Metadata) when is_map(Metadata) ->
+    %% Note that `"hidden"` is not a standard flag in OpenAPI
+    not maps:get(<<"hidden">>, Metadata, false);
+is_visible(_Key, _Metadata) ->
+    false.
 
 %% @private
 translate_swagger_paths([], Acc) ->
@@ -350,13 +355,20 @@ deconstruct_openapi_url(GlobalSpec) ->
     maps:get(path, uri_string:parse(Url)).
 
 %% @private
-validate_swagger_map(Map) ->
-  F = fun(_K, V) ->
+validate_swagger_map(Map) when is_map(Map) ->
+  %% Note that although per-path entries are usually methods such as
+  %% `"get": {...}`, there may also be entries whose values are not maps,
+  %% such as path-global `"parameters": [...]'.
+  F = fun(_K, V) when is_map(V) ->
         Params = validate_swagger_map_params(maps:get(<<"parameters">>, V, [])),
         Responses = validate_swagger_map_responses(maps:get(<<"responses">>, V, #{})),
-        V#{<<"parameters">> => Params, <<"responses">> => Responses}
+        V#{<<"parameters">> => Params, <<"responses">> => Responses};
+      (_K, V) ->
+        V
       end,
-  maps:map(F, Map).
+  maps:map(F, Map);
+validate_swagger_map(Other) ->
+  Other.
 
 %% @private
 validate_swagger_map_params(Params) ->
