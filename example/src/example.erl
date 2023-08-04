@@ -6,6 +6,8 @@
 -export([stop/1]).
 -export([start_phase/3]).
 
+-hank([unnecessary_function_arguments]).
+
 %% application
 %% @doc Starts the application
 start() ->

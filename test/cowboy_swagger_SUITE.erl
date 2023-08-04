@@ -8,6 +8,8 @@
 -export([to_json_test/1, add_definition_test/1, add_definition_array_test/1,
          schema_test/1, parameters_ref_test/1]).
 
+-hank([unnecessary_function_arguments]).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Common test
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

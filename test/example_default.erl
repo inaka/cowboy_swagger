@@ -3,6 +3,8 @@
 -export([init/3, rest_init/2, content_types_accepted/2, content_types_provided/2,
          forbidden/2, resource_exists/2]).
 
+-hank([unnecessary_function_arguments]).
+
 %% cowboy
 -spec init(any(), any(), any()) -> {upgrade, protocol, cowboy_rest}.
 init(_Transport, _Req, _Opts) ->
