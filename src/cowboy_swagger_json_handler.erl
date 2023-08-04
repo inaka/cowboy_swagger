@@ -16,7 +16,7 @@
       host => cowboy_swagger_handler:route_match(),
       _ => _}.
 
--export_type([options/0]).
+-export_type([options/0, state/0]).
 
 -type state() :: options().
 

@@ -16,6 +16,8 @@
 % is_visible is used as a maps:filter/2 predicate, which requires a /2 arity function
 -hank([{unnecessary_function_arguments, [{is_visible, 2}]}]).
 
+-elvis([{elvis_style, no_throw, disable}]).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Types.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
