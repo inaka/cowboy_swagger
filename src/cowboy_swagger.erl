@@ -119,7 +119,8 @@ definition_type(Definition) ->
             <<"schemas">>
     end.
 
--spec schema(DefinitionName :: parameter_definition_name()) -> map().
+-spec schema(DefinitionName :: parameter_definition_name()) ->
+                #{<<_:32>> => <<_:64, _:_*8>>}.
 schema(DefinitionName) ->
     case swagger_version() of
         swagger_2_0 ->
