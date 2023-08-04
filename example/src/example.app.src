@@ -1,19 +1,10 @@
-{application, example,
- [
-  {description, "Cowboy Swagger OpenAPI 3.0.0 Basic Example."},
+{application,
+ example,
+ [{description, "Cowboy Swagger OpenAPI 3.0.0 Basic Example."},
   {vsn, "0.1"},
-  {applications,
-   [kernel,
-    stdlib,
-    jsx,
-    cowboy,
-    trails,
-    cowboy_swagger
-   ]},
+  {applications, [kernel, stdlib, jsx, cowboy, trails, cowboy_swagger]},
   {modules, []},
   {mod, {example, []}},
   {registered, []},
   {start_phases, [{start_trails_http, []}]},
-  {build_tools,["rebar3"]}
- ]
-}.
+  {build_tools, ["rebar3"]}]}.
