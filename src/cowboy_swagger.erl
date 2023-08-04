@@ -1,8 +1,6 @@
 %%% @doc cowboy-swagger main interface.
 -module(cowboy_swagger).
 
--ignore_xref([{?MODULE, add_definition, 1}]).
-
 %% API
 -export([to_json/1, add_definition/1, add_definition/2, add_definition_array/2,
          schema/1]).
