@@ -75,7 +75,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% @doc Returns the swagger json specification from given `trails'.
-%%      This function basically takes the metadata from each `trails:trail()'
+%%      This function basically takes the metadata from each `t:trails:trail()'
 %%      (which must be compliant with Swagger specification) and builds the
 %%      required `swagger.json'.
 -spec to_json([trails:trail()]) -> jsx:json_text().
