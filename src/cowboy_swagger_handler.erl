@@ -16,7 +16,7 @@
 %%% Trails
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% @hidden
+%% @private
 %% @doc Implements `trails_handler:trails/0' callback. This function returns
 %%      trails routes for both: static content (Swagger-UI) and this handler
 %%      that returns the `swagger.json'.

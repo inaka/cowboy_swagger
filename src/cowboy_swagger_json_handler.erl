@@ -1,3 +1,4 @@
+%% @private
 %%% @doc Cowboy Swagger Handler. This handler exposes a GET operation
 %%%      to enable `swagger.json' to be retrieved from embedded
 %%%      Swagger-UI (located in `priv/swagger' folder).
@@ -24,13 +25,11 @@
 %%% Cowboy Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% @hidden
 -spec init(cowboy_req:req(), options()) -> {cowboy_rest, cowboy_req:req(), state()}.
 init(Req, Opts) ->
     State = Opts,
     {cowboy_rest, Req, State}.
 
-%% @hidden
 -spec content_types_provided(cowboy_req:req(), state()) ->
                                 {[{binary(), atom()}], cowboy_req:req(), state()}.
 content_types_provided(Req, State) ->
@@ -40,7 +39,6 @@ content_types_provided(Req, State) ->
 %%% Handlers
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% @hidden
 -spec handle_get(cowboy_req:req(), state()) -> {iodata(), cowboy_req:req(), state()}.
 handle_get(Req, State) ->
     Server = maps:get(server, State, '_'),

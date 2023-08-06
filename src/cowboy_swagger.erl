@@ -133,12 +133,12 @@ schema(DefinitionName) ->
 %% Utilities.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% @hidden
+%% @private
 -spec enc_json(jsx:json_term()) -> jsx:json_text().
 enc_json(Json) ->
     jsx:encode(Json, [uescape]).
 
-%% @hidden
+%% @private
 -spec dec_json(iodata()) -> jsx:json_term().
 dec_json(Data) ->
     try
@@ -165,7 +165,7 @@ dec_json(Data) ->
 %% When normalizing, we make all strings and labels be binaries,
 %% and all objects be maps, not proplists.
 
-%% @hidden
+%% @private
 -spec normalize_json(jsx:json_term()) -> jsx:json_term().
 normalize_json(Json) when is_map(Json) ->
     normalize_json_proplist(maps:to_list(Json));
@@ -208,7 +208,7 @@ normalize_json_list(List) ->
     F = fun(V, Acc) -> [normalize_json(V) | Acc] end,
     lists:foldr(F, [], List).
 
-%% @hidden
+%% @private
 -spec swagger_paths([trails:trail()]) -> map().
 swagger_paths(Trails) ->
     swagger_paths(Trails, undefined).
@@ -218,12 +218,12 @@ swagger_paths(Trails, BasePath) ->
     Paths = translate_swagger_paths(Trails, #{}),
     refactor_base_path(Paths, BasePath).
 
-%% @hidden
+%% @private
 -spec validate_metadata(trails:metadata(_)) -> metadata().
 validate_metadata(Metadata) ->
     validate_swagger_map(Metadata).
 
-%% @hidden
+%% @private
 -spec filter_cowboy_swagger_handler([trails:trail()]) -> [trails:trail()].
 filter_cowboy_swagger_handler(Trails) ->
     %% Keeps only trails with at least one non-hidden method.
