@@ -29,7 +29,7 @@ trails() ->
     [trails:trail("/description", example_description_handler, [], Metadata)].
 
 %% cowboy
--spec allowed_methods(Req, State) -> {[binary(), ...], Req, State}.
+-spec allowed_methods(Req, State) -> {[<<_:24>>, ...], Req, State}.
 allowed_methods(Req, State) ->
     {[<<"GET">>], Req, State}.
 

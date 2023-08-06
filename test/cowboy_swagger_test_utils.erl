@@ -8,7 +8,9 @@
       headers => [tuple()],
       body => binary()}.
 -type config() :: proplists:proplist().
+-type shotgun_http_verb() :: delete | get | head | options | patch | post | put.
 
+-export_type([shotgun_http_verb/0]).
 -export_type([config/0, response/0]).
 
 -spec all(atom()) -> [atom()].
@@ -25,11 +27,11 @@ init_per_suite(Config) ->
 end_per_suite(Config) ->
     Config.
 
--spec api_call(atom(), string()) -> response().
+-spec api_call(shotgun_http_verb(), [byte()]) -> response().
 api_call(Method, Uri) ->
     api_call(Method, Uri, "localhost", 8080).
 
--spec api_call(atom(), string(), string(), integer()) -> response().
+-spec api_call(shotgun_http_verb(), string(), string(), integer()) -> response().
 api_call(Method, Uri, HostMatch, Port) ->
     {ok, Pid} = shotgun:open(HostMatch, Port),
     try

@@ -21,7 +21,7 @@ stop() ->
 
 %% behaviour
 %% @private
--spec start(normal, [any()]) -> {ok, pid()} | {ok, pid(), any()} | {error, any()}.
+-spec start(normal, [any()]) -> {ok, pid()}.
 start(_StartType, _StartArgs) ->
     example_sup:start_link().
 
@@ -30,7 +30,7 @@ start(_StartType, _StartArgs) ->
 stop(_State) ->
     ok = cowboy:stop_listener(example_http).
 
--spec start_phase(atom(), application:start_type(), []) -> ok | {error, term()}.
+-spec start_phase(atom(), application:start_type(), []) -> ok.
 start_phase(start_trails_http, _StartType, []) ->
     {ok, Port} = application:get_env(example, http_port),
     Trails =

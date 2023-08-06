@@ -21,7 +21,7 @@ stop() ->
 
 %% behaviour
 %% @private
--spec start(normal, [any()]) -> {ok, pid()} | {ok, pid(), any()} | {error, any()}.
+-spec start(normal, [any()]) -> {ok, pid()}.
 start(_StartType, _StartArgs) ->
     _ = application:stop(lager),
     ok = application:stop(sasl),
@@ -33,7 +33,7 @@ start(_StartType, _StartArgs) ->
 stop(_State) ->
     ok = cowboy:stop_listener(multiple_hosts_servers_http).
 
--spec start_phase(atom(), application:start_type(), []) -> ok | {error, term()}.
+-spec start_phase(atom(), application:start_type(), []) -> ok.
 start_phase(start_multiple_hosts_servers_example_http, _StartType, []) ->
     %% Host1
     {ok, #{hosts := [HostMatch11, HostMatch12], port := Port1}} =

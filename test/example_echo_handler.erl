@@ -42,7 +42,7 @@ trails() ->
     [trails:trail("/message/[:echo]", example_echo_handler, [], Metadata)].
 
 %% cowboy
--spec allowed_methods(Req, State) -> {[binary(), ...], Req, State}.
+-spec allowed_methods(Req, State) -> {[<<_:24, _:_*8>>, ...], Req, State}.
 allowed_methods(Req, State) ->
     {[<<"GET">>, <<"PUT">>, <<"HEAD">>], Req, State}.
 

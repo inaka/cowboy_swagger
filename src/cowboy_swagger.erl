@@ -44,7 +44,10 @@
       items => property_desc()}.
 -type property_obj() :: #{binary() => property_desc()}.
 -type parameters_definitions() ::
-    #{parameter_definition_name() => #{type => binary(), properties => property_obj()}}.
+    #{parameter_definition_name() =>
+          #{type => binary(),
+            properties => property_obj(),
+            _ => _}}.
 -type parameters_definition_array() ::
     #{parameter_definition_name() =>
           #{type => binary(), items => #{type => binary(), properties => property_obj()}}}.

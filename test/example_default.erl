@@ -14,11 +14,11 @@ init(_Transport, _Req, _Opts) ->
 rest_init(Req, _Opts) ->
     {ok, Req, #{}}.
 
--spec content_types_accepted(Req, State) -> {[{binary(), handle_put}], Req, State}.
+-spec content_types_accepted(Req, State) -> {[{<<_:80>>, handle_put}, ...], Req, State}.
 content_types_accepted(Req, State) ->
     {[{<<"text/plain">>, handle_put}], Req, State}.
 
--spec content_types_provided(Req, State) -> {[{binary(), handle_get}], Req, State}.
+-spec content_types_provided(Req, State) -> {[{<<_:80>>, handle_get}, ...], Req, State}.
 content_types_provided(Req, State) ->
     {[{<<"text/plain">>, handle_get}], Req, State}.
 
