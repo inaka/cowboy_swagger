@@ -1,38 +1,40 @@
-<img src="http://www.braveterry.com/wp-content/uploads/2015/03/swagger2.png"/>
+<img src="https://www.braveterry.com/wp-content/uploads/2015/03/swagger2.png"/>
 
 # cowboy-swagger
-[Swagger](http://swagger.io/) integration for [Cowboy](https://github.com/ninenines/cowboy) (built on [trails](https://github.com/inaka/cowboy-trails)).
+
+[Swagger](https://swagger.io/) integration for [Cowboy](https://github.com/ninenines/cowboy) (built on [trails](https://github.com/inaka/cowboy-trails)).
 
 ![build](https://github.com/inaka/cowboy_swagger/workflows/build/badge.svg)
 
 ## Contact Us
+
 If you find any **bugs** or have a **problem** while using this library, please
-[open an issue](https://github.com/inaka/elvis/issues/new) in this repo
+[open an issue](https://github.com/inaka/cowboy_swagger/issues/new) in this repo
 (or a pull request :)).
 
-## Requirements
-Cowboy Swagger requires Erlang 18+ after 0.1.0 version
-
 ## Why Cowboy Swagger?
+
 Simple, because there isn't a tool in Erlang to document Cowboy RESTful APIs easy and fast,
 and to improve development productivity.
 
 With `cowboy_swagger` is possible to integrate Swagger to your Erlang projects that use Cowboy as a web server.
 It is extremely easy to use, and with just a few steps you'll have a nice Web documentation for your RESTful APIs.
 
-To learn a bit more about Swagger, please check this [blog post](http://inaka.net/blog/2015/06/23/erlang-swagger-2015/).
+To learn a bit more about Swagger, please check this [blog post](https://web.archive.org/web/20161110235900/https://inaka.net/blog/2015/06/23/erlang-swagger-2015/).
 
 ## How to Use it?
+
 This is the best part. It is extremely easy.
 
 ### 1. Document each Cowboy Handler
+
 Because `cowboy_swagger` runs on top of `trails`, the first thing that you have to do
 is document all about your handler within the trails metadata. Keep in mind that
 all fields defined within each method into the metadata must be compliant with the
-[Swagger specification](http://swagger.io/specification).
+[Swagger specification](https://swagger.io/specification).
 
-For example, suppose that you have `example_echo_handler`, so it must implement the `trails/0`
-callback from `trails_handler` behaviour:
+For example, suppose that you have `example_echo_handler`, so it must implement the
+`c:trails_handler:trails/0` callback:
 
 ```erlang
 trails() ->
@@ -58,9 +60,10 @@ trails() ->
   [trails:trail("/message/[:echo]", example_echo_handler, [], Metadata)].
 ```
 
-To get a better idea of how your handler should look like, please check [here](./example/src/example_echo_handler.erl).
+To get a better idea of how your handler should look like, please check [`example/src/example_echo_handler.erl`](https://github.com/inaka/cowboy_swagger/blob/master/example/src/example_echo_handler.erl).
 
 ### 2. Include cowboy_swagger in your app
+
 First, you need to include `cowboy_swagger_handler` module in your list of trails to be compiled.
 
 ```erlang
@@ -74,7 +77,7 @@ trails:store(Trails),
 Dispatch = trails:single_host_compile(Trails),
 ```
 
-The snippet of code above is usually placed when you start `cowboy`. Check it [here](./example/src/example.erl#L31).
+The snippet of code above is usually placed when you start `cowboy`. Check it [here](https://github.com/inaka/cowboy_swagger/blob/master/example/src/example.erl).
 
 Then add `cowboy_swagger` to the list of apps to be loaded in your `*.app.src` file.
 
@@ -140,10 +143,10 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
 
 ### Definitions
 
-[Definitions](http://swagger.io/specification/#definitionsObject) can be used for describing
-[parameters](http://swagger.io/specification/#parametersDefinitionsObject),
-[responses](http://swagger.io/specification/#responsesDefinitionsObject) and
-[security](http://swagger.io/specification/#securityDefinitionsObject) schemas.
+[Definitions](https://swagger.io/specification/#definitionsObject) can be used for describing
+[parameters](https://swagger.io/specification/#parametersDefinitionsObject),
+[responses](https://swagger.io/specification/#responsesDefinitionsObject) and
+[security](https://swagger.io/specification/#securityDefinitionsObject) schemas.
 
 For adding definitions to your app, you have 2 choices:
 
@@ -155,6 +158,7 @@ Let's say you want to describe a `POST` call to a `newspapers` endpoint that req
 `name` and `description` fields only, you can do it like this:
 
 **Option 1:**
+
 ```erlang
 [ ... % other configurations
 , { cowboy_swagger
@@ -204,7 +208,6 @@ trails() ->
   ...
 ```
 
-
 Now in your handler's trails callback function you can use it:
 
 ```erlang
@@ -241,4 +244,5 @@ model in swagger-ui, so client developers will know exactly what parameters
 the API expects for every endpoint.
 
 ## Example
-For more information about `cowboy_swagger` and how to use it, please check this [Example](./example).
+
+For more information about `cowboy_swagger` and how to use it, please check this [Example](https://github.com/inaka/cowboy_swagger/tree/master/example).

@@ -1,23 +1,14 @@
-{application, cowboy_swagger,
- [
-  {description,
-   "Swagger for Cowboy Erlang projects"},
+{application,
+ cowboy_swagger,
+ [{description, "Swagger for Cowboy Erlang projects"},
   {vsn, git},
-  {applications,
-   [kernel,
-    stdlib,
-    ranch,
-    cowboy,
-    trails,
-    jsx
-   ]},
+  {applications, [kernel, stdlib, ranch, cowboy, trails, jsx]},
   {modules, []},
   {registered, []},
-  {licenses,["Apache 2.0"]},
-  {links,[ {"Github","https://github.com/inaka/cowboy-swagger"},
-           {"Blog", "http://inaka.net/blog/2015/08/19/cowboy-swagger/"},
-           {"Example", "https://github.com/inaka/cowboy-swagger/tree/master/example"}
-         ]},
-  {build_tools,["rebar3"]}
- ]
-}.
+  {licenses, ["Apache 2.0"]},
+  {links,
+   [{"GitHub", "https://github.com/inaka/cowboy-swagger"},
+    {"Blog",
+     "https://web.archive.org/web/20160621233046/http://inaka.net/blog/2015/08/19/cowboy-swagger/"},
+    {"Example", "https://github.com/inaka/cowboy-swagger/tree/master/example"}]},
+  {build_tools, ["rebar3"]}]}.
