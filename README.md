@@ -3,9 +3,11 @@
 # cowboy-swagger
 
 [Swagger](https://swagger.io/) integration for [Cowboy](https://github.com/ninenines/cowboy) (built on [trails](https://github.com/inaka/cowboy-trails)).
+
 ![build](https://github.com/inaka/cowboy_swagger/workflows/build/badge.svg)
 
 ## Contact Us
+
 If you find any **bugs** or have a **problem** while using this library, please
 [open an issue](https://github.com/inaka/elvis/issues/new) in this repo
 (or a pull request :)).
@@ -14,6 +16,7 @@ If you find any **bugs** or have a **problem** while using this library, please
 Cowboy Swagger requires Erlang 18+ after 0.1.0 version
 
 ## Why Cowboy Swagger?
+
 Simple, because there isn't a tool in Erlang to document Cowboy RESTful APIs easy and fast,
 and to improve development productivity.
 
@@ -23,9 +26,11 @@ It is extremely easy to use, and with just a few steps you'll have a nice Web do
 To learn a bit more about Swagger, please check this [blog post](http://inaka.net/blog/2015/06/23/erlang-swagger-2015/).
 
 ## How to Use it?
+
 This is the best part. It is extremely easy.
 
 ### 1. Document each Cowboy Handler
+
 Because `cowboy_swagger` runs on top of `trails`, the first thing that you have to do
 is document all about your handler within the trails metadata. Keep in mind that
 all fields defined within each method into the metadata must be compliant with the
@@ -61,6 +66,7 @@ trails() ->
 To get a better idea of how your handler should look like, please check [here](./example/src/example_echo_handler.erl).
 
 ### 2. Include cowboy_swagger in your app
+
 First, you need to include `cowboy_swagger_handler` module in your list of trails to be compiled.
 
 ```erlang
@@ -155,6 +161,7 @@ Let's say you want to describe a `POST` call to a `newspapers` endpoint that req
 `name` and `description` fields only, you can do it like this:
 
 **Option 1:**
+
 ```erlang
 [ ... % other configurations
 , { cowboy_swagger
@@ -204,7 +211,6 @@ trails() ->
   ...
 ```
 
-
 Now in your handler's trails callback function you can use it:
 
 ```erlang
@@ -242,3 +248,4 @@ the API expects for every endpoint.
 
 ## Example
 For more information about `cowboy_swagger` and how to use it, please check this [Example](./example).
+
