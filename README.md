@@ -33,8 +33,8 @@ is document all about your handler within the trails metadata. Keep in mind that
 all fields defined within each method into the metadata must be compliant with the
 [Swagger specification](https://swagger.io/specification).
 
-For example, suppose that you have `example_echo_handler`, so it must implement the `trails/0`
-callback from `trails_handler` behaviour:
+For example, suppose that you have `example_echo_handler`, so it must implement the
+`c:trails_handler:trails/0` callback:
 
 ```erlang
 trails() ->
