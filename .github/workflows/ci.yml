@@ -18,3 +18,17 @@ jobs:
       - name: Format check
         run: rebar3 format --verify
       - run: rebar3 test
+      - name: test our example
+        run: |
+          cd example
+          rebar3 release
+          _build/default/rel/example/bin/example daemon
+          _build/default/rel/example/bin/example ping
+      - name: Format check
+        run: |
+          cd example
+          rebar3 format --verify
+      - name: check our example
+        run: |
+          cd example
+          rebar3 test
