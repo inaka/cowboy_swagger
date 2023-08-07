@@ -1,8 +1,8 @@
-<img src="http://www.braveterry.com/wp-content/uploads/2015/03/swagger2.png"/>
+<img src="https://www.braveterry.com/wp-content/uploads/2015/03/swagger2.png"/>
 
 # cowboy-swagger
-[Swagger](http://swagger.io/) integration for [Cowboy](https://github.com/ninenines/cowboy) (built on [trails](https://github.com/inaka/cowboy-trails)).
 
+[Swagger](https://swagger.io/) integration for [Cowboy](https://github.com/ninenines/cowboy) (built on [trails](https://github.com/inaka/cowboy-trails)).
 ![build](https://github.com/inaka/cowboy_swagger/workflows/build/badge.svg)
 
 ## Contact Us
@@ -29,7 +29,7 @@ This is the best part. It is extremely easy.
 Because `cowboy_swagger` runs on top of `trails`, the first thing that you have to do
 is document all about your handler within the trails metadata. Keep in mind that
 all fields defined within each method into the metadata must be compliant with the
-[Swagger specification](http://swagger.io/specification).
+[Swagger specification](https://swagger.io/specification).
 
 For example, suppose that you have `example_echo_handler`, so it must implement the `trails/0`
 callback from `trails_handler` behaviour:
@@ -140,10 +140,10 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
 
 ### Definitions
 
-[Definitions](http://swagger.io/specification/#definitionsObject) can be used for describing
-[parameters](http://swagger.io/specification/#parametersDefinitionsObject),
-[responses](http://swagger.io/specification/#responsesDefinitionsObject) and
-[security](http://swagger.io/specification/#securityDefinitionsObject) schemas.
+[Definitions](https://swagger.io/specification/#definitionsObject) can be used for describing
+[parameters](https://swagger.io/specification/#parametersDefinitionsObject),
+[responses](https://swagger.io/specification/#responsesDefinitionsObject) and
+[security](https://swagger.io/specification/#securityDefinitionsObject) schemas.
 
 For adding definitions to your app, you have 2 choices:
 
