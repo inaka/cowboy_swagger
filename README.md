@@ -9,7 +9,7 @@
 ## Contact Us
 
 If you find any **bugs** or have a **problem** while using this library, please
-[open an issue](https://github.com/inaka/elvis/issues/new) in this repo
+[open an issue](https://github.com/inaka/cowboy_swagger/issues/new) in this repo
 (or a pull request :)).
 
 ## Requirements
@@ -23,7 +23,7 @@ and to improve development productivity.
 With `cowboy_swagger` is possible to integrate Swagger to your Erlang projects that use Cowboy as a web server.
 It is extremely easy to use, and with just a few steps you'll have a nice Web documentation for your RESTful APIs.
 
-To learn a bit more about Swagger, please check this [blog post](http://inaka.net/blog/2015/06/23/erlang-swagger-2015/).
+To learn a bit more about Swagger, please check this [blog post](https://web.archive.org/web/20161110235900/https://inaka.net/blog/2015/06/23/erlang-swagger-2015/).
 
 ## How to Use it?
 
@@ -63,7 +63,7 @@ trails() ->
   [trails:trail("/message/[:echo]", example_echo_handler, [], Metadata)].
 ```
 
-To get a better idea of how your handler should look like, please check [here](./example/src/example_echo_handler.erl).
+To get a better idea of how your handler should look like, please check [`example/src/example_echo_handler.erl`](https://github.com/inaka/cowboy_swagger/blob/master/example/src/example_echo_handler.erl).
 
 ### 2. Include cowboy_swagger in your app
 
@@ -80,7 +80,7 @@ trails:store(Trails),
 Dispatch = trails:single_host_compile(Trails),
 ```
 
-The snippet of code above is usually placed when you start `cowboy`. Check it [here](./example/src/example.erl#L31).
+The snippet of code above is usually placed when you start `cowboy`. Check it [here](https://github.com/inaka/cowboy_swagger/blob/master/example/src/example.erl).
 
 Then add `cowboy_swagger` to the list of apps to be loaded in your `*.app.src` file.
 
@@ -247,5 +247,5 @@ model in swagger-ui, so client developers will know exactly what parameters
 the API expects for every endpoint.
 
 ## Example
-For more information about `cowboy_swagger` and how to use it, please check this [Example](./example).
 
+For more information about `cowboy_swagger` and how to use it, please check this [Example](https://github.com/inaka/cowboy_swagger/tree/master/example).
