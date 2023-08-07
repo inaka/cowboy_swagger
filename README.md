@@ -12,9 +12,6 @@ If you find any **bugs** or have a **problem** while using this library, please
 [open an issue](https://github.com/inaka/cowboy_swagger/issues/new) in this repo
 (or a pull request :)).
 
-## Requirements
-Cowboy Swagger requires Erlang 18+ after 0.1.0 version
-
 ## Why Cowboy Swagger?
 
 Simple, because there isn't a tool in Erlang to document Cowboy RESTful APIs easy and fast,
