@@ -6,10 +6,10 @@ set -eux
 npm install swagger-ui-dist
 rm -f package-lock.json
 rm -f package.json
-NEW_SWAGGER_VSN=$(cat node_modules/swagger-ui-dist/package.json | jq -r .version)
+NEW_SWAGGER_VSN=$(jq -r .version < node_modules/swagger-ui-dist/package.json)
 OLD_SWAGGER_VSN=$(cat SWAGGER_VSN)
 
-if [ "$NEW_SWAGGER_VSN" = "$OLD_SWAGGER_VSN" ]; then
+if [[ "${NEW_SWAGGER_VSN}" = "${OLD_SWAGGER_VSN}" ]]; then
   # no change
   exit
 fi
@@ -25,26 +25,26 @@ FIND="\"https://petstore.swagger.io/v2/swagger.json\""
 REPLACE="window.location.origin + \"/api-docs/swagger.json\""
 sed -i -e "s|${FIND}|${REPLACE}|g" priv/swagger/swagger-initializer.js
 
-echo $NEW_SWAGGER_VSN > SWAGGER_VSN
+echo "${NEW_SWAGGER_VSN}" > SWAGGER_VSN
 
 git config user.name "GitHub Actions"
 git config user.email "actions@user.noreply.github.com"
 
 BRANCH=feature/swagger-ui-update
 
-if git branch -a | grep "$BRANCH" > /dev/null; then
+if git show-ref --verify --quiet "refs/heads/${BRANCH}"; then
     # already exists
     exit
 fi
 
 git fetch origin
-git checkout -b "$BRANCH"
+git checkout -b "${BRANCH}"
 
 if ! git diff --exit-code 1> /dev/null ; then
     # there's stuff to push
     git add .
     git commit -m "Update Swagger UI to ${NEW_SWAGGER_VSN}"
-    git push origin "$BRANCH"
+    git push origin "${BRANCH}"
 
     gh pr create --fill \
         --title "Update Swagger UI to ${NEW_SWAGGER_VSN} (automation)" \
