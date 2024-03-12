@@ -31,12 +31,12 @@ trails() ->
               #{tags => ["echo"],
                 description => "Sets echo var in the server",
                 parameters =>
-                    [#{name => <<"echo">>,
+                    [#{name => <<"echo-kebab_case">>,
                        description => <<"Echo message">>,
                        in => <<"path">>,
                        required => false,
                        schema => #{type => string, example => <<"Hello, World!">>}}]}},
-    [trails:trail("/message/[:echo]", example_echo_handler, [], Metadata)].
+    [trails:trail("/message/[:echo-kebab_case]", example_echo_handler, [], Metadata)].
 
 %% cowboy
 allowed_methods(Req, State) ->
@@ -49,7 +49,7 @@ handle_get(Req, State) ->
     {Body, Req, State}.
 
 handle_put(Req, State) ->
-    Echo = cowboy_req:binding(echo, Req, ""),
+    Echo = cowboy_req:binding('echo-kebab_case', Req, ""),
     application:set_env(example, echo, Echo),
     Body = [<<"You put an echo! ">>, Echo],
     Req1 = cowboy_req:set_resp_body(Body, Req),

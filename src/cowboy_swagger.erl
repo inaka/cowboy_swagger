@@ -332,7 +332,7 @@ remove_base_path(Path, BasePath) ->
 %% @private
 normalize_path(Path) ->
     re:replace(
-        re:replace(Path, "\\:\\w+", "\\{&\\}", [global]),
+        re:replace(Path, "\\:[a-zA-Z0-9_][a-zA-Z0-9-_]*", "\\{&\\}", [global]),
         "\\[|\\]|\\:",
         "",
         [{return, binary}, global]).
