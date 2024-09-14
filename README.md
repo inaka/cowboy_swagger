@@ -119,6 +119,9 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
  %% cowboy_swagger config
  {cowboy_swagger,
   [
+   %% `path`: Path where you can access Swagger-UI. Default: `/api-docs`.
+   {path, "/swagger"}
+
    %% `static_files`: Static content directory. This is where Swagger-UI
    %% is located. Default: `priv/swagger`.
    %% Remember that Swagger-UI is embedded into `cowboy-swagger` project,

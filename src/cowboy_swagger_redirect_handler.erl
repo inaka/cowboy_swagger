@@ -8,7 +8,7 @@
 %% Handlers
 -export([resource_exists/2, previously_existed/2, moved_permanently/2]).
 
--type state() :: #{}.
+-type state() :: {file, string()}.
 
 -export_type([state/0]).
 
@@ -35,5 +35,5 @@ previously_existed(Req, State) ->
 
 -spec moved_permanently(Req :: cowboy_req:req(), State :: state()) ->
                            {{true, iodata()}, cowboy_req:req(), state()}.
-moved_permanently(Req, State) ->
-    {{true, "/api-docs/index.html"}, Req, State}.
+moved_permanently(Req, {file, File} = State) ->
+    {{true, File}, Req, State}.
