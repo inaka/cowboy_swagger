@@ -135,11 +135,41 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
       info => #{title => "Example API"},
       basePath => "/api-docs"
      }
-   }
+   },
+   %% `server_spec`:Fields for Swagger specification for a given server.
+   %% If these fields are not set for a given server, `cowboy_swagger` will use
+   %% `global_spec` for that server.
+   {server_spec,
+    #{my_server =>
+      #{swagger => "3.0",
+        info => #{title => "Example API"},
+        basePath => "/api-docs"
+      },
+      my_other_server =>
+      #{swagger => "3.0",
+        info => #{title => "Other API"},
+        basePath => "/api-docs"
+      }
+     }
+    }
   ]
  }
 ].
 ```
+
+### Diferences between global_spec and server_spec
+
+`global_spec` is a single config which contains every specification for your application.
+
+`server_spec` is a config map with servers as key and a specification (just like `global_spec`) as a
+value.
+
+Since `global_spec` contains all of the definitions it can create a really messy swagger if your
+application starts multiple servers. With `server_spec` everything is separated so your swagger will
+stay clean and relevant for a given server.
+
+Note: A server can use either `global_spec` or `server_spec` it cannot be hybrid so you have to make
+a choice.
 
 ### Definitions
 
@@ -150,14 +180,15 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
 
 For adding definitions to your app, you have 2 choices:
 
-1. Add a `definitions` key to your cowboy_swagger `global_spec` map.
-2. Add them by calling `cowboy_swagger:add_definition/2` and send the
-   definition's name and properties.
+1. Add a `definitions` key to your cowboy_swagger `global_spec` or `server_spec` map.
+2. Add them by calling `cowboy_swagger:add_definition/2` or `cowboy_swagger:add_definition_to_server/3`.
 
 Let's say you want to describe a `POST` call to a `newspapers` endpoint that requires
 `name` and `description` fields only, you can do it like this:
 
 **Option 1:**
+
+With `global_spec`
 
 ```erlang
 [ ... % other configurations
@@ -178,6 +209,35 @@ Let's say you want to describe a `POST` call to a `newspapers` endpoint that req
                 }
            }
          }
+      }
+    ]
+  }
+]
+```
+
+With `server_spec`
+
+```erlang
+[ ... % other configurations
+, { cowboy_swagger
+  , [ { server_spec
+      , #{server =>
+          #{ swagger => "2.0"
+           , info => #{title => "My app API"}
+           , definitions => #{
+               "RequestBody" =>
+                 #{ "name" =>
+                     #{ "type" => "string"
+                      , "description" => "Newspaper name"
+                      }
+                  , "description" =>
+                      #{ "type" => "string"
+                       , "description" => "Newspaper description"
+                       }
+                  }
+             }
+          }
+        }
       }
     ]
   }
@@ -205,6 +265,26 @@ trails() ->
      },
   % Add the definition
   ok = cowboy_swagger:add_definition(DefinitionName, DefinitionProperties),
+  ...
+```
+
+```erlang
+-spec trails() -> trails:trails().
+trails() ->
+  Server = my_ranch_listener,
+  DefinitionName = <<"RequestBody">>,
+  DefinitionProperties =
+    #{ <<"name">> =>
+         #{ type => <<"string">>
+          , description => <<"Newspaper name">>
+          }
+     , <<"description">> =>
+         #{ type => <<"string">>
+          , description => <<"Newspaper description">>
+          }
+     },
+  % Add the definition
+  ok = cowboy_swagger:add_definition_to_server(Server, DefinitionName, DefinitionProperties),
   ...
 ```
 
