@@ -140,12 +140,12 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
    %% `global_spec` for that server.
    {server_spec,
     #{my_server =>
-      #{swagger => ~"3.0",
+      #{swagger => ~"2.0",
         info => #{~"title" => ~"Example API"},
         basePath => ~"/api-docs"
       },
       my_other_server =>
-      #{openapi => ~"3.0",
+      #{openapi => ~"3.0.0",
         info => #{~"title" => ~"Other API"},
         basePath => ~"/api-docs"
       }

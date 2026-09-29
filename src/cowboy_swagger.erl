@@ -293,8 +293,6 @@ get_existing_server_definitions(Server, CurrentSpec, Type) ->
 ) ->
     Definition ::
         parameters_definitions() | parameters_definition_array().
-get_existing_definitions(Version, CurrentSpec, Type) when is_atom(Type) ->
-    get_existing_definitions(Version, CurrentSpec, atom_to_binary(Type, utf8));
 get_existing_definitions(swagger_2_0, CurrentSpec, _Type) ->
     maps:get(~"definitions", CurrentSpec, #{});
 get_existing_definitions(openapi_3_0_0, CurrentSpec, Type) ->

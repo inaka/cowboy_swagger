@@ -197,9 +197,9 @@ different_definitions_per_server_test(_Config) ->
     {ok, #{Server1 := Server1Spec0, Server2 := Server2Spec0}} =
         application:get_env(cowboy_swagger, server_spec),
     JsonDefinitionsServer1 =
-        cowboy_swagger:get_existing_server_definitions(Server1, Server1Spec0, schemas),
+        cowboy_swagger:get_existing_server_definitions(Server1, Server1Spec0, ~"schemas"),
     JsonDefinitionsServer2 =
-        cowboy_swagger:get_existing_server_definitions(Server2, Server2Spec0, schemas),
+        cowboy_swagger:get_existing_server_definitions(Server2, Server2Spec0, ~"schemas"),
 
     ct:comment("Check if both servers have a given property with different definitions"),
     true = maps:is_key(Name, JsonDefinitionsServer1),
@@ -232,7 +232,7 @@ test_add_definition(Server) ->
 
     {ok, #{Server := SwaggerSpec1}} = application:get_env(cowboy_swagger, server_spec),
     JsonDefinitions =
-        cowboy_swagger:get_existing_server_definitions(Server, SwaggerSpec1, schemas),
+        cowboy_swagger:get_existing_server_definitions(Server, SwaggerSpec1, ~"schemas"),
     true = maps:is_key(Name1, JsonDefinitions),
     true = maps:is_key(Name2, JsonDefinitions),
     ok.
@@ -251,7 +251,7 @@ test_add_completed_definition(Server) ->
 
     {ok, #{Server := SwaggerSpec1}} = application:get_env(cowboy_swagger, server_spec),
     JsonDefinitions =
-        cowboy_swagger:get_existing_server_definitions(Server, SwaggerSpec1, schemas),
+        cowboy_swagger:get_existing_server_definitions(Server, SwaggerSpec1, ~"schemas"),
     true = maps:is_key(Name1, JsonDefinitions),
     true = maps:is_key(Name2, JsonDefinitions),
     ok.
@@ -268,7 +268,7 @@ test_add_definition_array(Server) ->
 
     {ok, #{Server := SwaggerSpec1}} = application:get_env(cowboy_swagger, server_spec),
     JsonDefinitions =
-        cowboy_swagger:get_existing_server_definitions(Server, SwaggerSpec1, schemas),
+        cowboy_swagger:get_existing_server_definitions(Server, SwaggerSpec1, ~"schemas"),
     true = maps:is_key(~"items", maps:get(Name1, JsonDefinitions)),
     true = maps:is_key(~"items", maps:get(Name2, JsonDefinitions)),
     ~"array" = maps:get(~"type", maps:get(Name1, JsonDefinitions)),
