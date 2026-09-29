@@ -8,8 +8,7 @@
 
 -export([trails/0, trails/1]).
 
--type route_match() :: '_' | iodata().
-
+-nominal route_match() :: '_' | iodata().
 -export_type([route_match/0]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

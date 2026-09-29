@@ -8,8 +8,7 @@
 %% Handlers
 -export([resource_exists/2, previously_existed/2, moved_permanently/2]).
 
--type state() :: #{}.
-
+-opaque state() :: #{}.
 -export_type([state/0]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

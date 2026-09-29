@@ -53,20 +53,20 @@
 
 -opaque response_obj() :: #{description => binary()}.
 
--type responses_definitions() :: #{binary() => response_obj()}.
+-nominal responses_definitions() :: #{binary() => response_obj()}.
 
 -export_type([response_obj/0, responses_definitions/0]).
 
--type parameter_definition_name() :: binary().
--type property_desc() ::
+-nominal parameter_definition_name() :: binary().
+-nominal property_desc() ::
     #{
         type => binary(),
         description => binary(),
         example => binary(),
         items => property_desc()
     }.
--type property_obj() :: #{binary() => property_desc()}.
--type parameters_definitions() ::
+-nominal property_obj() :: #{binary() => property_desc()}.
+-nominal parameters_definitions() ::
     #{
         parameter_definition_name() =>
             #{
@@ -75,7 +75,7 @@
                 _ => _
             }
     }.
--type parameters_definition_array() ::
+-nominal parameters_definition_array() ::
     #{
         parameter_definition_name() =>
             #{type => binary(), items => #{type => binary(), properties => property_obj()}}
@@ -100,11 +100,11 @@
         responses => responses_definitions()
     }.
 
--type metadata() :: trails:metadata(swagger_map()).
+-nominal metadata() :: trails:metadata(swagger_map()).
 
 -export_type([swagger_map/0, metadata/0]).
 
--type swagger_version() :: swagger_2_0 | openapi_3_0_0.
+-nominal swagger_version() :: swagger_2_0 | openapi_3_0_0.
 
 -export_type([swagger_version/0]).
 

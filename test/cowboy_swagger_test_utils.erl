@@ -3,14 +3,14 @@
 -export([all/1, init_per_suite/1, end_per_suite/1]).
 -export([api_call/2, api_call/4]).
 
--type response() ::
+-nominal response() ::
     #{
         status_code => integer(),
         headers => [tuple()],
         body => binary()
     }.
--type config() :: proplists:proplist().
--type shotgun_http_verb() :: delete | get | head | options | patch | post | put.
+-nominal config() :: proplists:proplist().
+-nominal shotgun_http_verb() :: delete | get | head | options | patch | post | put.
 
 -export_type([shotgun_http_verb/0]).
 -export_type([config/0, response/0]).

@@ -11,13 +11,13 @@
 %% Handlers
 -export([handle_get/2]).
 
--type options() ::
+-nominal options() ::
     #{
         server => ranch:ref(),
         host => cowboy_swagger_handler:route_match(),
         _ => _
     }.
--type state() :: options().
+-opaque state() :: options().
 -export_type([options/0, state/0]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
