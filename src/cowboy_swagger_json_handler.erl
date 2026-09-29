@@ -44,4 +44,4 @@ handle_get(Req, State) ->
     Server = maps:get(server, State, '_'),
     HostMatch = maps:get(host, State, '_'),
     Trails = trails:all(Server, HostMatch),
-    {cowboy_swagger:to_json(Trails), Req, State}.
+    {cowboy_swagger:to_json(Server, Trails), Req, State}.

@@ -1,9 +1,14 @@
 %%% @doc cowboy-swagger main interface.
 -module(cowboy_swagger).
 
-%% API
+%% Global Spec API
 -export([to_json/1, add_definition/1, add_definition/2, add_definition_array/2,
          schema/1]).
+%% Server Spec API
+-export([to_json/2, add_definition_to_server/2, add_definition_to_server/3,
+         add_definition_array_to_server/3, server_schema/2]).
+-export([get_server_spec/0, get_server_spec/1, get_server_spec/2, set_server_spec/2,
+         get_existing_server_definitions/3]).
 %% Utilities
 -export([enc_json/1, dec_json/1, normalize_json/1]).
 -export([swagger_paths/1, validate_metadata/1]).
@@ -83,10 +88,24 @@
 %%      required `swagger.json'.
 -spec to_json([trails:trail()]) -> jsx:json_text().
 to_json(Trails) ->
-    Default = #{info => #{title => <<"API-DOCS">>}},
-    GlobalSpec = get_global_spec(Default),
+    to_json(undefined, Trails).
+
+%% @doc Returns the swagger json specification from given `trails' and `server_spec`.
+%%      This function takes the metadata from each `t:trails:trail()' and combines it
+%%      with the data stored in server_spec.
+%%      If no data is stored in server_spec related to the listener use global_spec instead.
+-spec to_json(ranch:ref(), [trails:trail()]) -> jsx:json_text().
+to_json(Server, Trails) ->
+    NormalizedSpec =
+        case get_server_spec(Server, #{}) of
+            Spec when map_size(Spec) == 0 ->
+                Default = #{info => #{title => <<"API-DOCS">>}},
+                get_global_spec(Default);
+            Spec ->
+                Spec
+        end,
     SanitizeTrails = filter_cowboy_swagger_handler(Trails),
-    SwaggerSpec = create_swagger_spec(GlobalSpec, SanitizeTrails),
+    SwaggerSpec = create_swagger_spec(NormalizedSpec, SanitizeTrails),
     enc_json(SwaggerSpec).
 
 -spec add_definition_array(Name :: parameter_definition_name(),
@@ -125,12 +144,53 @@ definition_type(Definition) ->
 -spec schema(DefinitionName :: parameter_definition_name()) ->
                 #{<<_:32>> => <<_:64, _:_*8>>}.
 schema(DefinitionName) ->
-    case swagger_version() of
-        swagger_2_0 ->
-            #{<<"$ref">> => <<"#/definitions/", DefinitionName/binary>>};
-        openapi_3_0_0 ->
-            #{<<"$ref">> => <<"#/components/schemas/", DefinitionName/binary>>}
-    end.
+    Version = swagger_version(),
+    get_schema_based_on_version(Version, DefinitionName).
+
+-spec server_schema(Server :: ranch:ref(),
+                    DefinitionName :: parameter_definition_name()) ->
+                       #{<<_:32>> => <<_:64, _:_*8>>}.
+server_schema(Server, DefinitionName) ->
+    Version = server_swagger_version(Server),
+    get_schema_based_on_version(Version, DefinitionName).
+
+-spec get_schema_based_on_version(Version :: swagger_version(),
+                                  DefinitionName :: parameter_definition_name()) ->
+                                     #{<<_:32>> => <<_:64, _:_*8>>}.
+get_schema_based_on_version(swagger_2_0, DefinitionName) ->
+    #{<<"$ref">> => <<"#/definitions/", DefinitionName/binary>>};
+get_schema_based_on_version(openapi_3_0_0, DefinitionName) ->
+    #{<<"$ref">> => <<"#/components/schemas/", DefinitionName/binary>>}.
+
+-spec add_definition_to_server(Server :: ranch:ref(),
+                               Definition ::
+                                   parameters_definitions() | parameters_definition_array()) ->
+                                  ok.
+add_definition_to_server(Server, Definition) ->
+    CurrentSpec = get_server_spec(Server),
+    NormDefinition = normalize_json(Definition),
+    Type = definition_type(NormDefinition),
+    NewDefinitions =
+        maps:merge(get_existing_server_definitions(Server, CurrentSpec, Type),
+                   normalize_json(NormDefinition)),
+    NewSpec = prepare_new_server_spec(Server, CurrentSpec, NewDefinitions, Type),
+    set_server_spec(Server, NewSpec).
+
+-spec add_definition_to_server(Server :: ranch:ref(),
+                               Name :: parameter_definition_name(),
+                               Properties :: property_obj()) ->
+                                  ok.
+add_definition_to_server(Server, Name, Properties) ->
+    Definition = build_definition(Name, Properties),
+    add_definition_to_server(Server, Definition).
+
+-spec add_definition_array_to_server(Server :: ranch:ref(),
+                                     Name :: parameter_definition_name(),
+                                     Properties :: property_obj()) ->
+                                        ok.
+add_definition_array_to_server(Server, Name, Properties) ->
+    DefinitionArray = build_definition_array(Name, Properties),
+    add_definition_to_server(Server, DefinitionArray).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Utilities.
@@ -243,19 +303,35 @@ filter_cowboy_swagger_handler(Trails) ->
                                Type :: atom() | binary()) ->
                                   Definition ::
                                       parameters_definitions() | parameters_definition_array().
-get_existing_definitions(CurrentSpec, Type) when is_atom(Type) ->
-    get_existing_definitions(CurrentSpec, atom_to_binary(Type, utf8));
-get_existing_definitions(CurrentSpec, Type) when is_binary(Type) ->
-    case swagger_version() of
-        swagger_2_0 ->
-            maps:get(<<"definitions">>, CurrentSpec, #{});
-        openapi_3_0_0 ->
-            case CurrentSpec of
-                #{<<"components">> := #{Type := Def}} ->
-                    Def;
-                _Other ->
-                    #{}
-            end
+get_existing_definitions(CurrentSpec, Type) ->
+    Version = swagger_version(),
+    get_existing_definitions(Version, CurrentSpec, Type).
+
+-spec get_existing_server_definitions(Server :: ranch:ref(),
+                                      CurrentSpec :: jsx:json_term(),
+                                      Type :: atom() | binary()) ->
+                                         Definition ::
+                                             parameters_definitions() |
+                                             parameters_definition_array().
+get_existing_server_definitions(Server, CurrentSpec, Type) ->
+    Version = server_swagger_version(Server),
+    get_existing_definitions(Version, CurrentSpec, Type).
+
+-spec get_existing_definitions(Version :: swagger_version(),
+                               CurrentSpec :: jsx:json_term(),
+                               Type :: atom() | binary()) ->
+                                  Definition ::
+                                      parameters_definitions() | parameters_definition_array().
+get_existing_definitions(Version, CurrentSpec, Type) when is_atom(Type) ->
+    get_existing_definitions(Version, CurrentSpec, atom_to_binary(Type, utf8));
+get_existing_definitions(swagger_2_0, CurrentSpec, _Type) ->
+    maps:get(<<"definitions">>, CurrentSpec, #{});
+get_existing_definitions(openapi_3_0_0, CurrentSpec, Type) ->
+    case CurrentSpec of
+        #{<<"components">> := #{Type := Def}} ->
+            Def;
+        _Other ->
+            #{}
     end.
 
 -spec get_global_spec() -> jsx:json_term().
@@ -274,6 +350,26 @@ set_global_spec(NewSpec) ->
 get_metadata(Trail) ->
     normalize_json(trails:metadata(Trail)).
 
+-spec get_server_spec() -> #{ranch:ref() := jsx:json_term()}.
+get_server_spec() ->
+    ServerSpec = application:get_env(cowboy_swagger, server_spec, #{}),
+    maps:map(fun(_Server, Spec) -> normalize_json(Spec) end, ServerSpec).
+
+-spec get_server_spec(ranch:ref()) -> jsx:json_term().
+get_server_spec(Server) ->
+    get_server_spec(Server, #{}).
+
+-spec get_server_spec(ranch:ref(), jsx:json_term()) -> jsx:json_term().
+get_server_spec(Server, Default) ->
+    ServerSpec = application:get_env(cowboy_swagger, server_spec, #{}),
+    normalize_json(maps:get(Server, ServerSpec, Default)).
+
+-spec set_server_spec(ranch:ref(), jsx:json_term()) -> ok.
+set_server_spec(Server, NewSpec) ->
+    ServerSpec = application:get_env(cowboy_swagger, server_spec, #{}),
+    NormalizedSpec = normalize_json(NewSpec),
+    application:set_env(cowboy_swagger, server_spec, ServerSpec#{Server => NormalizedSpec}).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Private API.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -282,6 +378,17 @@ get_metadata(Trail) ->
 -spec swagger_version() -> swagger_version().
 swagger_version() ->
     case get_global_spec() of
+        #{<<"openapi">> := <<"3.0.0">>} ->
+            openapi_3_0_0;
+        #{<<"swagger">> := <<"2.0">>} ->
+            swagger_2_0;
+        _Other ->
+            swagger_2_0
+    end.
+
+-spec server_swagger_version(Server :: ranch:ref()) -> swagger_version().
+server_swagger_version(Server) ->
+    case get_server_spec(Server) of
         #{<<"openapi">> := <<"3.0.0">>} ->
             openapi_3_0_0;
         #{<<"swagger">> := <<"2.0">>} ->
@@ -416,10 +523,24 @@ build_definition_array(Name, Properties) when is_binary(Name) ->
                               Type :: binary()) ->
                                  NewSpec :: jsx:json_term().
 prepare_new_global_spec(CurrentSpec, Definitions, Type) ->
-    case swagger_version() of
-        swagger_2_0 ->
-            CurrentSpec#{<<"definitions">> => Definitions};
-        openapi_3_0_0 ->
-            Components = maps:get(<<"components">>, CurrentSpec, #{}),
-            CurrentSpec#{<<"components">> => Components#{Type => Definitions}}
-    end.
+    prepare_new_spec(swagger_version(), CurrentSpec, Definitions, Type).
+
+-spec prepare_new_server_spec(Server :: ranch:ref(),
+                              CurrentSpec :: jsx:json_term(),
+                              Definitions ::
+                                  parameters_definitions() | parameters_definition_array(),
+                              Type :: binary()) ->
+                                 NewSpec :: jsx:json_term().
+prepare_new_server_spec(Server, CurrentSpec, Definitions, Type) ->
+    prepare_new_spec(server_swagger_version(Server), CurrentSpec, Definitions, Type).
+
+-spec prepare_new_spec(Version :: swagger_version(),
+                       CurrentSpec :: jsx:json_term(),
+                       Definitions :: parameters_definitions() | parameters_definition_array(),
+                       Type :: binary()) ->
+                          NewSpec :: jsx:json_term().
+prepare_new_spec(swagger_2_0, CurrentSpec, Definitions, _Type) ->
+    CurrentSpec#{<<"definitions">> => Definitions};
+prepare_new_spec(openapi_3_0_0, CurrentSpec, Definitions, Type) ->
+    Components = maps:get(<<"components">>, CurrentSpec, #{}),
+    CurrentSpec#{<<"components">> => Components#{Type => Definitions}}.
