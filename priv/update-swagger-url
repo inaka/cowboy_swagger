@@ -1,0 +1,40 @@
+#!/usr/bin/env escript
+-module('update-swagger-url').
+
+main(_) ->
+    %% Define the path to the template and the output file
+    TemplateFilePath = "priv/swagger/swagger-initializer.template",
+    OutputFilePath = "priv/swagger/swagger-initializer.js",
+    %% Read the contents of the template file
+    case file:read_file(TemplateFilePath) of
+        {ok, Content} ->
+            %% Get the configuration for the path from the application environment
+            Path = application:get_env(cowboy_swagger, path, "/api-docs"),
+            %% Ensure Path is a binary (if it's a list, convert to binary)
+            BinPath =
+                case is_binary(Path) of
+                    true ->
+                        Path;
+                    false ->
+                        list_to_binary(Path)
+                end,
+            %% Replace the placeholder in the template file content
+            %% Ensure both the placeholder and replacement are binaries
+            ModifiedContent =
+                binary:replace(Content,
+                               <<"__SWAGGER_PATH__">>,
+                               <<"'", BinPath/binary, "'">>,
+                               [global]),
+            %% Write the modified content to the new JavaScript file
+            case file:write_file(OutputFilePath, ModifiedContent) of
+                ok ->
+                    %% Successfully written, log the updated path
+                    io:format("Swagger path updated to: ~s~n", [Path]);
+                {error, WriteError} ->
+                    %% Failed to write the new file
+                    io:format("Failed to write swagger-initializer.js: ~p~n", [WriteError])
+            end;
+        {error, ReadError} ->
+            %% Failed to read the template file
+            io:format("Failed to read swagger-initializer.template: ~p~n", [ReadError])
+    end.

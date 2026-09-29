@@ -22,8 +22,8 @@ rm -rf node_modules
 
 # Same as https://github.com/swagger-api/swagger-ui/blob/63ad6f6a5bce19075e717ea74acaf9f7055dcdf5/docker/docker-entrypoint.d/40-swagger-ui.sh#L12
 FIND="\"https://petstore.swagger.io/v2/swagger.json\""
-REPLACE="window.location.origin + \"/api-docs/swagger.json\""
-sed -i -e "s|${FIND}|${REPLACE}|g" priv/swagger/swagger-initializer.js
+REPLACE="window.location.origin + __SWAGGER_PATH__ + \'/swagger.json\'"
+sed -i -e "s|${FIND}|${REPLACE}|g" priv/swagger/swagger-initializer.template
 
 echo "${NEW_SWAGGER_VSN}" >SWAGGER_VSN
 
