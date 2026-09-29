@@ -34,15 +34,19 @@ trails(Options) ->
                 filename:join(cowboy_swagger_priv(), "swagger")
         end,
     Redirect =
-        trails:trail("/api-docs",
-                     cowboy_swagger_redirect_handler,
-                     {file, StaticFiles ++ "/index.html"},
-                     #{get => #{hidden => true}}),
+        trails:trail(
+            "/api-docs",
+            cowboy_swagger_redirect_handler,
+            {file, StaticFiles ++ "/index.html"},
+            #{get => #{hidden => true}}
+        ),
     Static =
-        trails:trail("/api-docs/[...]",
-                     cowboy_static,
-                     {dir, StaticFiles, [{mimetypes, cow_mimetypes, all}]},
-                     #{get => #{hidden => true}}),
+        trails:trail(
+            "/api-docs/[...]",
+            cowboy_static,
+            {dir, StaticFiles, [{mimetypes, cow_mimetypes, all}]},
+            #{get => #{hidden => true}}
+        ),
     MD = #{get => #{hidden => true}},
     Handler =
         trails:trail("/api-docs/swagger.json", cowboy_swagger_json_handler, Options, MD),
@@ -55,7 +59,8 @@ cowboy_swagger_priv() ->
         {error, bad_name} ->
             case code:which(cowboy_swagger_handler) of
                 cover_compiled ->
-                    "../../priv"; % required for tests to work
+                    % required for tests to work
+                    "../../priv";
                 BeamPath ->
                     filename:join([filename:dirname(BeamPath), "..", "priv"])
             end;

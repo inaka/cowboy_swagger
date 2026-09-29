@@ -1,8 +1,13 @@
 -module(cowboy_swagger_handler_SUITE).
 
 %% CT
--export([all/0, init_per_suite/1, end_per_suite/1, init_per_testcase/2,
-         end_per_testcase/2]).
+-export([
+    all/0,
+    init_per_suite/1,
+    end_per_suite/1,
+    init_per_testcase/2,
+    end_per_testcase/2
+]).
 %% Test cases
 -export([handler_test/1, multiple_hosts_test/1]).
 
@@ -17,20 +22,22 @@ all() ->
     cowboy_swagger_test_utils:all(?MODULE).
 
 -spec init_per_suite(cowboy_swagger_test_utils:config()) ->
-                        cowboy_swagger_test_utils:config().
+    cowboy_swagger_test_utils:config().
 init_per_suite(Config) ->
     {ok, _} = shotgun:start(),
     Config.
 
 -spec end_per_suite(cowboy_swagger_test_utils:config()) ->
-                       cowboy_swagger_test_utils:config().
+    cowboy_swagger_test_utils:config().
 end_per_suite(Config) ->
     _ = shotgun:stop(),
     Config.
 
--spec init_per_testcase(TestCase :: atom(),
-                        Config :: cowboy_swagger_test_utils:config()) ->
-                           cowboy_swagger_test_utils:config().
+-spec init_per_testcase(
+    TestCase :: atom(),
+    Config :: cowboy_swagger_test_utils:config()
+) ->
+    cowboy_swagger_test_utils:config().
 init_per_testcase(handler_test, Config) ->
     {ok, _} = example:start(),
     Config;
@@ -38,9 +45,11 @@ init_per_testcase(multiple_hosts_test, Config) ->
     {ok, _} = multiple_hosts_servers_example:start(),
     Config.
 
--spec end_per_testcase(TestCase :: atom(),
-                       Config :: cowboy_swagger_test_utils:config()) ->
-                          cowboy_swagger_test_utils:config().
+-spec end_per_testcase(
+    TestCase :: atom(),
+    Config :: cowboy_swagger_test_utils:config()
+) ->
+    cowboy_swagger_test_utils:config().
 end_per_testcase(handler_test, Config) ->
     _ = example:stop(),
     ok = cleanup(),
@@ -65,31 +74,39 @@ cleanup() ->
 handler_test(_Config) ->
     %% Expected result
     Trails =
-        trails:trails([example_echo_handler,
-                       example_description_handler,
-                       cowboy_swagger_handler]),
+        trails:trails([
+            example_echo_handler,
+            example_description_handler,
+            cowboy_swagger_handler
+        ]),
     SanitizeTrails = cowboy_swagger:filter_cowboy_swagger_handler(Trails),
     ExpectedPaths =
         cowboy_swagger:dec_json(
             cowboy_swagger:enc_json(
-                cowboy_swagger:swagger_paths(SanitizeTrails))),
+                cowboy_swagger:swagger_paths(SanitizeTrails)
+            )
+        ),
 
     %% GET swagger.json spec
     ct:comment("GET /api-docs/swagger.json should return 200 OK"),
     #{status_code := 200, body := Body0} =
         cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger.json"),
-    #{<<"openapi">> := <<"3.0.0">>,
-      <<"info">> := #{<<"title">> := <<"Example API">>},
-      <<"paths">> := ExpectedPaths} =
+    #{
+        ~"openapi" := ~"3.0.0",
+        ~"info" := #{~"title" := ~"Example API"},
+        ~"paths" := ExpectedPaths
+    } =
         cowboy_swagger:dec_json(Body0),
 
     %% GET index.html
-    ct:comment("GET /api-docs should return 301 MOVED PERMANENTLY to "
-               ++ "/api-docs/index.html"),
+    ct:comment(
+        "GET /api-docs should return 301 MOVED PERMANENTLY to " ++
+            "/api-docs/index.html"
+    ),
     #{status_code := 301, headers := Headers} =
         cowboy_swagger_test_utils:api_call(get, "/api-docs"),
-    Location = {<<"location">>, <<"/api-docs/index.html">>},
-    Location = lists:keyfind(<<"location">>, 1, Headers),
+    Location = {~"location", ~"/api-docs/index.html"},
+    Location = lists:keyfind(~"location", 1, Headers),
 
     %% GET swagger-ui.js - test /api-docs/[...] trail
     ct:comment("GET /api-docs/swagger-ui-js should return 200 OK"),
@@ -105,7 +122,7 @@ handler_test(_Config) ->
     {comment, ""}.
 
 -spec multiple_hosts_test(_Config :: cowboy_swagger_test_utils:config()) ->
-                             {atom(), string()}.
+    {atom(), string()}.
 multiple_hosts_test(_Config) ->
     %% api1 - host1
     Trails11 = trails:trails(example_echo_handler),
@@ -114,9 +131,11 @@ multiple_hosts_test(_Config) ->
     ct:comment("GET /api-docs/swagger.json should return 200 OK"),
     #{status_code := 200, body := Body11} =
         cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger.json", "localhost", 8383),
-    #{<<"openapi">> := <<"3.0.0">>,
-      <<"info">> := #{<<"title">> := <<"Example API">>},
-      <<"paths">> := ExpectedPaths11} =
+    #{
+        ~"openapi" := ~"3.0.0",
+        ~"info" := #{~"title" := ~"Example API"},
+        ~"paths" := ExpectedPaths11
+    } =
         cowboy_swagger:dec_json(Body11),
     %% api1 - host2
     Trails12 = trails:trails(host1_handler),
@@ -125,9 +144,11 @@ multiple_hosts_test(_Config) ->
     ct:comment("GET /api-docs/swagger.json should return 200 OK"),
     #{status_code := 200, body := Body12} =
         cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger.json", "127.0.0.1", 8383),
-    #{<<"openapi">> := <<"3.0.0">>,
-      <<"info">> := #{<<"title">> := <<"Example API">>},
-      <<"paths">> := ExpectedPaths12} =
+    #{
+        ~"openapi" := ~"3.0.0",
+        ~"info" := #{~"title" := ~"Example API"},
+        ~"paths" := ExpectedPaths12
+    } =
         cowboy_swagger:dec_json(Body12),
     %% api2 - host1
     Trails21 = trails:trails([host1_handler, example_echo_handler]),
@@ -136,9 +157,11 @@ multiple_hosts_test(_Config) ->
     ct:comment("GET /api-docs/swagger.json should return 200 OK"),
     #{status_code := 200, body := Body21} =
         cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger.json", "localhost", 8282),
-    #{<<"openapi">> := <<"3.0.0">>,
-      <<"info">> := #{<<"title">> := <<"Example API">>},
-      <<"paths">> := ExpectedPaths21} =
+    #{
+        ~"openapi" := ~"3.0.0",
+        ~"info" := #{~"title" := ~"Example API"},
+        ~"paths" := ExpectedPaths21
+    } =
         cowboy_swagger:dec_json(Body21),
     {comment, ""}.
 
@@ -148,4 +171,6 @@ get_expected_paths(Trails) ->
     SanitizeTrails = cowboy_swagger:filter_cowboy_swagger_handler(Trails),
     cowboy_swagger:dec_json(
         cowboy_swagger:enc_json(
-            cowboy_swagger:swagger_paths(SanitizeTrails))).
+            cowboy_swagger:swagger_paths(SanitizeTrails)
+        )
+    ).

@@ -2,8 +2,14 @@
 
 -behaviour(cowboy_rest).
 
--export([init/2, rest_init/2, content_types_accepted/2, content_types_provided/2,
-         forbidden/2, resource_exists/2]).
+-export([
+    init/2,
+    rest_init/2,
+    content_types_accepted/2,
+    content_types_provided/2,
+    forbidden/2,
+    resource_exists/2
+]).
 
 %% cowboy
 init(Req, _Opts) ->

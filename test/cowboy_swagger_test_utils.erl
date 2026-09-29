@@ -4,9 +4,11 @@
 -export([api_call/2, api_call/4]).
 
 -type response() ::
-    #{status_code => integer(),
-      headers => [tuple()],
-      body => binary()}.
+    #{
+        status_code => integer(),
+        headers => [tuple()],
+        body => binary()
+    }.
 -type config() :: proplists:proplist().
 -type shotgun_http_verb() :: delete | get | head | options | patch | post | put.
 
@@ -17,7 +19,7 @@
 all(Module) ->
     ExcludedFuns = [module_info, init_per_suite, end_per_suite, group, all],
     Exports = apply(Module, module_info, [exports]),
-    [F || {F, 1} <- Exports, not lists:member(F, ExcludedFuns)].
+    [F || {F, A} <:- Exports, A =:= 1, not lists:member(F, ExcludedFuns)].
 
 -spec init_per_suite(config()) -> config().
 init_per_suite(Config) ->

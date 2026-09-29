@@ -6,11 +6,11 @@
 -export([stop/1]).
 -export([start_phase/3]).
 
--hank([unnecessary_function_arguments]).
+-behaviour(application).
 
 %% application
 %% @doc Starts the application
--spec start() -> {ok, [atom()]}.
+-spec start() -> {ok, [atom()]} | {error, term()}.
 start() ->
     application:ensure_all_started(example).
 
@@ -21,7 +21,7 @@ stop() ->
 
 %% behaviour
 %% @private
--spec start(normal, [any()]) -> {ok, pid()}.
+-spec start(normal, [term()]) -> {ok, pid()}.
 start(_StartType, _StartArgs) ->
     example_sup:start_link().
 
@@ -34,17 +34,21 @@ stop(_State) ->
 start_phase(start_trails_http, _StartType, []) ->
     {ok, Port} = application:get_env(example, http_port),
     Trails =
-        trails:trails([example_echo_handler,
-                       example_description_handler,
-                       cowboy_swagger_handler]),
+        trails:trails([
+            example_echo_handler,
+            example_description_handler,
+            cowboy_swagger_handler
+        ]),
     trails:store(Trails),
 
     Dispatch = trails:single_host_compile(Trails),
     RanchOptions = [{port, Port}],
     CowboyOptions =
-        #{env => #{dispatch => Dispatch},
-          compress => true,
-          timeout => 12000},
+        #{
+            env => #{dispatch => Dispatch},
+            compress => true,
+            timeout => 12000
+        },
 
     {ok, _} = cowboy:start_clear(example_http, RanchOptions, CowboyOptions),
     ok.
