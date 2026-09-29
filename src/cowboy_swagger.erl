@@ -30,9 +30,6 @@
     set_global_spec/1
 ]).
 
-% is_visible is used as a maps:filter/2 predicate, which requires a /2 arity function
--hank([{unnecessary_function_arguments, [{is_visible, 2}]}]).
-
 -elvis([{elvis_style, no_throw, disable}]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -313,12 +310,10 @@ normalize_json_key(K) ->
     K.
 
 normalize_json_proplist(Proplist) ->
-    F = fun({K, V}, Acc) -> maps:put(normalize_json_key(K), normalize_json(V), Acc) end,
-    lists:foldl(F, #{}, Proplist).
+    #{normalize_json_key(K) => normalize_json(V) || {K, V} <:- Proplist}.
 
 normalize_json_list(List) ->
-    F = fun(V, Acc) -> [normalize_json(V) | Acc] end,
-    lists:foldr(F, [], List).
+    lists:map(fun normalize_json/1, List).
 
 %% @private
 -spec swagger_paths([trails:trail()]) -> map().
@@ -340,11 +335,15 @@ validate_metadata(Metadata) ->
 filter_cowboy_swagger_handler(Trails) ->
     %% Keeps only trails with at least one non-hidden method.
     %% (All the cowboy_swagger_handler methdods are marked as hidden.)
-    F = fun(Trail) ->
-        MD = get_metadata(Trail),
-        maps:filter(fun is_visible/2, MD) =/= #{}
-    end,
-    lists:filter(F, Trails).
+    lists:filter(fun has_a_visible_endpoint/1, Trails).
+
+has_a_visible_endpoint(Trail) ->
+    [] =/= [Endpoint || Endpoint := Metadata <:- get_metadata(Trail), is_visible(Metadata)].
+
+%% @private
+is_visible(#{~"hidden" := true}) -> false;
+is_visible(#{}) -> true;
+is_visible(_Metadata) -> false.
 
 -spec get_existing_definitions(
     CurrentSpec :: jsx:json_term(),
@@ -451,13 +450,6 @@ server_swagger_version(Server) ->
     end.
 
 %% @private
-is_visible(_Key, Metadata) when is_map(Metadata) ->
-    %% Note that `"hidden"` is not a standard flag in OpenAPI
-    not maps:get(~"hidden", Metadata, false);
-is_visible(_Key, _Metadata) ->
-    false.
-
-%% @private
 translate_swagger_paths([], Acc) ->
     Acc;
 translate_swagger_paths([Trail | T], Acc) ->
@@ -471,10 +463,7 @@ refactor_base_path(PathMap, undefined) ->
 refactor_base_path(PathMap, BasePath) when is_list(BasePath) ->
     refactor_base_path(PathMap, list_to_binary(BasePath));
 refactor_base_path(PathMap, BasePath) ->
-    Fun = fun(Path, NextPathMap) ->
-        maps:put(remove_base_path(Path, BasePath), maps:get(Path, PathMap), NextPathMap)
-    end,
-    lists:foldl(Fun, #{}, maps:keys(PathMap)).
+    #{remove_base_path(Path, BasePath) => PathValue || Path := PathValue <:- PathMap}.
 
 %% /base_path/api -> /api
 %% @private
