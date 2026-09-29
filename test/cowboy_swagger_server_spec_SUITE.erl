@@ -57,7 +57,7 @@ to_json_test(_Config) ->
 
     ct:comment("SERVER1 swagger json should not contain any components"),
     SwaggerJson1 = cowboy_swagger:to_json(Server1, Trails),
-    Result1 = jsx:decode(SwaggerJson1, [return_maps]),
+    Result1 = json:decode(SwaggerJson1),
     #{
         ~"openapi" := ~"3.0.0",
         ~"paths" :=
@@ -95,7 +95,7 @@ to_json_test(_Config) ->
 
     ct:comment("SERVER2 swagger json should contain added definitions"),
     SwaggerJson2 = cowboy_swagger:to_json(Server2, Trails),
-    Result2 = jsx:decode(SwaggerJson2, [return_maps]),
+    Result2 = json:decode(SwaggerJson2),
     #{
         ~"components" :=
             #{
@@ -204,7 +204,8 @@ different_definitions_per_server_test(_Config) ->
     ct:comment("Check if both servers have a given property with different definitions"),
     true = maps:is_key(Name, JsonDefinitionsServer1),
     true = maps:is_key(Name, JsonDefinitionsServer2),
-    true = JsonDefinitionsServer1 =/= JsonDefinitionsServer2.
+    true = JsonDefinitionsServer1 =/= JsonDefinitionsServer2,
+    {comment, ""}.
 
 different_schema_per_server_test(_Config) ->
     Server1 = server,
@@ -304,7 +305,7 @@ test_properties_two() ->
 
 set_swagger_version(Server, swagger_2_0) ->
     Spec0 = maps:remove(~"openapi", cowboy_swagger:get_server_spec(Server)),
-    cowboy_swagger:set_server_spec(Server, Spec0#{swagger => "2.0"});
+    cowboy_swagger:set_server_spec(Server, Spec0#{swagger => ~"2.0"});
 set_swagger_version(Server, openapi_3_0_0) ->
     Spec0 = maps:remove(~"swagger", cowboy_swagger:get_server_spec(Server)),
-    cowboy_swagger:set_server_spec(Server, Spec0#{openapi => "3.0.0"}).
+    cowboy_swagger:set_server_spec(Server, Spec0#{openapi => ~"3.0.0"}).

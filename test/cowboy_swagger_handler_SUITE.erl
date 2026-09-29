@@ -166,7 +166,7 @@ multiple_hosts_test(_Config) ->
     {comment, ""}.
 
 %% @private
--spec get_expected_paths(Trails :: trails:trails()) -> jsx:json_term().
+-spec get_expected_paths(Trails :: trails:trails()) -> json:decode_value().
 get_expected_paths(Trails) ->
     SanitizeTrails = cowboy_swagger:filter_cowboy_swagger_handler(Trails),
     cowboy_swagger:dec_json(

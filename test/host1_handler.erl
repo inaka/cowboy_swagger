@@ -25,8 +25,8 @@ trails() ->
         #{
             get =>
                 #{
-                    tags => ["whoami"],
-                    description => "Get hostname",
+                    tags => [~"whoami"],
+                    description => ~"Get hostname",
                     responses =>
                         #{
                             ~"200" =>

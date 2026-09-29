@@ -25,14 +25,13 @@ trails() ->
         #{
             get =>
                 #{
-                    tags => ["example"],
-                    description => "Retrives trails's server description",
+                    tags => [~"example"],
+                    description => ~"Retrives trails's server description",
                     responses =>
                         #{
                             ~"200" =>
                                 #{
-                                    description =>
-                                        ~"Retrives trails's server description 200 OK",
+                                    description => ~"Retrives trails's server description 200 OK",
                                     content => #{'text/plain' => #{schema => #{type => string}}}
                                 }
                         }

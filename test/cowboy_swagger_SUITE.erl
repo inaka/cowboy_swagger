@@ -29,10 +29,10 @@ all() ->
 
 -spec to_json_test(cowboy_swagger_test_utils:config()) -> {atom(), string()}.
 to_json_test(_Config) ->
-    set_openapi_url("/basepath"),
+    set_openapi_url(~"/basepath"),
     Trails = test_trails(),
     SwaggerJson = cowboy_swagger:to_json(Trails),
-    Result = jsx:decode(SwaggerJson, [return_maps]),
+    Result = json:decode(SwaggerJson),
     #{
         ~"info" := #{~"title" := ~"Example API"},
         ~"openapi" := ~"3.0.0",
@@ -267,7 +267,7 @@ parameters_ref_test(_Config) ->
             #{
                 description => ~"results per page (max 100)",
                 example => 1,
-                in => query,
+                in => ~"query",
                 name => per_page,
                 schema =>
                     #{
@@ -279,8 +279,8 @@ parameters_ref_test(_Config) ->
             }
     }),
     {ok, SwaggerSpec1} = application:get_env(cowboy_swagger, global_spec),
-    JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1, parameters),
-    true = maps:is_key(~"page", JsonDefinitions),
+    JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1, ~"parameters"),
+    #{~"page" := _} = JsonDefinitions,
     {comment, ""}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -310,7 +310,7 @@ perform_add_completed_definition_test() ->
     %% Then
     %%
     {ok, SwaggerSpec1} = application:get_env(cowboy_swagger, global_spec),
-    JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1, schemas),
+    JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1, ~"schemas"),
     true = maps:is_key(Name1, JsonDefinitions),
     true = maps:is_key(Name2, JsonDefinitions),
     ok.
@@ -338,7 +338,7 @@ perform_add_definition_test() ->
     %% Then
     %%
     {ok, SwaggerSpec1} = application:get_env(cowboy_swagger, global_spec),
-    JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1, schemas),
+    JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1, ~"schemas"),
     true = maps:is_key(Name1, JsonDefinitions),
     true = maps:is_key(Name2, JsonDefinitions),
     ok.
@@ -366,7 +366,7 @@ perform_add_definition_array_test() ->
     %% Then
     %%
     {ok, SwaggerSpec1} = application:get_env(cowboy_swagger, global_spec),
-    JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1, schemas),
+    JsonDefinitions = cowboy_swagger:get_existing_definitions(SwaggerSpec1, ~"schemas"),
     true = maps:is_key(~"items", maps:get(Name1, JsonDefinitions)),
     true = maps:is_key(~"items", maps:get(Name2, JsonDefinitions)),
     ~"array" = maps:get(~"type", maps:get(Name1, JsonDefinitions)),
@@ -383,16 +383,16 @@ test_trails() ->
                     parameters =>
                         [
                             #{
-                                name => "b",
-                                in => "path",
-                                description => "bla",
+                                name => ~"b",
+                                in => ~"path",
+                                description => ~"bla",
                                 schema => #{type => string},
                                 required => false
                             },
                             #{
-                                name => "c",
-                                in => "path",
-                                description => "bla",
+                                name => ~"c",
+                                in => ~"path",
+                                description => ~"bla",
                                 schema => #{type => string, example => ~"c"},
                                 required => false
                             }
@@ -437,7 +437,7 @@ test_trails() ->
                                 schema => #{type => string}
                             }
                         ],
-                    responses => #{~"200" => #{description => "bla"}}
+                    responses => #{~"200" => #{description => ~"bla"}}
                 }
         },
     Metadata1 =
@@ -498,11 +498,11 @@ test_properties_two() ->
 %% @private
 set_swagger_version(swagger_2_0) ->
     Spec0 = maps:remove(~"openapi", cowboy_swagger:get_global_spec()),
-    cowboy_swagger:set_global_spec(Spec0#{swagger => "2.0"});
+    cowboy_swagger:set_global_spec(Spec0#{swagger => ~"2.0"});
 set_swagger_version(openapi_3_0_0) ->
     Spec0 = maps:remove(~"swagger", cowboy_swagger:get_global_spec()),
-    cowboy_swagger:set_global_spec(Spec0#{openapi => "3.0.0"}).
+    cowboy_swagger:set_global_spec(Spec0#{openapi => ~"3.0.0"}).
 
 set_openapi_url(Url) ->
     Spec0 = maps:remove(~"swagger", cowboy_swagger:get_global_spec()),
-    cowboy_swagger:set_global_spec(Spec0#{openapi => "3.0.0", servers => [#{url => Url}]}).
+    cowboy_swagger:set_global_spec(Spec0#{openapi => ~"3.0.0", servers => [#{url => Url}]}).

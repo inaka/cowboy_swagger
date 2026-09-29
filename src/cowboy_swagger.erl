@@ -21,7 +21,7 @@
     get_existing_server_definitions/3
 ]).
 %% Utilities
--export([enc_json/1, dec_json/1, normalize_json/1]).
+-export([enc_json/1, dec_json/1]).
 -export([swagger_paths/1, validate_metadata/1]).
 -export([filter_cowboy_swagger_handler/1]).
 -export([
@@ -69,6 +69,7 @@
             #{
                 type => binary(),
                 properties => property_obj(),
+                in => binary(),
                 _ => _
             }
     }.
@@ -113,7 +114,7 @@
 %%      This function basically takes the metadata from each `t:trails:trail()'
 %%      (which must be compliant with Swagger specification) and builds the
 %%      required `swagger.json'.
--spec to_json([trails:trail()]) -> jsx:json_text().
+-spec to_json([trails:trail()]) -> binary().
 to_json(Trails) ->
     to_json(undefined, Trails).
 
@@ -121,7 +122,7 @@ to_json(Trails) ->
 %%      This function takes the metadata from each `t:trails:trail()' and combines it
 %%      with the data stored in server_spec.
 %%      If no data is stored in server_spec related to the listener use global_spec instead.
--spec to_json(ranch:ref(), [trails:trail()]) -> jsx:json_text().
+-spec to_json(ranch:ref(), [trails:trail()]) -> binary().
 to_json(Server, Trails) ->
     NormalizedSpec =
         case get_server_spec(Server, #{}) of
@@ -135,26 +136,17 @@ to_json(Server, Trails) ->
     SwaggerSpec = create_swagger_spec(NormalizedSpec, SanitizeTrails),
     enc_json(SwaggerSpec).
 
--spec add_definition_array(
-    Name :: parameter_definition_name(),
-    Properties :: property_obj()
-) ->
-    ok.
+-spec add_definition_array(parameter_definition_name(), property_obj()) -> ok.
 add_definition_array(Name, Properties) ->
     DefinitionArray = build_definition_array(Name, Properties),
     add_definition(DefinitionArray).
 
--spec add_definition(Name :: parameter_definition_name(), Properties :: property_obj()) ->
-    ok.
+-spec add_definition(parameter_definition_name(), property_obj()) -> ok.
 add_definition(Name, Properties) ->
     Definition = build_definition(Name, Properties),
     add_definition(Definition).
 
--spec add_definition(
-    Definition ::
-        parameters_definitions() | parameters_definition_array()
-) ->
-    ok.
+-spec add_definition(parameters_definitions() | parameters_definition_array()) -> ok.
 add_definition(Definition) ->
     CurrentSpec = get_global_spec(),
     NormDefinition = normalize_json(Definition),
@@ -198,11 +190,8 @@ get_schema_based_on_version(openapi_3_0_0, DefinitionName) ->
     #{~"$ref" => <<"#/components/schemas/", DefinitionName/binary>>}.
 
 -spec add_definition_to_server(
-    Server :: ranch:ref(),
-    Definition ::
-        parameters_definitions() | parameters_definition_array()
-) ->
-    ok.
+    ranch:ref(), parameters_definitions() | parameters_definition_array()
+) -> ok.
 add_definition_to_server(Server, Definition) ->
     CurrentSpec = get_server_spec(Server),
     NormDefinition = normalize_json(Definition),
@@ -215,21 +204,12 @@ add_definition_to_server(Server, Definition) ->
     NewSpec = prepare_new_server_spec(Server, CurrentSpec, NewDefinitions, Type),
     set_server_spec(Server, NewSpec).
 
--spec add_definition_to_server(
-    Server :: ranch:ref(),
-    Name :: parameter_definition_name(),
-    Properties :: property_obj()
-) ->
-    ok.
+-spec add_definition_to_server(ranch:ref(), parameter_definition_name(), property_obj()) -> ok.
 add_definition_to_server(Server, Name, Properties) ->
     Definition = build_definition(Name, Properties),
     add_definition_to_server(Server, Definition).
 
--spec add_definition_array_to_server(
-    Server :: ranch:ref(),
-    Name :: parameter_definition_name(),
-    Properties :: property_obj()
-) ->
+-spec add_definition_array_to_server(ranch:ref(), parameter_definition_name(), property_obj()) ->
     ok.
 add_definition_array_to_server(Server, Name, Properties) ->
     DefinitionArray = build_definition_array(Name, Properties),
@@ -240,80 +220,21 @@ add_definition_array_to_server(Server, Name, Properties) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% @private
--spec enc_json(jsx:json_term()) -> jsx:json_text().
+-spec enc_json(json:encode_value()) -> binary().
 enc_json(Json) ->
-    jsx:encode(Json, [uescape]).
+    iolist_to_binary(json:encode(Json)).
 
 %% @private
--spec dec_json(iodata()) -> jsx:json_term().
+-spec dec_json(iodata()) -> json:decode_value().
 dec_json(Data) ->
-    try
-        jsx:decode(Data, [return_maps])
-    catch
-        _:{error, _} ->
-            throw(bad_json)
-    end.
-
-%% We assume the jsx representation of JSON as Erlang terms:
-%%   true/false/null: 'true' | 'false' | 'null'
-%%   number:          integer() | float()
-%%   string:          binary() | atom()
-%%   array:           [ JSON ]
-%%   object:          #{ Label => JSON, ... } |  [{ Label, JSON }] | [{}]
-%%   date string:     {{Year, Month, Day}, {Hour, Min, Sec}}
-%% where
-%%   Label:           binary() | atom() | integer()
-%%
-%% We also detect lists of printable characters (plain Erlang strings) and
-%% convert them into binaries. This use is deprecated and should be
-%% removed (for example, a json array [64] becomes ~"@").
-%%
-%% When normalizing, we make all strings and labels be binaries,
-%% and all objects be maps, not proplists.
+    json:decode(iolist_to_binary(Data)).
 
 %% @private
--spec normalize_json(jsx:json_term()) -> jsx:json_term().
-normalize_json(Json) when is_map(Json) ->
-    normalize_json_proplist(maps:to_list(Json));
-normalize_json([]) ->
-    % empty array
-    [];
-normalize_json([{}]) ->
-    % special case in jsx for empty map as list
-    #{};
-normalize_json([{_K, _V} | _] = Json) ->
-    % map as proplist
-    normalize_json_proplist(Json);
-normalize_json(Json) when is_list(Json) ->
-    case io_lib:printable_list(Json) of
-        true ->
-            unicode:characters_to_binary(Json);
-        false ->
-            normalize_json_list(Json)
-    end;
-normalize_json(true) ->
-    true;
-normalize_json(false) ->
-    false;
-normalize_json(null) ->
-    null;
-normalize_json(Json) when is_atom(Json) ->
-    erlang:atom_to_binary(Json, utf8);
+-spec normalize_json(json:encode_value()) -> json:decode_value().
 normalize_json(Json) ->
-    Json.
-
-normalize_json_key(K) when is_atom(K) ->
-    erlang:atom_to_binary(K, utf8);
-normalize_json_key(K) when is_integer(K) ->
-    erlang:integer_to_binary(K);
-normalize_json_key(K) ->
-    K.
-
-normalize_json_proplist(Proplist) ->
-    #{normalize_json_key(K) => normalize_json(V) || {K, V} <:- Proplist}.
-
-normalize_json_list(List) ->
-    lists:map(fun normalize_json/1, List).
+    %% This way all atom keys and atom values (other than true, false, null)
+    %% are turned into binaries, recursively.
+    dec_json(enc_json(Json)).
 
 %% @private
 -spec swagger_paths([trails:trail()]) -> map().
@@ -346,8 +267,8 @@ is_visible(#{}) -> true;
 is_visible(_Metadata) -> false.
 
 -spec get_existing_definitions(
-    CurrentSpec :: jsx:json_term(),
-    Type :: atom() | binary()
+    CurrentSpec :: json:decode_value(),
+    Type :: binary()
 ) ->
     Definition ::
         parameters_definitions() | parameters_definition_array().
@@ -357,20 +278,18 @@ get_existing_definitions(CurrentSpec, Type) ->
 
 -spec get_existing_server_definitions(
     Server :: ranch:ref(),
-    CurrentSpec :: jsx:json_term(),
-    Type :: atom() | binary()
+    CurrentSpec :: json:decode_value(),
+    Type :: binary()
 ) ->
-    Definition ::
-        parameters_definitions()
-        | parameters_definition_array().
+    Definition :: parameters_definitions() | parameters_definition_array().
 get_existing_server_definitions(Server, CurrentSpec, Type) ->
     Version = server_swagger_version(Server),
     get_existing_definitions(Version, CurrentSpec, Type).
 
 -spec get_existing_definitions(
     Version :: swagger_version(),
-    CurrentSpec :: jsx:json_term(),
-    Type :: atom() | binary()
+    CurrentSpec :: json:decode_value(),
+    Type :: binary()
 ) ->
     Definition ::
         parameters_definitions() | parameters_definition_array().
@@ -386,37 +305,37 @@ get_existing_definitions(openapi_3_0_0, CurrentSpec, Type) ->
             #{}
     end.
 
--spec get_global_spec() -> jsx:json_term().
+-spec get_global_spec() -> json:decode_value().
 get_global_spec() ->
     get_global_spec(#{}).
 
--spec get_global_spec(jsx:json_term()) -> jsx:json_term().
+-spec get_global_spec(json:encode_value()) -> json:decode_value().
 get_global_spec(Default) ->
     normalize_json(application:get_env(cowboy_swagger, global_spec, Default)).
 
--spec set_global_spec(jsx:json_term()) -> ok.
+-spec set_global_spec(json:encode_value()) -> ok.
 set_global_spec(NewSpec) ->
     application:set_env(cowboy_swagger, global_spec, normalize_json(NewSpec)).
 
--spec get_metadata(trails:trail()) -> jsx:json_term().
+-spec get_metadata(trails:trail()) -> json:decode_value().
 get_metadata(Trail) ->
     normalize_json(trails:metadata(Trail)).
 
--spec get_server_spec() -> #{ranch:ref() := jsx:json_term()}.
+-spec get_server_spec() -> #{ranch:ref() := json:decode_value()}.
 get_server_spec() ->
     ServerSpec = application:get_env(cowboy_swagger, server_spec, #{}),
-    maps:map(fun(_Server, Spec) -> normalize_json(Spec) end, ServerSpec).
+    #{Server => normalize_json(Spec) || Server := Spec <:- ServerSpec}.
 
--spec get_server_spec(ranch:ref()) -> jsx:json_term().
+-spec get_server_spec(ranch:ref()) -> json:decode_value().
 get_server_spec(Server) ->
     get_server_spec(Server, #{}).
 
--spec get_server_spec(ranch:ref(), jsx:json_term()) -> jsx:json_term().
+-spec get_server_spec(ranch:ref(), json:decode_value()) -> json:decode_value().
 get_server_spec(Server, Default) ->
     ServerSpec = application:get_env(cowboy_swagger, server_spec, #{}),
     normalize_json(maps:get(Server, ServerSpec, Default)).
 
--spec set_server_spec(ranch:ref(), jsx:json_term()) -> ok.
+-spec set_server_spec(ranch:ref(), json:encode_value()) -> ok.
 set_server_spec(Server, NewSpec) ->
     ServerSpec = application:get_env(cowboy_swagger, server_spec, #{}),
     NormalizedSpec = normalize_json(NewSpec),
@@ -430,23 +349,15 @@ set_server_spec(Server, NewSpec) ->
 -spec swagger_version() -> swagger_version().
 swagger_version() ->
     case get_global_spec() of
-        #{~"openapi" := ~"3.0.0"} ->
-            openapi_3_0_0;
-        #{~"swagger" := ~"2.0"} ->
-            swagger_2_0;
-        _Other ->
-            swagger_2_0
+        #{~"openapi" := ~"3.0.0"} -> openapi_3_0_0;
+        _Other -> swagger_2_0
     end.
 
 -spec server_swagger_version(Server :: ranch:ref()) -> swagger_version().
 server_swagger_version(Server) ->
     case get_server_spec(Server) of
-        #{~"openapi" := ~"3.0.0"} ->
-            openapi_3_0_0;
-        #{~"swagger" := ~"2.0"} ->
-            swagger_2_0;
-        _Other ->
-            swagger_2_0
+        #{~"openapi" := ~"3.0.0"} -> openapi_3_0_0;
+        _Other -> swagger_2_0
     end.
 
 %% @private
@@ -455,7 +366,7 @@ translate_swagger_paths([], Acc) ->
 translate_swagger_paths([Trail | T], Acc) ->
     Path = normalize_path(trails:path_match(Trail)),
     Metadata = validate_metadata(get_metadata(Trail)),
-    translate_swagger_paths(T, maps:put(Path, Metadata, Acc)).
+    translate_swagger_paths(T, Acc#{Path => Metadata}).
 
 %% @private
 refactor_base_path(PathMap, undefined) ->
@@ -497,7 +408,7 @@ create_swagger_spec(#{~"openapi" := _Version} = GlobalSpec, SanitizeTrails) ->
     SwaggerPaths = swagger_paths(SanitizeTrails, BasePath),
     GlobalSpec#{~"paths" => SwaggerPaths};
 create_swagger_spec(GlobalSpec, SanitizeTrails) ->
-    create_swagger_spec(GlobalSpec#{~"openapi" => ~"3.0"}, SanitizeTrails).
+    create_swagger_spec(GlobalSpec#{~"openapi" => ~"3.0.0"}, SanitizeTrails).
 
 %% @private
 deconstruct_openapi_url(GlobalSpec) ->
@@ -528,7 +439,7 @@ validate_swagger_map_params(Params) ->
         fun(E) ->
             case maps:get(~"name", E, undefined) of
                 undefined ->
-                    maps:is_key(~"$r", E);
+                    maps:is_key(~"$ref", E);
                 _ ->
                     {true, E#{~"in" => maps:get(~"in", E, ~"path")}}
             end
@@ -537,28 +448,16 @@ validate_swagger_map_params(Params) ->
 
 %% @private
 validate_swagger_map_responses(Responses) ->
-    F = fun(_K, V) -> V#{~"description" => maps:get(~"description", V, ~"")} end,
-    maps:map(F, Responses).
+    #{K => V#{~"description" => maps:get(~"description", V, ~"")} || K := V <:- Responses}.
 
 %% @private
--spec build_definition(
-    Name :: parameter_definition_name(),
-    Properties :: property_obj()
-) ->
-    parameters_definitions().
-build_definition(Name, Properties) when is_atom(Name) ->
-    build_definition(erlang:atom_to_binary(Name, utf8), Properties);
+-spec build_definition(parameter_definition_name(), property_obj()) -> parameters_definitions().
 build_definition(Name, Properties) when is_binary(Name) ->
     #{Name => #{~"type" => ~"object", ~"properties" => Properties}}.
 
 %% @private
--spec build_definition_array(
-    Name :: parameter_definition_name(),
-    Properties :: property_obj()
-) ->
+-spec build_definition_array(parameter_definition_name(), property_obj()) ->
     parameters_definition_array().
-build_definition_array(Name, Properties) when is_atom(Name) ->
-    build_definition_array(erlang:atom_to_binary(Name, utf8), Properties);
 build_definition_array(Name, Properties) when is_binary(Name) ->
     #{
         Name =>
@@ -570,33 +469,33 @@ build_definition_array(Name, Properties) when is_binary(Name) ->
 
 %% @private
 -spec prepare_new_global_spec(
-    CurrentSpec :: jsx:json_term(),
+    CurrentSpec :: json:decode_value(),
     Definitions ::
         parameters_definitions() | parameters_definition_array(),
     Type :: binary()
 ) ->
-    NewSpec :: jsx:json_term().
+    NewSpec :: json:decode_value().
 prepare_new_global_spec(CurrentSpec, Definitions, Type) ->
     prepare_new_spec(swagger_version(), CurrentSpec, Definitions, Type).
 
 -spec prepare_new_server_spec(
     Server :: ranch:ref(),
-    CurrentSpec :: jsx:json_term(),
+    CurrentSpec :: json:decode_value(),
     Definitions ::
         parameters_definitions() | parameters_definition_array(),
     Type :: binary()
 ) ->
-    NewSpec :: jsx:json_term().
+    NewSpec :: json:decode_value().
 prepare_new_server_spec(Server, CurrentSpec, Definitions, Type) ->
     prepare_new_spec(server_swagger_version(Server), CurrentSpec, Definitions, Type).
 
 -spec prepare_new_spec(
     Version :: swagger_version(),
-    CurrentSpec :: jsx:json_term(),
+    CurrentSpec :: json:decode_value(),
     Definitions :: parameters_definitions() | parameters_definition_array(),
     Type :: binary()
 ) ->
-    NewSpec :: jsx:json_term().
+    NewSpec :: json:decode_value().
 prepare_new_spec(swagger_2_0, CurrentSpec, Definitions, _Type) ->
     CurrentSpec#{~"definitions" => Definitions};
 prepare_new_spec(openapi_3_0_0, CurrentSpec, Definitions, Type) ->

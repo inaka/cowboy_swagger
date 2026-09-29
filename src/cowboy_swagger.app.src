@@ -1,7 +1,7 @@
 {application, cowboy_swagger, [
     {description, "Swagger/OpenAPI for Cowboy Erlang projects"},
     {vsn, git},
-    {applications, [kernel, stdlib, ranch, cowboy, trails, jsx]},
+    {applications, [kernel, stdlib, ranch, cowboy, trails]},
     {modules, []},
     {registered, []},
     {licenses, ["Apache-2.0"]},

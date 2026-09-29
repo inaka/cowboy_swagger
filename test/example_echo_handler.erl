@@ -25,8 +25,8 @@ trails() ->
         #{
             get =>
                 #{
-                    tags => ["echo"],
-                    description => "Gets echo var from the server",
+                    tags => [~"echo"],
+                    description => ~"Gets echo var from the server",
                     responses =>
                         #{
                             ~"200" =>
@@ -38,8 +38,8 @@ trails() ->
                 },
             put =>
                 #{
-                    tags => ["echo"],
-                    description => "Sets echo var in the server",
+                    tags => [~"echo"],
+                    description => ~"Sets echo var in the server",
                     parameters =>
                         [
                             #{

@@ -22,7 +22,7 @@ content_types_accepted(Req, State) ->
     {[{'*', handle_put}], Req, State}.
 
 content_types_provided(Req, State) ->
-    {[{<<"text/plain">>, handle_get}], Req, State}.
+    {[{~"text/plain", handle_get}], Req, State}.
 
 forbidden(Req, State) ->
     {false, Req, State}.

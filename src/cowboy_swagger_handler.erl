@@ -25,13 +25,9 @@ trails() ->
 
 -spec trails(cowboy_swagger_json_handler:options()) -> trails:trails().
 trails(Options) ->
-    StaticFiles =
-        case application:get_env(cowboy_swagger, static_files) of
-            {ok, Val} ->
-                Val;
-            _ ->
-                filename:join(cowboy_swagger_priv(), "swagger")
-        end,
+    StaticFiles = application:get_env(
+        cowboy_swagger, static_files, filename:join(cowboy_swagger_priv(), "swagger")
+    ),
     Redirect =
         trails:trail(
             "/api-docs",

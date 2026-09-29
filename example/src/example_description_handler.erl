@@ -26,14 +26,13 @@ trails() ->
         #{
             get =>
                 #{
-                    tags => ["example"],
-                    description => "Retrives trails's server description",
+                    tags => [~"example"],
+                    description => ~"Retrives trails's server description",
                     responses =>
                         #{
-                            <<"200">> =>
+                            ~"200" =>
                                 #{
-                                    description =>
-                                        <<"Retrives trails's server description 200 OK">>,
+                                    description => ~"Retrives trails's server description 200 OK",
                                     content => #{'text/plain' => #{schema => #{type => string}}}
                                 }
                         }
@@ -43,7 +42,7 @@ trails() ->
 
 %% cowboy
 allowed_methods(Req, State) ->
-    {[<<"GET">>], Req, State}.
+    {[~"GET"], Req, State}.
 
 %% internal
 handle_get(Req, State) ->
