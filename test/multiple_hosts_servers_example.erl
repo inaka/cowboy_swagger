@@ -6,22 +6,20 @@
 -export([stop/1]).
 -export([start_phase/3]).
 
--hank([unnecessary_function_arguments]).
+-behaviour(application).
 
 %% application
 %% @doc Starts the application
--spec start() -> {ok, [atom()]}.
 start() ->
     application:ensure_all_started(multiple_hosts_servers_example).
 
 %% @doc Stops the application
--spec stop() -> ok.
 stop() ->
     application:stop(multiple_hosts_servers_example).
 
 %% behaviour
 %% @private
--spec start(normal, [any()]) -> {ok, pid()}.
+-spec start(normal, [term()]) -> {ok, pid()}.
 start(_StartType, _StartArgs) ->
     _ = application:stop(lager),
     ok = application:stop(sasl),
@@ -42,11 +40,11 @@ start_phase(start_multiple_hosts_servers_example_http, _StartType, []) ->
         application:get_env(multiple_hosts_servers_example, api2),
 
     Trails11 =
-        trails:trails(example_echo_handler)
-        ++ cowboy_swagger_handler:trails(#{server => api1, host => HostMatch11}),
+        trails:trails(example_echo_handler) ++
+            cowboy_swagger_handler:trails(#{server => api1, host => HostMatch11}),
     Trails12 =
-        trails:trails(host1_handler)
-        ++ cowboy_swagger_handler:trails(#{server => api1, host => HostMatch12}),
+        trails:trails(host1_handler) ++
+            cowboy_swagger_handler:trails(#{server => api1, host => HostMatch12}),
     Routes1 = [{HostMatch11, Trails11}, {HostMatch12, Trails12}],
 
     trails:store(api1, Routes1),
@@ -54,8 +52,8 @@ start_phase(start_multiple_hosts_servers_example_http, _StartType, []) ->
     {ok, _} = start_cowboy(api1, Dispatch1, Port1),
 
     Trails21 =
-        trails:trails([host1_handler, example_echo_handler])
-        ++ cowboy_swagger_handler:trails(#{server => api2}),
+        trails:trails([host1_handler, example_echo_handler]) ++
+            cowboy_swagger_handler:trails(#{server => api2}),
 
     trails:store(api2, Trails21),
     Dispatch2 = trails:single_host_compile(Trails21),
@@ -66,7 +64,9 @@ start_phase(start_multiple_hosts_servers_example_http, _StartType, []) ->
 start_cowboy(Server, Dispatch, Port) ->
     RanchOptions = [{port, Port}],
     CowboyOptions =
-        #{env => #{dispatch => Dispatch},
-          compress => true,
-          timeout => 12000},
+        #{
+            env => #{dispatch => Dispatch},
+            compress => true,
+            timeout => 12000
+        },
     cowboy:start_clear(Server, RanchOptions, CowboyOptions).

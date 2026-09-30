@@ -3,12 +3,14 @@
 -export([all/1, init_per_suite/1, end_per_suite/1]).
 -export([api_call/2, api_call/4]).
 
--type response() ::
-    #{status_code => integer(),
-      headers => [tuple()],
-      body => binary()}.
--type config() :: proplists:proplist().
--type shotgun_http_verb() :: delete | get | head | options | patch | post | put.
+-nominal response() ::
+    #{
+        status_code => integer(),
+        headers => [tuple()],
+        body => binary()
+    }.
+-nominal config() :: proplists:proplist().
+-nominal shotgun_http_verb() :: delete | get | head | options | patch | post | put.
 
 -export_type([shotgun_http_verb/0]).
 -export_type([config/0, response/0]).
@@ -17,7 +19,7 @@
 all(Module) ->
     ExcludedFuns = [module_info, init_per_suite, end_per_suite, group, all],
     Exports = apply(Module, module_info, [exports]),
-    [F || {F, 1} <- Exports, not lists:member(F, ExcludedFuns)].
+    [F || {F, A} <:- Exports, A =:= 1, not lists:member(F, ExcludedFuns)].
 
 -spec init_per_suite(config()) -> config().
 init_per_suite(Config) ->
