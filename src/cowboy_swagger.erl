@@ -311,7 +311,7 @@ is_visible(#{}) -> true;
 is_visible(_Metadata) -> false.
 
 -doc """
-Returns all existing definitions for the chosen type (`~"schemas"` or `~"properties"`).
+Returns all existing definitions for the chosen type (`~"schemas"` or `~"parameters"`).
 """.
 -doc #{group => "Global Spec API"}.
 -spec get_existing_definitions(
