@@ -1,9 +1,10 @@
-%%% @doc Cowboy Swagger Handler. This handler exposes a GET operation
-%%%      to enable `swagger.json' to be retrieved from embedded
-%%%      Swagger-UI (located in `priv/swagger' folder).
 -module(cowboy_swagger_handler).
+-moduledoc """
+Cowboy Swagger Handler. This handler exposes a `GET` operation
+to enable `/api-docs` to be retrieved and host the Swagger-UI
+(located in `priv/swagger` folder).
+""".
 
-%% Trails
 -behaviour(trails_handler).
 
 -export([trails/0, trails/1]).
@@ -11,18 +12,20 @@
 -nominal route_match() :: '_' | iodata().
 -export_type([route_match/0]).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Trails
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% @private
-%% @doc Implements `trails_handler:trails/0' callback. This function returns
-%%      trails routes for both: static content (Swagger-UI) and this handler
-%%      that returns the `swagger.json'.
+-doc """
+Implements `c:trails_handler:trails/0`. This function returns
+trails routes for both: static content (Swagger-UI) and this handler
+that returns the `swagger.json`.
+""".
 -spec trails() -> trails:trails().
 trails() ->
     trails(#{}).
 
+-doc """
+Implements `c:trails_handler:trails/1`. This function returns
+trails routes for both: static content (Swagger-UI) and this handler
+that returns the `swagger.json`.
+""".
 -spec trails(cowboy_swagger_json_handler:options()) -> trails:trails().
 trails(Options) ->
     StaticFiles = application:get_env(
@@ -47,7 +50,7 @@ trails(Options) ->
         trails:trail("/api-docs/swagger.json", cowboy_swagger_json_handler, Options, MD),
     [Redirect, Handler, Static].
 
-%% @private
+-doc false.
 -spec cowboy_swagger_priv() -> string().
 cowboy_swagger_priv() ->
     case code:priv_dir(cowboy_swagger) of

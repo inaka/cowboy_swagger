@@ -11,7 +11,6 @@
     resource_exists/2
 ]).
 
-%% cowboy
 init(Req, _Opts) ->
     {cowboy_rest, Req, #{}}.
 

@@ -1,6 +1,5 @@
 -module(cowboy_swagger_handler_SUITE).
 
-%% CT
 -export([
     all/0,
     init_per_suite/1,
@@ -8,14 +7,9 @@
     init_per_testcase/2,
     end_per_testcase/2
 ]).
-%% Test cases
 -export([handler_test/1, multiple_hosts_test/1]).
 
 -hank([unnecessary_function_arguments]).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Common test
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec all() -> [atom()].
 all() ->
@@ -59,16 +53,12 @@ end_per_testcase(multiple_hosts_test, Config) ->
     ok = cleanup(),
     Config.
 
-%% @private
+-doc false.
 -spec cleanup() -> ok.
 cleanup() ->
     _ = application:stop(cowboy_swagger),
     _ = application:stop(trails),
     ok.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Test Cases
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec handler_test(cowboy_swagger_test_utils:config()) -> {atom(), string()}.
 handler_test(_Config) ->
@@ -165,7 +155,7 @@ multiple_hosts_test(_Config) ->
         cowboy_swagger:dec_json(Body21),
     {comment, ""}.
 
-%% @private
+-doc false.
 -spec get_expected_paths(Trails :: trails:trails()) -> json:decode_value().
 get_expected_paths(Trails) ->
     SanitizeTrails = cowboy_swagger:filter_cowboy_swagger_handler(Trails),

@@ -14,7 +14,6 @@
 
 -export([allowed_methods/2, handle_get/2]).
 
-%trails
 -behaviour(trails_handler).
 
 -export([trails/0]).
@@ -39,12 +38,10 @@ trails() ->
         },
     [trails:trail("/whoami", host1_handler, #{}, Metadata)].
 
-%% cowboy
 -spec allowed_methods(Req, State) -> {[<<_:24>>, ...], Req, State}.
 allowed_methods(Req, State) ->
     {[~"GET"], Req, State}.
 
-%% internal
 -spec handle_get(cowboy_req:req(), State) -> {<<_:40, _:_*8>>, cowboy_req:req(), State}.
 handle_get(Req, State) ->
     Host = cowboy_req:host(Req),

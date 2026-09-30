@@ -14,7 +14,6 @@
 
 -export([allowed_methods/2, handle_put/2, handle_get/2]).
 
-%trails
 -behaviour(trails_handler).
 
 -export([trails/0]).
@@ -62,12 +61,10 @@ trails() ->
         },
     [trails:trail("/message/[:echo]", example_echo_handler, [], Metadata)].
 
-%% cowboy
 -spec allowed_methods(Req, State) -> {[<<_:24, _:_*8>>, ...], Req, State}.
 allowed_methods(Req, State) ->
     {[~"GET", ~"PUT", ~"HEAD"], Req, State}.
 
-%% internal
 -spec handle_get(Req, State) -> {[binary(), ...], Req, State}.
 handle_get(Req, State) ->
     Echo = application:get_env(example, echo, ""),

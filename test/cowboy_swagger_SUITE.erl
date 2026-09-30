@@ -15,17 +15,9 @@
 
 -hank([unnecessary_function_arguments]).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Common test
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 -spec all() -> [atom()].
 all() ->
     cowboy_swagger_test_utils:all(?MODULE).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Test Cases
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec to_json_test(cowboy_swagger_test_utils:config()) -> {atom(), string()}.
 to_json_test(_Config) ->
@@ -283,10 +275,6 @@ parameters_ref_test(_Config) ->
     #{~"page" := _} = JsonDefinitions,
     {comment, ""}.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Internal functions
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 perform_add_completed_definition_test() ->
     %%
     %% Given
@@ -315,7 +303,7 @@ perform_add_completed_definition_test() ->
     true = maps:is_key(Name2, JsonDefinitions),
     ok.
 
-%% @private
+-doc false.
 perform_add_definition_test() ->
     %%
     %% Given
@@ -343,7 +331,7 @@ perform_add_definition_test() ->
     true = maps:is_key(Name2, JsonDefinitions),
     ok.
 
-%% @private
+-doc false.
 perform_add_definition_array_test() ->
     %%
     %% Given
@@ -373,7 +361,7 @@ perform_add_definition_array_test() ->
     ~"array" = maps:get(~"type", maps:get(Name2, JsonDefinitions)),
     ok.
 
-%% @private
+-doc false.
 test_trails() ->
     Metadata =
         #{
@@ -466,7 +454,7 @@ test_trails() ->
         | cowboy_swagger_handler:trails()
     ].
 
-%% @private
+-doc false.
 test_properties_one() ->
     #{
         ~"first_name" =>
@@ -483,7 +471,7 @@ test_properties_one() ->
             }
     }.
 
-%% @private
+-doc false.
 test_properties_two() ->
     #{
         ~"brand" => #{type => ~"string", description => ~"Car brand"},
@@ -495,7 +483,7 @@ test_properties_two() ->
             }
     }.
 
-%% @private
+-doc false.
 set_swagger_version(swagger_2_0) ->
     Spec0 = maps:remove(~"openapi", cowboy_swagger:get_global_spec()),
     cowboy_swagger:set_global_spec(Spec0#{swagger => ~"2.0"});

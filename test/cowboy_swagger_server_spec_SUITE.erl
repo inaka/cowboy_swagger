@@ -291,7 +291,7 @@ test_properties_one() ->
             }
     }.
 
-%% @private
+-doc false.
 test_properties_two() ->
     #{
         ~"brand" => #{type => ~"string", description => ~"Car brand"},

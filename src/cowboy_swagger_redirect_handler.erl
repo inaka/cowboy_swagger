@@ -1,27 +1,18 @@
-%% @private
 -module(cowboy_swagger_redirect_handler).
+-moduledoc false.
 
 -behaviour(cowboy_rest).
 
-%% Cowboy callbacks
 -export([init/2]).
-%% Handlers
 -export([resource_exists/2, previously_existed/2, moved_permanently/2]).
 
 -opaque state() :: #{}.
 -export_type([state/0]).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Cowboy Callbacks
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 -spec init(cowboy_req:req(), state()) -> {cowboy_rest, cowboy_req:req(), state()}.
 init(Req, State) ->
     {cowboy_rest, Req, State}.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Handlers
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 -spec resource_exists(Req :: cowboy_req:req(), State :: state()) ->
     {boolean(), cowboy_req:req(), state()}.
 resource_exists(Req, State) ->
