@@ -164,7 +164,7 @@ add_definition_array(Name, Properties) ->
     add_definition(DefinitionArray).
 
 -doc """
-Register an single-valued global definition.
+Register a single-valued global definition.
 """.
 -doc #{group => "Global Spec API"}.
 -spec add_definition(parameter_definition_name(), property_obj()) -> ok.
