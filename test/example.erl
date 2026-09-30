@@ -8,24 +8,26 @@
 
 -behaviour(application).
 
-%% application
-%% @doc Starts the application
+-doc """
+Starts the application.
+""".
 -spec start() -> {ok, [atom()]} | {error, term()}.
 start() ->
     application:ensure_all_started(example).
 
-%% @doc Stops the application
+-doc """
+Stops the application.
+""".
 -spec stop() -> ok.
 stop() ->
     application:stop(example).
 
-%% behaviour
-%% @private
+-doc false.
 -spec start(normal, [term()]) -> {ok, pid()}.
 start(_StartType, _StartArgs) ->
     example_sup:start_link().
 
-%% @private
+-doc false.
 -spec stop(_) -> ok.
 stop(_State) ->
     ok = cowboy:stop_listener(example_http).

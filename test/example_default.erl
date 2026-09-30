@@ -12,7 +12,6 @@
 -elvis([{elvis_style, consistent_ok_error_spec, disable}]).
 -hank([unnecessary_function_arguments]).
 
-%% cowboy
 -spec init(term(), term(), term()) -> {upgrade, protocol, cowboy_rest}.
 init(_Transport, _Req, _Opts) ->
     {upgrade, protocol, cowboy_rest}.

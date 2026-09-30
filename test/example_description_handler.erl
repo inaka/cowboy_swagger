@@ -14,7 +14,6 @@
 
 -export([allowed_methods/2, handle_get/2]).
 
-%trails
 -behaviour(trails_handler).
 
 -export([trails/0]).
@@ -39,12 +38,10 @@ trails() ->
         },
     [trails:trail("/description", example_description_handler, [], Metadata)].
 
-%% cowboy
 -spec allowed_methods(Req, State) -> {[<<_:24>>, ...], Req, State}.
 allowed_methods(Req, State) ->
     {[~"GET"], Req, State}.
 
-%% internal
 -spec handle_get(Req, State) -> {[trails:trail()], Req, State}.
 handle_get(Req, State) ->
     Body = trails:all(),

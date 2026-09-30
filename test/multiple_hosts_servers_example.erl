@@ -8,17 +8,19 @@
 
 -behaviour(application).
 
-%% application
-%% @doc Starts the application
+-doc """
+Starts the application.
+""".
 start() ->
     application:ensure_all_started(multiple_hosts_servers_example).
 
-%% @doc Stops the application
+-doc """
+Stops the application.
+""".
 stop() ->
     application:stop(multiple_hosts_servers_example).
 
-%% behaviour
-%% @private
+-doc false.
 -spec start(normal, [term()]) -> {ok, pid()}.
 start(_StartType, _StartArgs) ->
     _ = application:stop(lager),
@@ -26,7 +28,7 @@ start(_StartType, _StartArgs) ->
     {ok, _} = application:ensure_all_started(sasl),
     {ok, self()}.
 
-%% @private
+-doc false.
 -spec stop(_) -> ok.
 stop(_State) ->
     ok = cowboy:stop_listener(multiple_hosts_servers_http).
@@ -60,7 +62,7 @@ start_phase(start_multiple_hosts_servers_example_http, _StartType, []) ->
     {ok, _} = start_cowboy(api2, Dispatch2, Port2),
     ok.
 
-%% @private
+-doc false.
 start_cowboy(Server, Dispatch, Port) ->
     RanchOptions = [{port, Port}],
     CowboyOptions =

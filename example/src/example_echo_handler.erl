@@ -16,7 +16,6 @@
 
 -export([allowed_methods/2, handle_put/2, handle_get/2]).
 
-%trails
 -behaviour(trails_handler).
 
 -export([trails/0]).
@@ -55,11 +54,9 @@ trails() ->
         },
     [trails:trail("/message/[:echo-kebab_case]", example_echo_handler, [], Metadata)].
 
-%% cowboy
 allowed_methods(Req, State) ->
     {[~"GET", ~"PUT", ~"HEAD"], Req, State}.
 
-%% internal
 handle_get(Req, State) ->
     Echo = application:get_env(example, echo, ""),
     Body = [~"You Get an echo!", Echo],
