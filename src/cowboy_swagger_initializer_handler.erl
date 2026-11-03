@@ -1,5 +1,23 @@
 -module(cowboy_swagger_initializer_handler).
--moduledoc false.
+-moduledoc """
+Serves the Swagger UI initializer with a runtime-configured specification URL.
+
+`cowboy_swagger_handler:trails/0,1` registers this handler at
+`<base_path>/swagger-initializer.js`, before the static-file route.
+It reads `swagger-initializer.template` from the configured `static_files`
+directory and replaces `__SWAGGER_JSON_URL__` with a JSON-encoded string.
+The placeholder must appear without surrounding quotes in the template.
+
+The `cowboy_swagger` application setting `swagger_json_url` selects the
+specification loaded by the UI and defaults to `<base_path>/swagger.json`.
+It accepts a string or UTF-8 binary, including an absolute URL. The setting
+is read for each initializer request, so changing it does not require
+recompilation or a listener restart. It does not change the local JSON route.
+
+Responses use the `application/javascript` content type. A missing template
+returns HTTP 404. The static directory and base path are captured when the
+routes are built.
+""".
 
 -behaviour(cowboy_rest).
 
