@@ -118,8 +118,12 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
  %% cowboy_swagger config
  {cowboy_swagger,
   [
-   %% `path`: Path where you can access Swagger-UI. Default: `/api-docs`
-   {path, "/api-docs-swagger"},
+   %% `base_path`: Path where you can access Swagger-UI. Default: `/api-docs`
+   {base_path, "/api-docs"},
+   %% `swagger_json_url`: URL loaded by Swagger-UI. Defaults to
+   %% `base_path` followed by `/swagger.json`. May also be an absolute URL.
+   %% Only changes the UI source; the local JSON route stays under `base_path`.
+   {swagger_json_url, "/api-docs/swagger.json"},
    %% `static_files`: Static content directory. This is where Swagger-UI
    %% is located. Default: `priv/swagger`.
    %% Remember that Swagger-UI is embedded into `cowboy-swagger` project,
@@ -129,13 +133,15 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
    %% `cowboy-swagger` as dependency from the console, `static_files` will be:
    {static_files, "./deps/cowboy_swagger/priv/swagger"},
 
+   %% Custom static_files directories must include swagger-initializer.template
+   %% with the __SWAGGER_JSON_URL__ placeholder (a complete JavaScript value).
+
    %% `global_spec`: Global fields for Swagger specification.
    %% If these fields are not set, `cowboy_swagger` will set default values.
    {global_spec,
     #{swagger => "2.0",
       info => #{title => "Example API"},
-      %% See "path" config section
-      basePath => "/api-docs-swagger"
+      basePath => "/api-docs"
      }
    },
    %% `server_spec`:Fields for Swagger specification for a given server.

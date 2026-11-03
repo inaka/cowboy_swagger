@@ -26,5 +26,5 @@ previously_existed(Req, State) ->
 -spec moved_permanently(Req :: cowboy_req:req(), State :: state()) ->
     {{true, iodata()}, cowboy_req:req(), state()}.
 moved_permanently(Req, State) ->
-    SwaggerPath = application:get_env(cowboy_swagger, path, "/api-docs"),
+    SwaggerPath = application:get_env(cowboy_swagger, base_path, "/api-docs"),
     {{true, SwaggerPath ++ "/index.html"}, Req, State}.
