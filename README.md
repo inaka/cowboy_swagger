@@ -139,9 +139,9 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
    %% `global_spec`: Global fields for Swagger specification.
    %% If these fields are not set, `cowboy_swagger` will set default values.
    {global_spec,
-    #{swagger => "2.0",
-      info => #{title => "Example API"},
-      basePath => "/api-docs"
+    #{swagger => ~"2.0",
+      info => #{~"title" => ~"Example API"},
+      basePath => ~"/api-docs"
      }
    },
    %% `server_spec`:Fields for Swagger specification for a given server.
