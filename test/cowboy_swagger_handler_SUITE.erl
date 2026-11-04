@@ -7,7 +7,14 @@
     init_per_testcase/2,
     end_per_testcase/2
 ]).
--export([handler_test/1, multiple_hosts_test/1]).
+-export([
+    handler_test/1,
+    multiple_hosts_test/1,
+    custom_base_path_test/1,
+    swagger_json_url_test/1,
+    custom_static_files_test/1,
+    missing_template_test/1
+]).
 
 -hank([unnecessary_function_arguments]).
 
@@ -32,6 +39,31 @@ end_per_suite(Config) ->
     Config :: cowboy_swagger_test_utils:config()
 ) ->
     cowboy_swagger_test_utils:config().
+init_per_testcase(custom_base_path_test, Config) ->
+    ok = application:set_env(cowboy_swagger, base_path, "/v2/docs"),
+    {ok, _} = example:start(),
+    Config;
+init_per_testcase(Test, Config) when
+    Test =:= custom_static_files_test; Test =:= missing_template_test
+->
+    StaticFiles = filename:join(proplists:get_value(priv_dir, Config), atom_to_list(Test)),
+    ok = file:make_dir(StaticFiles),
+    case Test of
+        custom_static_files_test ->
+            ok = file:write_file(
+                filename:join(StaticFiles, "swagger-initializer.template"),
+                ~"const url = __SWAGGER_JSON_URL__;"
+            ),
+            ok = file:write_file(filename:join(StaticFiles, "index.html"), ~"Custom UI");
+        missing_template_test ->
+            ok
+    end,
+    ok = application:set_env(cowboy_swagger, static_files, StaticFiles),
+    {ok, _} = example:start(),
+    Config;
+init_per_testcase(swagger_json_url_test, Config) ->
+    {ok, _} = example:start(),
+    Config;
 init_per_testcase(handler_test, Config) ->
     {ok, _} = example:start(),
     Config;
@@ -44,7 +76,7 @@ init_per_testcase(multiple_hosts_test, Config) ->
     Config :: cowboy_swagger_test_utils:config()
 ) ->
     cowboy_swagger_test_utils:config().
-end_per_testcase(handler_test, Config) ->
+end_per_testcase(Test, Config) when Test =/= multiple_hosts_test ->
     _ = example:stop(),
     ok = cleanup(),
     Config;
@@ -56,6 +88,10 @@ end_per_testcase(multiple_hosts_test, Config) ->
 -doc false.
 -spec cleanup() -> ok.
 cleanup() ->
+    lists:foreach(
+        fun(Key) -> ok = application:unset_env(cowboy_swagger, Key) end,
+        [base_path, swagger_json_url, static_files]
+    ),
     _ = application:stop(cowboy_swagger),
     _ = application:stop(trails),
     ok.
@@ -104,6 +140,13 @@ handler_test(_Config) ->
         cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger-ui.js"),
     {ok, SwaggerUIBodySrc} = file:read_file("../../../../priv/swagger/swagger-ui.js"),
     SwaggerUIBody = SwaggerUIBodySrc,
+
+    %% The initializer must use the default URL without an unresolved placeholder.
+    ok = check_initializer("/api-docs", ~"/api-docs/swagger.json"),
+
+    %% GET index.html through the static route
+    #{status_code := 200} =
+        cowboy_swagger_test_utils:api_call(get, "/api-docs/index.html"),
 
     %% GET unknown-file.ext - test /api-docs/[...] trail
     ct:comment("GET /api-docs/unknown-file.ext should return 404 NOT FOUND"),
@@ -164,3 +207,61 @@ get_expected_paths(Trails) ->
             cowboy_swagger:swagger_paths(SanitizeTrails)
         )
     ).
+
+-spec custom_base_path_test(cowboy_swagger_test_utils:config()) -> ok.
+custom_base_path_test(_Config) ->
+    #{status_code := 301, headers := Headers} =
+        cowboy_swagger_test_utils:api_call(get, "/v2/docs"),
+    {~"location", ~"/v2/docs/index.html"} = lists:keyfind(~"location", 1, Headers),
+    #{status_code := 200} =
+        cowboy_swagger_test_utils:api_call(get, "/v2/docs/index.html"),
+    #{status_code := 200} =
+        cowboy_swagger_test_utils:api_call(get, "/v2/docs/swagger-ui.js"),
+    #{status_code := 200, body := Body} =
+        cowboy_swagger_test_utils:api_call(get, "/v2/docs/swagger.json"),
+    #{~"openapi" := ~"3.0.0"} = cowboy_swagger:dec_json(Body),
+    #{status_code := 404} =
+        cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger.json"),
+    ok = check_initializer("/v2/docs", ~"/v2/docs/swagger.json"),
+    %% An independent UI source must not move the local spec route.
+    ok = application:set_env(cowboy_swagger, swagger_json_url, "/specs/v3.json"),
+    ok = check_initializer("/v2/docs", ~"/specs/v3.json"),
+    #{status_code := 200} =
+        cowboy_swagger_test_utils:api_call(get, "/v2/docs/swagger.json"),
+    ok.
+
+-spec swagger_json_url_test(cowboy_swagger_test_utils:config()) -> ok.
+swagger_json_url_test(_Config) ->
+    %% Change the environment after startup: no recompilation or listener restart.
+    lists:foreach(
+        fun(URL) ->
+            ok = application:set_env(cowboy_swagger, swagger_json_url, URL),
+            ok = check_initializer("/api-docs", unicode:characters_to_binary(URL))
+        end,
+        ["/specs/v1.json", ~"https://example.org/spec.json?name=\"quoted\"&path=\\test"]
+    ),
+    ok = application:unset_env(cowboy_swagger, swagger_json_url),
+    check_initializer("/api-docs", ~"/api-docs/swagger.json").
+
+-spec custom_static_files_test(cowboy_swagger_test_utils:config()) -> ok.
+custom_static_files_test(_Config) ->
+    #{status_code := 200, body := ~"Custom UI"} =
+        cowboy_swagger_test_utils:api_call(get, "/api-docs/index.html"),
+    #{status_code := 200, body := ~"const url = \"/api-docs/swagger.json\";"} =
+        cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger-initializer.js"),
+    ok.
+
+-spec missing_template_test(cowboy_swagger_test_utils:config()) -> ok.
+missing_template_test(_Config) ->
+    #{status_code := 404} =
+        cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger-initializer.js"),
+    ok.
+
+-spec check_initializer(string(), binary()) -> ok.
+check_initializer(BasePath, URL) ->
+    #{status_code := 200, body := Body, headers := Headers} =
+        cowboy_swagger_test_utils:api_call(get, BasePath ++ "/swagger-initializer.js"),
+    {~"content-type", ~"application/javascript"} = lists:keyfind(~"content-type", 1, Headers),
+    nomatch = binary:match(Body, ~"__SWAGGER_JSON_URL__"),
+    {_, _} = binary:match(Body, iolist_to_binary(json:encode(URL))),
+    ok.

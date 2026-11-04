@@ -31,24 +31,31 @@ trails(Options) ->
     StaticFiles = application:get_env(
         cowboy_swagger, static_files, filename:join(cowboy_swagger_priv(), "swagger")
     ),
+    SwaggerPath = application:get_env(cowboy_swagger, base_path, "/api-docs"),
     Redirect =
         trails:trail(
-            "/api-docs",
+            SwaggerPath,
             cowboy_swagger_redirect_handler,
             {file, StaticFiles ++ "/index.html"},
             #{get => #{hidden => true}}
         ),
     Static =
         trails:trail(
-            "/api-docs/[...]",
+            SwaggerPath ++ "/[...]",
             cowboy_static,
             {dir, StaticFiles, [{mimetypes, cow_mimetypes, all}]},
             #{get => #{hidden => true}}
         ),
     MD = #{get => #{hidden => true}},
     Handler =
-        trails:trail("/api-docs/swagger.json", cowboy_swagger_json_handler, Options, MD),
-    [Redirect, Handler, Static].
+        trails:trail(SwaggerPath ++ "/swagger.json", cowboy_swagger_json_handler, Options, MD),
+    Initializer = trails:trail(
+        SwaggerPath ++ "/swagger-initializer.js",
+        cowboy_swagger_initializer_handler,
+        #{static_files => StaticFiles, base_path => SwaggerPath},
+        MD
+    ),
+    [Redirect, Handler, Initializer, Static].
 
 -doc false.
 -spec cowboy_swagger_priv() -> string().
