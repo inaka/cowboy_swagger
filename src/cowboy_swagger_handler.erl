@@ -55,7 +55,17 @@ trails(Options) ->
         #{static_files => StaticFiles, base_path => SwaggerPath},
         MD
     ),
-    [Redirect, Handler, Initializer, Static].
+    [Redirect, Handler, Initializer, index_trail(SwaggerPath, StaticFiles), Static].
+
+-doc false.
+-spec index_trail(string(), string()) -> trails:trail().
+index_trail(SwaggerPath, StaticFiles) ->
+    trails:trail(
+        SwaggerPath ++ "/index.html",
+        cowboy_swagger_index_handler,
+        #{static_files => StaticFiles},
+        #{get => #{hidden => true}}
+    ).
 
 -doc false.
 -spec cowboy_swagger_priv() -> string().
