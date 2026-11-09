@@ -3,10 +3,9 @@
 
 main([BuildDir, ConfigPath, OutputPath]) ->
     try
-        Paths = lists:append([
-            filelib:wildcard(filename:join([BuildDir, Dir, "*", "ebin"]))
-         || Dir <:- ["lib", "checkouts"]
-        ]),
+        Paths =
+            filelib:wildcard(filename:join(BuildDir, "lib/*/ebin")) ++
+                filelib:wildcard(filename:join(BuildDir, "checkouts/*/ebin")),
         ok = code:add_paths(Paths),
         {ok, [Config]} = file:consult(ConfigPath),
         lists:foreach(fun load_config/1, Config),
