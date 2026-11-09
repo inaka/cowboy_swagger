@@ -13,7 +13,9 @@
     custom_base_path_test/1,
     swagger_json_url_test/1,
     custom_static_files_test/1,
-    missing_template_test/1
+    missing_template_test/1,
+    robots_noindex_test/1,
+    robots_custom_html_test/1
 ]).
 
 -hank([unnecessary_function_arguments]).
@@ -44,7 +46,9 @@ init_per_testcase(custom_base_path_test, Config) ->
     {ok, _} = example:start(),
     Config;
 init_per_testcase(Test, Config) when
-    Test =:= custom_static_files_test; Test =:= missing_template_test
+    Test =:= custom_static_files_test;
+    Test =:= missing_template_test;
+    Test =:= robots_custom_html_test
 ->
     StaticFiles = filename:join(proplists:get_value(priv_dir, Config), atom_to_list(Test)),
     ok = file:make_dir(StaticFiles),
@@ -55,13 +59,15 @@ init_per_testcase(Test, Config) when
                 ~"const url = __SWAGGER_JSON_URL__;"
             ),
             ok = file:write_file(filename:join(StaticFiles, "index.html"), ~"Custom UI");
+        robots_custom_html_test ->
+            ok;
         missing_template_test ->
             ok
     end,
     ok = application:set_env(cowboy_swagger, static_files, StaticFiles),
     {ok, _} = example:start(),
     Config;
-init_per_testcase(swagger_json_url_test, Config) ->
+init_per_testcase(Test, Config) when Test =:= swagger_json_url_test; Test =:= robots_noindex_test ->
     {ok, _} = example:start(),
     Config;
 init_per_testcase(handler_test, Config) ->
@@ -90,7 +96,7 @@ end_per_testcase(multiple_hosts_test, Config) ->
 cleanup() ->
     lists:foreach(
         fun(Key) -> ok = application:unset_env(cowboy_swagger, Key) end,
-        [base_path, swagger_json_url, static_files]
+        [base_path, swagger_json_url, static_files, robots_noindex]
     ),
     _ = application:stop(cowboy_swagger),
     _ = application:stop(trails),
@@ -213,8 +219,10 @@ custom_base_path_test(_Config) ->
     #{status_code := 301, headers := Headers} =
         cowboy_swagger_test_utils:api_call(get, "/v2/docs"),
     {~"location", ~"/v2/docs/index.html"} = lists:keyfind(~"location", 1, Headers),
-    #{status_code := 200} =
+    ok = application:set_env(cowboy_swagger, robots_noindex, true),
+    #{status_code := 200, body := HTML} =
         cowboy_swagger_test_utils:api_call(get, "/v2/docs/index.html"),
+    ok = check_robots_tag(HTML),
     #{status_code := 200} =
         cowboy_swagger_test_utils:api_call(get, "/v2/docs/swagger-ui.js"),
     #{status_code := 200, body := Body} =
@@ -264,4 +272,67 @@ check_initializer(BasePath, URL) ->
     {~"content-type", ~"application/javascript"} = lists:keyfind(~"content-type", 1, Headers),
     nomatch = binary:match(Body, ~"__SWAGGER_JSON_URL__"),
     {_, _} = binary:match(Body, iolist_to_binary(json:encode(URL))),
+    ok.
+
+-spec robots_noindex_test(cowboy_swagger_test_utils:config()) -> ok.
+robots_noindex_test(_Config) ->
+    {ok, Original} = file:read_file("../../../../priv/swagger/index.html"),
+    #{status_code := 200, body := Original} =
+        cowboy_swagger_test_utils:api_call(get, "/api-docs/index.html"),
+    ok = application:set_env(cowboy_swagger, robots_noindex, false),
+    #{status_code := 200, body := Original} =
+        cowboy_swagger_test_utils:api_call(get, "/api-docs/index.html"),
+    ok = application:set_env(cowboy_swagger, robots_noindex, true),
+    #{status_code := 200, body := HTML, headers := Headers} =
+        cowboy_swagger_test_utils:api_call(get, "/api-docs/index.html"),
+    {~"content-type", ~"text/html"} = lists:keyfind(~"content-type", 1, Headers),
+    ok = check_robots_tag(HTML),
+    #{status_code := 200, body := HTML} =
+        cowboy_swagger_test_utils:api_call(get, "/api-docs/index.html"),
+    #{status_code := 200, headers := HeadHeaders} =
+        HeadResponse =
+        cowboy_swagger_test_utils:api_call(head, "/api-docs/index.html"),
+    ~"" = maps:get(body, HeadResponse, ~""),
+    ContentLength = integer_to_binary(byte_size(HTML)),
+    {~"content-length", ContentLength} = lists:keyfind(~"content-length", 1, HeadHeaders),
+    %% Enabling the setting must not modify the file or affect other assets.
+    {ok, Original} = file:read_file("../../../../priv/swagger/index.html"),
+    #{status_code := 200} =
+        cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger-ui.css"),
+    ok = application:unset_env(cowboy_swagger, robots_noindex),
+    #{status_code := 200, body := Original} =
+        cowboy_swagger_test_utils:api_call(get, "/api-docs/index.html"),
+    ok.
+
+-spec robots_custom_html_test(cowboy_swagger_test_utils:config()) -> ok.
+robots_custom_html_test(_Config) ->
+    StaticFiles = application:get_env(cowboy_swagger, static_files, ""),
+    Index = filename:join(StaticFiles, "index.html"),
+    ok = application:set_env(cowboy_swagger, robots_noindex, true),
+    #{status_code := 404} =
+        cowboy_swagger_test_utils:api_call(get, "/api-docs/index.html"),
+    %% Custom HTML can use upper-case tags.
+    Original =
+        ~"<HTML><HEAD><title>Custom UI</title></HEAD><BODY>Custom UI</BODY></HTML>",
+    ok = file:write_file(Index, Original),
+    #{status_code := 200, body := HTML} =
+        cowboy_swagger_test_utils:api_call(get, "/api-docs/index.html"),
+    ok = check_robots_tag(HTML),
+    %% Documents without a head are passed through unchanged.
+    Headless = ~"<div>Custom UI fragment</div>",
+    ok = file:write_file(Index, Headless),
+    #{status_code := 200, body := Headless} =
+        cowboy_swagger_test_utils:api_call(get, "/api-docs/index.html"),
+    ok.
+
+-doc false.
+-spec check_robots_tag(binary()) -> ok.
+check_robots_tag(HTML) ->
+    Tag = ~"<meta name=\"robots\" content=\"noindex, nofollow\" />",
+    [_, _] = binary:split(HTML, Tag, [global]),
+    {match, _} = re:run(
+        HTML,
+        ~"<head[^>]*>.*<meta name=\"robots\" content=\"noindex, nofollow\" />.*</head>",
+        [caseless, dotall]
+    ),
     ok.

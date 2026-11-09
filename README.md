@@ -120,6 +120,9 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
   [
    %% `base_path`: Path where you can access Swagger-UI. Default: `/api-docs`
    {base_path, "/api-docs"},
+   %% `robots_noindex`: Add a robots meta tag to the UI HTML. Default: false.
+   %% When true, requests noindex, nofollow from search engines.
+   {robots_noindex, false},
    %% `swagger_json_url`: URL loaded by Swagger-UI. Defaults to
    %% `base_path` followed by `/swagger.json`. May also be an absolute URL.
    %% Only changes the UI source; the local JSON route stays under `base_path`.
@@ -164,6 +167,43 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
  }
 ].
 ```
+
+### Preventing Swagger UI indexing
+
+To request that search engines exclude the documentation page from their index
+and do not follow its links, enable `robots_noindex` in your application's
+`sys.config`:
+
+```erlang
+[
+    {cowboy_swagger, [
+        {base_path, "/v2/docs"},
+        {robots_noindex, true}
+    ]}
+].
+```
+
+The HTML returned by `/v2/docs/index.html` will contain the following tag
+inside `<head>`:
+
+```html
+<meta name="robots" content="noindex, nofollow" />
+```
+
+The setting defaults to `false`, which returns the original HTML unchanged.
+It is read for each HTML request, so it can also be changed with
+`application:set_env(cowboy_swagger, robots_noindex, true)` without restarting
+the listener. Refresh the page to fetch the updated HTML.
+
+Custom `static_files` directories are supported: the handler reads their
+`index.html` and inserts the tag before the first closing `</head>` tag
+(case-insensitive). The file on disk is never modified. HTML without a closing
+head tag is returned unchanged. Custom pages should omit an existing robots
+meta tag when using this setting, to avoid conflicting directives.
+
+This setting affects the UI HTML page only. It does not add directives to the
+JSON specification or restrict access to the documentation. Use authentication
+or network restrictions when access must be limited.
 
 ### Diferences between global_spec and server_spec
 
