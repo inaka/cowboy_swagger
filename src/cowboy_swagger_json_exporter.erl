@@ -8,9 +8,9 @@ JSON binary whenever `cowboy_swagger:to_json/1,2` generates a specification.
 The callback runs synchronously in the caller's process, including calls made
 by the HTTP JSON handler. No exporter is configured by default.
 
-Return `ok` after exporting successfully. Returning `{error, Reason}` makes
-generation fail with `{json_export_failed, Module, Reason}`. Exceptions raised
-by the callback propagate to the caller. Exporters should not call `to_json`
+Return `ok` after exporting successfully and raise an exception on failure.
+Callback exceptions propagate unchanged, preserving their original stacktrace.
+Exporters should not call `to_json`
 themselves, as that would recursively invoke the callback.
 
 This callback does not schedule generation. To export during a build, invoke
@@ -25,7 +25,7 @@ application is required by the generator itself.
 Exports the serialized specification. Output location and storage are chosen
 by the implementing module.
 """.
--callback export(JSON :: binary()) -> ok | {error, term()}.
+-callback export(JSON :: binary()) -> ok.
 
 -doc false.
 -spec maybe_export(binary()) -> ok.
@@ -34,8 +34,5 @@ maybe_export(JSON) ->
         undefined ->
             ok;
         {ok, Module} ->
-            case Module:export(JSON) of
-                ok -> ok;
-                {error, Reason} -> error({json_export_failed, Module, Reason})
-            end
+            ok = Module:export(JSON)
     end.

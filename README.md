@@ -183,7 +183,7 @@ the `cowboy_swagger_json_exporter` behaviour:
 -export([export/1]).
 
 export(JSON) ->
-    file:write_file("swagger.json", JSON).
+    ok = file:write_file("swagger.json", JSON).
 ```
 
 Then select the module in the application's `sys.config` (or `app.config`
@@ -209,9 +209,11 @@ serialized JSON binary synchronously, once per successful generation through
 binary. This includes generation triggered by HTTP requests to `swagger.json`;
 the setting does not mean “export once” or “export only during builds”.
 
-The callback must return `ok` or `{error, Reason}`. An error return raises
-`{json_export_failed, Module, Reason}`; callback exceptions propagate unchanged.
-An invalid exporter module or callback also fails generation. Exporters choose
+The callback must return `ok` on success and raise an exception on failure.
+Exceptions propagate unchanged with their original stacktrace. The library
+checks the callback result with `ok = Module:export(JSON)`; an unexpected return
+value fails with a bad match. An invalid exporter module or callback also
+fails generation. Exporters choose
 their storage destination and must handle concurrent requests or different
 server specifications as needed. Do not call `to_json` from `export/1`, as that
 would recursively invoke the exporter.

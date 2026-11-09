@@ -79,7 +79,8 @@ failure_test(Config) ->
     try cowboy_swagger:to_json(Trails) of
         _ -> ct:fail(expected_export_failure)
     catch
-        error:{json_export_failed, cowboy_swagger_test_exporter, enoent} -> ok
+        error:{badmatch, {error, enoent}}:WriteStack ->
+            [{cowboy_swagger_test_exporter, export, 1, _} | _] = WriteStack
     end,
     receive
         {exported_json, _} -> ok
@@ -89,7 +90,8 @@ failure_test(Config) ->
     try cowboy_swagger:to_json(Trails) of
         _ -> ct:fail(expected_exporter_exception)
     catch
-        error:exporter_crashed -> ok
+        error:exporter_crashed:CrashStack ->
+            [{cowboy_swagger_test_exporter, export, 1, _} | _] = CrashStack
     end,
     receive
         {exported_json, _} -> ok
