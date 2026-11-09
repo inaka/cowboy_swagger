@@ -127,6 +127,9 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
    %% `base_path` followed by `/swagger.json`. May also be an absolute URL.
    %% Only changes the UI source; the local JSON route stays under `base_path`.
    {swagger_json_url, "/api-docs/swagger.json"},
+   %% `json_exporter_mod`: Optional module implementing
+   %% cowboy_swagger_json_exporter. No exporter is configured by default.
+   %% {json_exporter_mod, my_swagger_exporter},
    %% `static_files`: Static content directory. This is where Swagger-UI
    %% is located. Default: `priv/swagger`.
    %% Remember that Swagger-UI is embedded into `cowboy-swagger` project,
@@ -170,8 +173,8 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
 
 ### Exporting generated JSON
 
-To export generated specifications, implement the
-`cowboy_swagger_json_exporter` behaviour and configure `json_exporter_mod`:
+Create `src/my_swagger_exporter.erl` in the consuming application to implement
+the `cowboy_swagger_json_exporter` behaviour:
 
 ```erlang
 -module(my_swagger_exporter).
@@ -183,11 +186,20 @@ export(JSON) ->
     file:write_file("swagger.json", JSON).
 ```
 
+Then select the module in the application's `sys.config` (or `app.config`
+loaded by your application), using the same application configuration format
+as the [app.config example](#appconfig) above:
+
 ```erlang
 [
-    {cowboy_swagger, [
-        {json_exporter_mod, my_swagger_exporter}
-    ]}
+ %% Other apps ...
+
+ %% cowboy_swagger config
+ {cowboy_swagger,
+  [
+   {json_exporter_mod, my_swagger_exporter}
+  ]
+ }
 ].
 ```
 
@@ -220,7 +232,8 @@ rebar3 as swagger compile
 ```
 
 This writes `example/_build/swagger/swagger.json` without starting the example
-application or an HTTP listener. The explicit `swagger` profile contains:
+application or an HTTP listener. The following build configuration belongs in
+`example/rebar.config`; merge it into the existing `profiles` entry if present:
 
 ```erlang
 {profiles, [
@@ -277,14 +290,19 @@ directory is not necessarily writable.
 
 To request that search engines exclude the documentation page from their index
 and do not follow its links, enable `robots_noindex` in your application's
-`sys.config`:
+`sys.config` (or the `app.config` loaded by your application):
 
 ```erlang
 [
-    {cowboy_swagger, [
-        {base_path, "/v2/docs"},
-        {robots_noindex, true}
-    ]}
+ %% Other apps ...
+
+ %% cowboy_swagger config
+ {cowboy_swagger,
+  [
+   {base_path, "/v2/docs"},
+   {robots_noindex, true}
+  ]
+ }
 ].
 ```
 

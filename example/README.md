@@ -64,11 +64,18 @@ The generated `_build/swagger/swagger.json` remains a build artifact until
 you explicitly package it. A normal `rebar3 release` neither enables the
 export profile nor copies this file into the release.
 
-For example, add the following entry to the existing `relx` overlay list in
-`rebar.config`, preserving the UI asset overlay:
+In `example/rebar.config`, extend the existing `relx` build configuration's
+`overlay` list as shown below. Keep the other existing `relx` options and the
+Swagger UI asset overlay:
 
 ```erlang
-{copy, "_build/swagger/swagger.json", "swagger.json"}
+{relx, [
+    %% Keep the existing release, sys_config and other relx options here.
+    {overlay, [
+        {copy, "./_checkouts/cowboy_swagger/priv/swagger", "priv/swagger"},
+        {copy, "_build/swagger/swagger.json", "swagger.json"}
+    ]}
+]}.
 ```
 
 Then generate a fresh specification before assembling the release:
@@ -93,7 +100,7 @@ escript export_swagger.escript _build/swagger config/sys.config priv/swagger.jso
 rebar3 release
 ```
 
-The installed application can locate that packaged file with:
+In the installed application's Erlang code, locate that packaged file with:
 
 ```erlang
 filename:join(code:priv_dir(example), "swagger.json").
