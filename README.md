@@ -192,14 +192,14 @@ as the [app.config example](#appconfig) above:
 
 ```erlang
 [
- %% Other apps ...
+    %% Other apps ...
 
- %% cowboy_swagger config
- {cowboy_swagger,
-  [
-   {json_exporter_mod, my_swagger_exporter}
-  ]
- }
+    %% cowboy_swagger config
+    {cowboy_swagger,
+        [
+            {json_exporter_mod, my_swagger_exporter}
+        ]
+    }
 ].
 ```
 
@@ -294,15 +294,15 @@ and do not follow its links, enable `robots_noindex` in your application's
 
 ```erlang
 [
- %% Other apps ...
+    %% Other apps ...
 
- %% cowboy_swagger config
- {cowboy_swagger,
-  [
-   {base_path, "/v2/docs"},
-   {robots_noindex, true}
-  ]
- }
+    %% cowboy_swagger config
+    {cowboy_swagger,
+        [
+            {base_path, "/v2/docs"},
+            {robots_noindex, true}
+        ]
+    }
 ].
 ```
 

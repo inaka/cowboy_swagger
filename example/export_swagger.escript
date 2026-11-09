@@ -23,7 +23,7 @@ main([BuildDir, ConfigPath, OutputPath]) ->
     end;
 main(_) ->
     io:format(standard_error,
-        "Usage: escript export_swagger.escript BUILD_DIR SYS_CONFIG OUTPUT_JSON~n", []),
+        "Usage: escript ~ts BUILD_DIR SYS_CONFIG OUTPUT_JSON~n", [escript:script_name()]),
     halt(2).
 
 load_config({App, Settings}) ->
