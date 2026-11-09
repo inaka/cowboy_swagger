@@ -127,6 +127,8 @@ Returns the swagger json specification from given `trails`.
 This function basically takes the metadata from each `t:trails:trail/0`
 (which must be compliant with Swagger specification) and builds the
 required `swagger.json`.
+If `json_exporter_mod` is configured, the generated JSON is also exported
+synchronously through `c:cowboy_swagger_json_exporter:export/1`.
 """.
 -doc #{group => "Global Spec API"}.
 -spec to_json([trails:trail()]) -> binary().
@@ -138,6 +140,9 @@ Returns the swagger json specification from given `trails` and `server_spec`.
 This function takes the metadata from each `t:trails:trail/0` and combines it
 with the data stored in `server_spec`.
 If no data is stored in `server_spec` related to the listener, use `global_spec` instead.
+If `json_exporter_mod` is configured, its `export/1` callback receives the
+generated JSON once before this function returns. Export failures propagate
+to the caller.
 """.
 -doc #{group => "Server Spec API"}.
 -spec to_json(ranch:ref(), [trails:trail()]) -> binary().
@@ -152,7 +157,9 @@ to_json(Server, Trails) ->
         end,
     SanitizeTrails = filter_cowboy_swagger_handler(Trails),
     SwaggerSpec = create_swagger_spec(NormalizedSpec, SanitizeTrails),
-    enc_json(SwaggerSpec).
+    Json = enc_json(SwaggerSpec),
+    ok = cowboy_swagger_json_exporter:maybe_export(Json),
+    Json.
 
 -doc """
 Register an array-valued global definition.
