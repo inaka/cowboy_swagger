@@ -2,7 +2,7 @@
 -moduledoc """
 Callback for exporting a generated Swagger/OpenAPI JSON specification.
 
-Set the `cowboy_swagger` application setting `json_exporter_mod` to a module
+Set the `cowboy_swagger` application setting `json_exporter` to a module
 implementing this behaviour. Its `export/1` callback receives the serialized
 JSON binary whenever `cowboy_swagger:to_json/1,2` generates a specification.
 The callback runs synchronously in the caller's process, including calls made
@@ -30,7 +30,7 @@ by the implementing module.
 -doc false.
 -spec maybe_export(binary()) -> ok.
 maybe_export(JSON) ->
-    case application:get_env(cowboy_swagger, json_exporter_mod) of
+    case application:get_env(cowboy_swagger, json_exporter) of
         undefined ->
             ok;
         {ok, Module} ->

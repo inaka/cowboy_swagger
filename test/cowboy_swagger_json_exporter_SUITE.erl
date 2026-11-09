@@ -12,9 +12,9 @@ all() ->
 -spec init_per_testcase(atom(), cowboy_swagger_test_utils:config()) ->
     cowboy_swagger_test_utils:config().
 init_per_testcase(_Test, Config) ->
-    Keys = [json_exporter_mod, test_exporter_result, global_spec, server_spec],
+    Keys = [json_exporter, test_exporter_result, global_spec, server_spec],
     Previous = [{Key, application:get_env(cowboy_swagger, Key)} || Key <:- Keys],
-    ok = application:unset_env(cowboy_swagger, json_exporter_mod),
+    ok = application:unset_env(cowboy_swagger, json_exporter),
     ok = application:unset_env(cowboy_swagger, test_exporter_result),
     ok = cowboy_swagger:set_global_spec(#{
         openapi => ~"3.0.0", info => #{title => ~"Exported API", version => ~"1.0.0"}
@@ -47,7 +47,7 @@ disabled_test(_Config) ->
 enabled_test(_Config) ->
     Trails = trails:trails(example_description_handler),
     Expected = cowboy_swagger:to_json(Trails),
-    ok = application:set_env(cowboy_swagger, json_exporter_mod, cowboy_swagger_test_exporter),
+    ok = application:set_env(cowboy_swagger, json_exporter, cowboy_swagger_test_exporter),
     Expected = cowboy_swagger:to_json(Trails),
     ok = exported_once(Expected),
     ok = cowboy_swagger:set_server_spec(export_test_server, #{
@@ -56,14 +56,14 @@ enabled_test(_Config) ->
     ServerJSON = cowboy_swagger:to_json(export_test_server, Trails),
     #{~"info" := #{~"title" := ~"Server API"}} = json:decode(ServerJSON),
     ok = exported_once(ServerJSON),
-    ok = application:unset_env(cowboy_swagger, json_exporter_mod),
+    ok = application:unset_env(cowboy_swagger, json_exporter),
     Expected = cowboy_swagger:to_json(Trails),
     no_extra_exports().
 
 -spec file_export_test(cowboy_swagger_test_utils:config()) -> ok.
 file_export_test(Config) ->
     Path = filename:join(proplists:get_value(priv_dir, Config), "swagger.json"),
-    ok = application:set_env(cowboy_swagger, json_exporter_mod, cowboy_swagger_test_exporter),
+    ok = application:set_env(cowboy_swagger, json_exporter, cowboy_swagger_test_exporter),
     ok = application:set_env(cowboy_swagger, test_exporter_result, {file, Path}),
     JSON = cowboy_swagger:to_json(trails:trails(example_description_handler)),
     {ok, JSON} = file:read_file(Path),
@@ -73,7 +73,7 @@ file_export_test(Config) ->
 -spec failure_test(cowboy_swagger_test_utils:config()) -> ok.
 failure_test(Config) ->
     Trails = trails:trails(example_description_handler),
-    ok = application:set_env(cowboy_swagger, json_exporter_mod, cowboy_swagger_test_exporter),
+    ok = application:set_env(cowboy_swagger, json_exporter, cowboy_swagger_test_exporter),
     Path = filename:join([proplists:get_value(priv_dir, Config), "missing", "swagger.json"]),
     ok = application:set_env(cowboy_swagger, test_exporter_result, {file, Path}),
     try cowboy_swagger:to_json(Trails) of

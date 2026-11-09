@@ -127,7 +127,7 @@ Returns the swagger json specification from given `trails`.
 This function basically takes the metadata from each `t:trails:trail/0`
 (which must be compliant with Swagger specification) and builds the
 required `swagger.json`.
-If `json_exporter_mod` is configured, the generated JSON is also exported
+If `json_exporter` is configured, the generated JSON is also exported
 synchronously through `c:cowboy_swagger_json_exporter:export/1`.
 """.
 -doc #{group => "Global Spec API"}.
@@ -140,7 +140,7 @@ Returns the swagger json specification from given `trails` and `server_spec`.
 This function takes the metadata from each `t:trails:trail/0` and combines it
 with the data stored in `server_spec`.
 If no data is stored in `server_spec` related to the listener, use `global_spec` instead.
-If `json_exporter_mod` is configured, its `export/1` callback receives the
+If `json_exporter` is configured, its `export/1` callback receives the
 generated JSON once before this function returns. Export failures propagate
 to the caller.
 """.

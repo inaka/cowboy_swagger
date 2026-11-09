@@ -10,7 +10,7 @@ main([BuildDir, ConfigPath, OutputPath]) ->
         {ok, [Config]} = file:consult(ConfigPath),
         ok = application:set_env(Config, []),
         ok = application:set_env(example, swagger_output, OutputPath),
-        ok = application:set_env(cowboy_swagger, json_exporter_mod, example_json_exporter),
+        ok = application:set_env(cowboy_swagger, json_exporter, example_json_exporter),
         Trails = trails:trails([example_echo_handler, example_description_handler]),
         JSON = cowboy_swagger:to_json(Trails),
         {ok, JSON} = file:read_file(OutputPath),

@@ -127,9 +127,9 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
    %% `base_path` followed by `/swagger.json`. May also be an absolute URL.
    %% Only changes the UI source; the local JSON route stays under `base_path`.
    {swagger_json_url, "/api-docs/swagger.json"},
-   %% `json_exporter_mod`: Optional module implementing
+   %% `json_exporter`: Optional module implementing
    %% cowboy_swagger_json_exporter. No exporter is configured by default.
-   %% {json_exporter_mod, my_swagger_exporter},
+   %% {json_exporter, my_swagger_exporter},
    %% `static_files`: Static content directory. This is where Swagger-UI
    %% is located. Default: `priv/swagger`.
    %% Remember that Swagger-UI is embedded into `cowboy-swagger` project,
@@ -197,7 +197,7 @@ as the [app.config example](#appconfig) above:
     %% cowboy_swagger config
     {cowboy_swagger,
         [
-            {json_exporter_mod, my_swagger_exporter}
+            {json_exporter, my_swagger_exporter}
         ]
     }
 ].
