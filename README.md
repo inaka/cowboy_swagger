@@ -127,6 +127,9 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
    %% `base_path` followed by `/swagger.json`. May also be an absolute URL.
    %% Only changes the UI source; the local JSON route stays under `base_path`.
    {swagger_json_url, "/api-docs/swagger.json"},
+   %% `json_exporter`: Optional module implementing
+   %% cowboy_swagger_json_exporter. No exporter is configured by default.
+   %% {json_exporter, my_swagger_exporter},
    %% `static_files`: Static content directory. This is where Swagger-UI
    %% is located. Default: `priv/swagger`.
    %% Remember that Swagger-UI is embedded into `cowboy-swagger` project,
@@ -168,18 +171,140 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
 ].
 ```
 
+### Exporting generated JSON
+
+Create `src/my_swagger_exporter.erl` in the consuming application to implement
+the `cowboy_swagger_json_exporter` behaviour:
+
+```erlang
+-module(my_swagger_exporter).
+-behaviour(cowboy_swagger_json_exporter).
+
+-export([export/1]).
+
+export(JSON) ->
+    ok = file:write_file("swagger.json", JSON).
+```
+
+Then select the module in the application's `sys.config` (or `app.config`
+loaded by your application), using the same application configuration format
+as the [app.config example](#appconfig) above:
+
+```erlang
+[
+    %% Other apps ...
+
+    %% cowboy_swagger config
+    {cowboy_swagger,
+        [
+            {json_exporter, my_swagger_exporter}
+        ]
+    }
+].
+```
+
+No exporter is configured by default. When enabled, the callback receives the
+serialized JSON binary synchronously, once per successful generation through
+`cowboy_swagger:to_json/1` or `to_json/2`. The functions still return that same
+binary. This includes generation triggered by HTTP requests to `swagger.json`;
+the setting does not mean “export once” or “export only during builds”.
+
+The callback must return `ok` on success and raise an exception on failure.
+Exceptions propagate unchanged with their original stacktrace. The library
+checks the callback result with `ok = Module:export(JSON)`; an unexpected return
+value fails with a bad match. An invalid exporter module or callback also
+fails generation. Exporters choose
+their storage destination and must handle concurrent requests or different
+server specifications as needed. Do not call `to_json` from `export/1`, as that
+would recursively invoke the exporter.
+
+### Generating swagger.json during a build
+
+Configuring an exporter does not initiate generation. A consuming application
+can opt into a post-compile hook that loads its compiled handlers and settings,
+collects the trails and calls `cowboy_swagger:to_json/1`. The library does not
+install a build hook automatically.
+
+The [example application](example/README.md#build-time-json-export) provides a
+complete implementation:
+
+```sh
+cd example
+rebar3 as swagger compile
+```
+
+This writes `example/_build/swagger/swagger.json` without starting the example
+application or an HTTP listener. The following build configuration belongs in
+`example/rebar.config`; merge it into the existing `profiles` entry if present:
+
+```erlang
+{profiles, [
+    {swagger, [
+        {post_hooks, [
+            {compile,
+                "escript export_swagger.escript _build/swagger config/sys.config "
+                "_build/swagger/swagger.json"}
+        ]}
+    ]}
+]}.
+```
+
+The script adds the selected build's dependency and checkout beam directories
+to the code path, loads the supplied configuration and invokes generation.
+It selects the example exporter only inside its own Erlang VM, leaving the
+application's normal runtime configuration unchanged. Export errors cause the
+script and the build hook to fail.
+
+For another application, adapt the handler list, exporter and build/configuration
+paths. The example script accepts a plain Erlang configuration file containing
+one list of application settings. Resolve configuration includes, environment
+substitutions or release-specific configuration before invoking it. Definitions
+or settings normally registered at application startup must also be prepared
+explicitly by the build script. Handlers must expose their trails without
+requiring a running application.
+
+### Export paths and releases
+
+`_build/swagger/swagger.json` is the example's build artifact location, not a
+path required by the library. Both the build directory and output filename
+are explicit script arguments. Relative paths are resolved from the script's
+working directory (`example` when using the example's hook). If you customize
+the rebar3 build directory or use another profile, update the hook arguments
+to match; the script does not discover those paths automatically.
+
+Building a release does not relocate this artifact or include it automatically.
+The example's plain `rebar3 release` does not enable the `swagger` profile.
+To package the generated file, run the export before assembling the release
+and explicitly copy it with a relx overlay, or generate it into the consuming
+application's `priv` directory before packaging. See the
+[release example](example/README.md#including-the-json-in-a-release).
+
+The example enables its exporter only in the build script's VM. If you also
+configure an exporter in a running release, relative output paths resolve
+from that process's working directory, which may differ from the project
+directory. For runtime writes, configure an explicit writable destination.
+For reading a specification packaged in an application's `priv` directory,
+resolve its installed location with
+`filename:join(code:priv_dir(my_app), "swagger.json")`; the installed application
+directory is not necessarily writable.
+
 ### Preventing Swagger UI indexing
 
 To request that search engines exclude the documentation page from their index
 and do not follow its links, enable `robots_noindex` in your application's
-`sys.config`:
+`sys.config` (or the `app.config` loaded by your application):
 
 ```erlang
 [
-    {cowboy_swagger, [
-        {base_path, "/v2/docs"},
-        {robots_noindex, true}
-    ]}
+    %% Other apps ...
+
+    %% cowboy_swagger config
+    {cowboy_swagger,
+        [
+            {base_path, "/v2/docs"},
+            {robots_noindex, true}
+        ]
+    }
 ].
 ```
 

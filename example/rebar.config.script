@@ -1,6 +1,11 @@
 %% To avoid specifying a version we add cowboy_swagger in the
 %% _checkouts directory.
-os:cmd("mkdir _checkouts; ln -s $PWD/.. _checkouts/cowboy_swagger").
+ok = filelib:ensure_dir("_checkouts/placeholder"),
+case file:make_symlink(filename:absname(".."), "_checkouts/cowboy_swagger") of
+    ok -> ok;
+    {error, eexist} -> ok;
+    {error, Reason} -> error({checkout_failed, Reason})
+end.
 
 %% Return the original rebar3 configuration.
 CONFIG.

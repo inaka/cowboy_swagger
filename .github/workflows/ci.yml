@@ -46,6 +46,12 @@ jobs:
       - name: Format check
         run: rebar3 fmt --check
       - run: rebar3 test
+      - name: Export example specification during build
+        run: |
+          cd example
+          rm -f _build/swagger/swagger.json
+          rebar3 as swagger compile
+          test -s _build/swagger/swagger.json
       - name: test our example
         run: |
           cd example
