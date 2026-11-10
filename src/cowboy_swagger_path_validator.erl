@@ -14,7 +14,7 @@ reference, validation raises
 References are never fetched from the network. The setting defaults to `false`.
 """.
 
--export([maybe_validate/1]).
+-export([maybe_validate/1, validate/1]).
 
 -spec maybe_validate(map()) -> ok.
 maybe_validate(Spec) ->
@@ -22,11 +22,16 @@ maybe_validate(Spec) ->
         false ->
             ok;
         true ->
-            maps:foreach(
-                fun(Path, Item) -> validate_path(Path, Item, Spec) end,
-                maps:get(~"paths", Spec, #{})
-            )
+            validate(Spec)
     end.
+
+-doc false.
+-spec validate(map()) -> ok.
+validate(Spec) ->
+    maps:foreach(
+        fun(Path, Item) -> validate_path(Path, Item, Spec) end,
+        maps:get(~"paths", Spec, #{})
+    ).
 
 -doc false.
 -spec validate_path(binary(), map(), map()) -> ok.

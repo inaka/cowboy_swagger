@@ -249,6 +249,43 @@ This is a binding-name check, not a complete Swagger/OpenAPI
 schema validator: it does not enforce `required: true`, infer parameter types
 or reject extra path parameters.
 
+#### Validation before starting Cowboy
+
+To reject invalid documentation before compiling routes or opening a listener,
+call `cowboy_swagger:validate_paths/1` explicitly in your Erlang startup code:
+
+```erlang
+Trails = trails:trails([my_handler, cowboy_swagger_handler]),
+ok = cowboy_swagger:validate_paths(Trails),
+ok = trails:store(Trails),
+Dispatch = trails:single_host_compile(Trails),
+{ok, _} = cowboy:start_clear(
+    my_listener,
+    #{socket_opts => [{port, 8080}]},
+    #{env => #{dispatch => Dispatch}}
+).
+```
+
+The function returns `ok` or raises the same validation errors described above.
+Calling it explicitly always validates, regardless of `validate_path_parameters`.
+It builds the specification for validation without serializing the final JSON
+or invoking `json_exporter`, so startup validation does not export a file.
+Prepare any application settings and shared parameter definitions before
+calling it. Invalid metadata interrupts this startup sequence before
+`trails:single_host_compile/1` and `cowboy:start_clear/3` are reached.
+
+For a server-specific specification, use this Erlang call instead:
+
+```erlang
+ok = cowboy_swagger:validate_paths(my_listener, Trails).
+```
+
+The server reference selects `server_spec` just as it does in `to_json/2`, with
+fallback to `global_spec`; the listener need not be running. For multiple hosts,
+validate each host's trails with the appropriate server reference before
+compiling its routes. Keep `validate_path_parameters` enabled if subsequent
+JSON generation should also detect metadata changes after startup.
+
 ### Exporting generated JSON
 
 Create `src/my_swagger_exporter.erl` in the consuming application to implement

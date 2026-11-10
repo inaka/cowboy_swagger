@@ -3,6 +3,7 @@
 -export([all/0, init_per_testcase/2, end_per_testcase/2]).
 -export([
     disabled_test/1,
+    explicit_validation_test/1,
     matching_test/1,
     provided_methods_test/1,
     missing_test/1,
@@ -53,6 +54,35 @@ disabled_test(_Config) ->
     ok = application:set_env(cowboy_swagger, validate_path_parameters, false),
     JSON = cowboy_swagger:to_json(Trails),
     #{~"paths" := #{~"/places/{id}" := _}} = json:decode(JSON),
+    ok.
+
+-spec explicit_validation_test(cowboy_swagger_test_utils:config()) -> ok.
+explicit_validation_test(_Config) ->
+    Bad = route("/places/:id", #{get => #{}}),
+    Missing = missing_id_error(),
+    %% Explicit validation works even without the automatic-check setting.
+    expect_error(Missing, fun() -> cowboy_swagger:validate_paths(Bad) end),
+    ok = application:set_env(cowboy_swagger, validate_path_parameters, false),
+    expect_error(Missing, fun() -> cowboy_swagger:validate_paths(validation_server, Bad) end),
+    ok = application:set_env(cowboy_swagger, json_exporter, cowboy_swagger_test_exporter),
+    Good = route("/places/:id", #{get => #{parameters => [parameter(~"id", ~"path")]}}),
+    ok = cowboy_swagger:validate_paths(Good),
+    ok = cowboy_swagger:validate_paths(unconfigured_server, Good),
+    Referenced = route("/places/:id", #{get => #{parameters => [#{'$ref' => ~"#/parameters/id"}]}}),
+    ok = cowboy_swagger:set_global_spec(#{
+        swagger => ~"2.0",
+        parameters => #{id => parameter(~"other", ~"path")}
+    }),
+    expect_error(Missing, fun() -> cowboy_swagger:validate_paths(Referenced) end),
+    ok = cowboy_swagger:set_server_spec(validation_server, #{
+        swagger => ~"2.0",
+        parameters => #{id => parameter(~"id", ~"path")}
+    }),
+    ok = cowboy_swagger:validate_paths(validation_server, Referenced),
+    receive
+        {exported_json, _} -> ct:fail(validation_invoked_exporter)
+    after 0 -> ok
+    end,
     ok.
 
 -spec matching_test(cowboy_swagger_test_utils:config()) -> ok.
@@ -124,7 +154,7 @@ missing_test(_Config) ->
     lists:foreach(
         fun(Params) ->
             expect_error(
-                {missing_path_parameters, ~"/places/{id}", ~"get", [~"id"]},
+                missing_id_error(),
                 fun() ->
                     cowboy_swagger:to_json(route("/places/:id", #{get => #{parameters => Params}}))
                 end
@@ -330,3 +360,7 @@ expect_error(Expected, Fun) ->
     catch
         error:Expected -> ok
     end.
+
+-doc false.
+-spec missing_id_error() -> term().
+missing_id_error() -> {missing_path_parameters, ~"/places/{id}", ~"get", [~"id"]}.

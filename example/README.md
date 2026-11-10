@@ -14,6 +14,21 @@ To start the example server in a interactive way do this:
 Now, if we point our favorite web browser at [http://localhost:8080/api-docs](http://localhost:8080/api-docs),
 we should see the swagger API doc.
 
+## Validating routes before startup
+
+Applications can call `cowboy_swagger:validate_paths(Trails)` before
+`trails:single_host_compile(Trails)` to reject inconsistent documentation
+before starting the HTTP listener. `src/example.erl` shows the optional call
+as a comment; it is not enabled automatically. Correct any missing path
+parameters in the handlers' metadata before opting in, including parameters
+in normalized optional routes.
+
+The explicit validation call always checks the supplied trails, independently
+of the `validate_path_parameters` setting, and does not invoke a JSON exporter.
+Use `cowboy_swagger:validate_paths(Server, Trails)` when selecting a
+server-specific specification. The main README includes a complete startup
+sequence and configuration details.
+
 
 ## Build-time JSON export
 

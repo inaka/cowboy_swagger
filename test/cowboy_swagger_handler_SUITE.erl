@@ -16,7 +16,8 @@
     missing_template_test/1,
     robots_noindex_test/1,
     robots_custom_html_test/1,
-    path_validation_test/1
+    path_validation_test/1,
+    startup_path_validation_test/1
 ]).
 
 -hank([unnecessary_function_arguments]).
@@ -42,6 +43,10 @@ end_per_suite(Config) ->
     Config :: cowboy_swagger_test_utils:config()
 ) ->
     cowboy_swagger_test_utils:config().
+init_per_testcase(startup_path_validation_test, Config) ->
+    {ok, _} = application:ensure_all_started(cowboy),
+    ok = application:set_env(example, validate_paths_on_startup, true),
+    Config;
 init_per_testcase(custom_base_path_test, Config) ->
     ok = application:set_env(cowboy_swagger, base_path, "/v2/docs"),
     {ok, _} = example:start(),
@@ -95,12 +100,31 @@ end_per_testcase(multiple_hosts_test, Config) ->
 -doc false.
 -spec cleanup() -> ok.
 cleanup() ->
+    ok = application:unset_env(example, validate_paths_on_startup),
     lists:foreach(
         fun(Key) -> ok = application:unset_env(cowboy_swagger, Key) end,
         [base_path, swagger_json_url, static_files, robots_noindex, validate_path_parameters]
     ),
     _ = application:stop(cowboy_swagger),
     _ = application:stop(trails),
+    ok.
+
+-spec startup_path_validation_test(cowboy_swagger_test_utils:config()) -> ok.
+startup_path_validation_test(_Config) ->
+    false = maps:is_key(example_http, ranch:info()),
+    %% The explicit startup check rejects the echo fixture's missing GET binding.
+    {error, {example, Reason}} = example:start(),
+    {_, _} = binary:match(
+        iolist_to_binary(io_lib:format("~p", [Reason])),
+        ~"missing_path_parameters"
+    ),
+    false = lists:keymember(example, 1, application:which_applications()),
+    false = maps:is_key(example_http, ranch:info()),
+    %% Show that this was a validation failure, not a listener/port failure.
+    ok = application:set_env(example, validate_paths_on_startup, false),
+    {ok, _} = example:start(),
+    true = maps:is_key(example_http, ranch:info()),
+    #{status_code := 200} = cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger.json"),
     ok.
 
 -spec handler_test(cowboy_swagger_test_utils:config()) -> {atom(), string()}.
