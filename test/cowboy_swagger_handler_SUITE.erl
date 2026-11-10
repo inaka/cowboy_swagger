@@ -15,7 +15,8 @@
     custom_static_files_test/1,
     missing_template_test/1,
     robots_noindex_test/1,
-    robots_custom_html_test/1
+    robots_custom_html_test/1,
+    path_validation_test/1
 ]).
 
 -hank([unnecessary_function_arguments]).
@@ -70,7 +71,7 @@ init_per_testcase(Test, Config) when
 init_per_testcase(Test, Config) when Test =:= swagger_json_url_test; Test =:= robots_noindex_test ->
     {ok, _} = example:start(),
     Config;
-init_per_testcase(handler_test, Config) ->
+init_per_testcase(Test, Config) when Test =:= handler_test; Test =:= path_validation_test ->
     {ok, _} = example:start(),
     Config;
 init_per_testcase(multiple_hosts_test, Config) ->
@@ -96,7 +97,7 @@ end_per_testcase(multiple_hosts_test, Config) ->
 cleanup() ->
     lists:foreach(
         fun(Key) -> ok = application:unset_env(cowboy_swagger, Key) end,
-        [base_path, swagger_json_url, static_files, robots_noindex]
+        [base_path, swagger_json_url, static_files, robots_noindex, validate_path_parameters]
     ),
     _ = application:stop(cowboy_swagger),
     _ = application:stop(trails),
@@ -335,4 +336,17 @@ check_robots_tag(HTML) ->
         ~"<head[^>]*>.*<meta name=\"robots\" content=\"noindex, nofollow\" />.*</head>",
         [caseless, dotall]
     ),
+    ok.
+
+-spec path_validation_test(cowboy_swagger_test_utils:config()) -> ok.
+path_validation_test(_Config) ->
+    %% The existing echo fixture omits its optional binding's GET parameter.
+    #{status_code := 200} =
+        cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger.json"),
+    ok = application:set_env(cowboy_swagger, validate_path_parameters, true),
+    #{status_code := 500} =
+        cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger.json"),
+    ok = application:unset_env(cowboy_swagger, validate_path_parameters),
+    #{status_code := 200} =
+        cowboy_swagger_test_utils:api_call(get, "/api-docs/swagger.json"),
     ok.

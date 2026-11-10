@@ -129,6 +129,8 @@ This function basically takes the metadata from each `t:trails:trail/0`
 required `swagger.json`.
 If `json_exporter` is configured, the generated JSON is also exported
 synchronously through `c:cowboy_swagger_json_exporter:export/1`.
+If `validate_path_parameters` is `true`, path bindings are checked against
+the documented parameters before export. Validation is disabled by default.
 """.
 -doc #{group => "Global Spec API"}.
 -spec to_json([trails:trail()]) -> binary().
@@ -143,6 +145,9 @@ If no data is stored in `server_spec` related to the listener, use `global_spec`
 If `json_exporter` is configured, its `export/1` callback receives the
 generated JSON once before this function returns. Export failures propagate
 to the caller.
+If `validate_path_parameters` is `true`, the selected specification's path
+parameters are validated before serialization and export. Validation errors
+propagate to the caller.
 """.
 -doc #{group => "Server Spec API"}.
 -spec to_json(ranch:ref(), [trails:trail()]) -> binary().
@@ -157,6 +162,7 @@ to_json(Server, Trails) ->
         end,
     SanitizeTrails = filter_cowboy_swagger_handler(Trails),
     SwaggerSpec = create_swagger_spec(NormalizedSpec, SanitizeTrails),
+    ok = cowboy_swagger_path_validator:maybe_validate(SwaggerSpec),
     Json = enc_json(SwaggerSpec),
     ok = cowboy_swagger_json_exporter:maybe_export(Json),
     Json.
