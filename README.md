@@ -242,7 +242,10 @@ Optional bindings are checked as they appear in the generated path:
 `/users/[:slug]` currently becomes `/users/{slug}` and requires a `slug`
 parameter. This option does not expand optional routes into multiple paths.
 Hidden operations are skipped; paths without named bindings require no
-additional checks. This is a binding-name check, not a complete Swagger/OpenAPI
+additional checks. Validation checks the operation entries supplied by the
+application, including custom methods, rather than a fixed list of method
+names. Non-operation path fields and `x-*` extensions are skipped.
+This is a binding-name check, not a complete Swagger/OpenAPI
 schema validator: it does not enforce `required: true`, infer parameter types
 or reject extra path parameters.
 

@@ -37,35 +37,36 @@ validate_path(Path, Item, Spec) ->
         {match, Matches} ->
             Bindings = lists:usort([Name || [Name] <:- Matches]),
             Common = maps:get(~"parameters", Item, []),
-            lists:foreach(
-                fun(Method) ->
+            maps:foreach(
+                fun(Method, Operation) ->
                     validate_operation(
                         Path,
                         Method,
-                        maps:get(Method, Item, #{}),
+                        Operation,
                         Bindings,
                         Common,
                         Spec
                     )
                 end,
-                [~"get", ~"put", ~"post", ~"delete", ~"options", ~"head", ~"patch", ~"trace"]
+                Item
             )
     end.
 
 -doc false.
--spec validate_operation(binary(), binary(), map(), [binary()], [map()], map()) -> ok.
+-spec validate_operation(binary(), binary(), term(), [binary()], [map()], map()) -> ok.
+validate_operation(_Path, _Method, Operation, _Bindings, _Common, _Spec) when
+    not is_map(Operation)
+->
+    ok;
+validate_operation(_Path, <<"x-", _/binary>>, _Operation, _Bindings, _Common, _Spec) ->
+    ok;
 validate_operation(_Path, _Method, #{~"hidden" := true}, _Bindings, _Common, _Spec) ->
     ok;
 validate_operation(Path, Method, Operation, Bindings, Common, Spec) ->
-    case map_size(Operation) of
-        0 ->
-            ok;
-        _ ->
-            Parameters = Common ++ maps:get(~"parameters", Operation, []),
-            Resolved = [resolve_parameter(Param, Spec, []) || Param <:- Parameters],
-            Names = lists:filtermap(fun parameter_name/1, Resolved),
-            check_missing(Path, Method, Bindings -- Names, Resolved)
-    end.
+    Parameters = Common ++ maps:get(~"parameters", Operation, []),
+    Resolved = [resolve_parameter(Param, Spec, []) || Param <:- Parameters],
+    Names = lists:filtermap(fun parameter_name/1, Resolved),
+    check_missing(Path, Method, Bindings -- Names, Resolved).
 
 -doc false.
 -spec check_missing(binary(), binary(), [binary()], [map() | {unresolved, binary()}]) -> ok.

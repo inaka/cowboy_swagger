@@ -4,6 +4,7 @@
 -export([
     disabled_test/1,
     matching_test/1,
+    provided_methods_test/1,
     missing_test/1,
     shared_test/1,
     references_test/1,
@@ -90,6 +91,30 @@ matching_test(_Config) ->
             #{swagger => ~"2.0", basePath => ~"/api"},
             #{openapi => ~"3.0.0", servers => [#{url => ~"https://example.org/api"}]}
         ]
+    ),
+    ok.
+
+-spec provided_methods_test(cowboy_swagger_test_utils:config()) -> ok.
+provided_methods_test(_Config) ->
+    ok = enable(),
+    Params = [parameter(~"id", ~"path")],
+    Metadata = #{
+        get => #{parameters => Params},
+        connect => #{parameters => Params},
+        subscribe => #{parameters => Params},
+        hidden_custom => #{hidden => true},
+        parameters => [],
+        summary => ~"Path summary",
+        description => ~"Path description",
+        servers => [#{url => ~"https://example.org"}],
+        '$ref' => ~"#/x-paths/example",
+        'x-extra' => #{description => ~"Not an HTTP operation"}
+    },
+    _ = cowboy_swagger:to_json(route("/places/:id", Metadata)),
+    %% A valid standard method must not hide an invalid custom method.
+    expect_error(
+        {missing_path_parameters, ~"/places/{id}", ~"subscribe", [~"id"]},
+        fun() -> cowboy_swagger:to_json(route("/places/:id", Metadata#{subscribe => #{}})) end
     ),
     ok.
 
