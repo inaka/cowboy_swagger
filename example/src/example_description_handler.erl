@@ -26,12 +26,12 @@ trails() ->
             get =>
                 #{
                     tags => [~"example"],
-                    description => ~"Retrives trails's server description",
+                    description => ~"Describe the example API",
                     responses =>
                         #{
                             ~"200" =>
                                 #{
-                                    description => ~"Retrives trails's server description 200 OK",
+                                    description => ~"Describe the example API 200 OK",
                                     content => #{'text/plain' => #{schema => #{type => string}}}
                                 }
                         }
@@ -43,5 +43,4 @@ allowed_methods(Req, State) ->
     {[~"GET"], Req, State}.
 
 handle_get(Req, State) ->
-    Body = trails:all(),
-    {io_lib:format("~p~n", [Body]), Req, State}.
+    {~"Example API: read and update a message, or authorize to access /protected.", Req, State}.

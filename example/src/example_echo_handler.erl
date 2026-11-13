@@ -21,49 +21,49 @@
 -export([trails/0]).
 
 trails() ->
-    Metadata =
-        #{
-            get =>
+    Response = #{
+        ~"200" => #{
+            description => ~"Echo message",
+            content => #{'text/plain' => #{schema => #{type => string}}}
+        }
+    },
+    Get = #{
+        get => #{
+            tags => [~"echo"],
+            summary => ~"Read the current message",
+            responses => Response
+        }
+    },
+    Put = #{
+        put => #{
+            tags => [~"echo"],
+            summary => ~"Update the message",
+            parameters => [
                 #{
-                    tags => [~"echo"],
-                    description => ~"Gets echo var from the server",
-                    responses =>
-                        #{
-                            ~"200" =>
-                                #{
-                                    description => ~"Gets echo var from the server 200 OK",
-                                    content => #{'text/plain' => #{schema => #{type => string}}}
-                                }
-                        }
-                },
-            put =>
-                #{
-                    tags => [~"echo"],
-                    description => ~"Sets echo var in the server",
-                    parameters =>
-                        [
-                            #{
-                                name => ~"echo-kebab_case",
-                                description => ~"Echo message",
-                                in => ~"path",
-                                required => false,
-                                schema => #{type => string, example => ~"Hello, World!"}
-                            }
-                        ]
+                    name => ~"echo",
+                    in => path,
+                    required => true,
+                    schema => #{type => string, example => ~"Hello, World!"}
                 }
-        },
-    [trails:trail("/message/[:echo-kebab_case]", example_echo_handler, [], Metadata)].
+            ],
+            responses => Response
+        }
+    },
+    [
+        trails:trail("/message", ?MODULE, [], Get),
+        trails:trail("/message/:echo", ?MODULE, [], Put)
+    ].
 
 allowed_methods(Req, State) ->
     {[~"GET", ~"PUT", ~"HEAD"], Req, State}.
 
 handle_get(Req, State) ->
     Echo = application:get_env(example, echo, ""),
-    Body = [~"You Get an echo!", Echo],
+    Body = [~"You Get an echo! ", Echo],
     {Body, Req, State}.
 
 handle_put(Req, State) ->
-    Echo = cowboy_req:binding('echo-kebab_case', Req, ""),
+    Echo = cowboy_req:binding(echo, Req, ""),
     application:set_env(example, echo, Echo),
     Body = [~"You put an echo! ", Echo],
     Req1 = cowboy_req:set_resp_body(Body, Req),

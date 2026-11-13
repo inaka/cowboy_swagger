@@ -1,34 +1,87 @@
-# Cowboy Swagger OpenAPI 3.0.0 Example
+# Cowboy Swagger OpenAPI 3 example
 
-To try this example, you need GNU `rebar3` , `git` and `Erlang` in your PATH.
+This Erlang application shows how to describe Cowboy routes, generate Swagger UI
+and implement Bearer authorization for an endpoint.
 
+## Build and run
+
+From the example directory, with Erlang/OTP 28+ and rebar3 in PATH:
+
+```sh
+rebar3 release
+_build/default/rel/example/bin/example console
 ```
-  rebar3 release
+
+Open http://localhost:8080/api-docs.
+
+To run in the background and stop it afterward:
+
+```sh
+_build/default/rel/example/bin/example daemon
+_build/default/rel/example/bin/example stop
 ```
 
-To start the example server in a interactive way do this:
+## Endpoints
+
+| Method | Path | Behavior |
+| --- | --- | --- |
+| GET | `/message` | Read the current message. |
+| PUT | `/message/{echo}` | Store the message supplied in the path. |
+| GET | `/description` | Read the API description. |
+| GET | `/protected` | Return an authenticated response when the Bearer token matches. |
+
+GET and PUT use separate routes with the required path parameters described in
+the metadata. In the terminal:
+
+```sh
+curl -X PUT http://localhost:8080/message/hello-world
+curl http://localhost:8080/message
 ```
-  _build/default/rel/example/bin/example console
+
+## Authorization in Swagger UI
+
+1. Expand `GET /protected` and select **Try it out → Execute**. Without a token,
+   the response is HTTP 401.
+2. Select **Authorize**, enter `example-token` without the `Bearer ` prefix,
+   then authorize and close the dialog.
+3. Execute `/protected` again. The response is HTTP 200 with
+   `{"authenticated":true}`.
+4. Log out through the Authorize dialog. The endpoint returns HTTP 401 again.
+
+The other endpoints do not require authorization. The same requests can be made
+from the terminal:
+
+```sh
+curl -i http://localhost:8080/protected
+curl -i -H 'Authorization: Bearer incorrect' http://localhost:8080/protected
+curl -i -H 'Authorization: Bearer example-token' http://localhost:8080/protected
 ```
 
-Now, if we point our favorite web browser at [http://localhost:8080/api-docs](http://localhost:8080/api-docs),
-we should see the swagger API doc.
+The token is configured in `config/sys.config`:
 
-## Validating routes before startup
+```erlang
+[
+    {example, [
+        {http_port, 8080},
+        {bearer_token, ~"example-token"}
+    ]}
+].
+```
 
-Applications can call `cowboy_swagger:validate_paths(Trails)` before
-`trails:single_host_compile(Trails)` to reject inconsistent documentation
-before starting the HTTP listener. `src/example.erl` shows the optional call
-as a comment; it is not enabled automatically. Correct any missing path
-parameters in the handlers' metadata before opting in, including parameters
-in normalized optional routes.
+## How the code is connected
 
-The explicit validation call always checks the supplied trails, independently
-of the `validate_path_parameters` setting, and does not invoke a JSON exporter.
-Use `cowboy_swagger:validate_paths(Server, Trails)` when selecting a
-server-specific specification. The main README includes a complete startup
-sequence and configuration details.
-
+- [example_auth_handler.erl](src/example_auth_handler.erl) documents the
+  protected operation and implements Cowboy REST's `is_authorized/2` callback.
+  It reads the Authorization header and compares the Bearer token with the
+  configured value.
+- [config/sys.config](config/sys.config) defines the OpenAPI HTTP Bearer security
+  scheme. The protected operation refers to it through its `security` metadata,
+  making the Authorize control available in Swagger UI.
+- [example_echo_handler.erl](src/example_echo_handler.erl) describes the public
+  GET and PUT operations and their responses.
+- [example.erl](src/example.erl) collects the routes through `trails/0`, validates
+  their path parameters and starts Cowboy. The JSON export script uses the same
+  routes.
 
 ## Build-time JSON export
 
@@ -43,8 +96,8 @@ The opt-in `swagger` profile runs a post-compile hook that writes
 do not enable this hook.
 
 `export_swagger.escript` loads the compiled example and dependency modules,
-reads `config/sys.config`, collects the echo and description handlers' trails
-and calls `cowboy_swagger:to_json/1`. It configures `example_json_exporter`
+reads `config/sys.config`, collects the shared routes through `example:trails/0`,
+validates them and calls `cowboy_swagger:to_json/1`. It configures `example_json_exporter`
 inside the export VM. The exporter creates the output directory and writes
 the generated JSON. The example application, Cowboy and HTTP listeners are
 not started.
