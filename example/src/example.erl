@@ -4,7 +4,7 @@
 -export([start/2]).
 -export([stop/0]).
 -export([stop/1]).
--export([start_phase/3]).
+-export([start_phase/3, trails/0]).
 
 -hank([unnecessary_function_arguments]).
 
@@ -22,6 +22,7 @@ stop() ->
 
 -doc false.
 start(_StartType, _StartArgs) ->
+    ok = cowboy_swagger:validate_paths(trails()),
     example_sup:start_link().
 
 -doc false.
@@ -31,14 +32,7 @@ stop(_State) ->
 -spec start_phase(atom(), application:start_type(), []) -> ok.
 start_phase(start_trails_http, _StartType, []) ->
     {ok, Port} = application:get_env(example, http_port),
-    Trails =
-        trails:trails([
-            example_echo_handler,
-            example_description_handler,
-            cowboy_swagger_handler
-        ]),
-    %% To reject inconsistent metadata before compiling routes, opt in here:
-    %% ok = cowboy_swagger:validate_paths(Trails),
+    Trails = trails(),
     trails:store(Trails),
     Dispatch = trails:single_host_compile(Trails),
     RanchOptions = [{port, Port}],
@@ -51,3 +45,13 @@ start_phase(start_trails_http, _StartType, []) ->
 
     {ok, _} = cowboy:start_clear(example_http, RanchOptions, CowboyOptions),
     ok.
+
+-doc "Routes used by the running API and specification export.".
+-spec trails() -> trails:trails().
+trails() ->
+    trails:trails([
+        example_echo_handler,
+        example_description_handler,
+        example_auth_handler,
+        cowboy_swagger_handler
+    ]).

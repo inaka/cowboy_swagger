@@ -613,4 +613,5 @@ the API expects for every endpoint.
 
 ## Example
 
-For more information about `cowboy_swagger` and how to use it, please check this [Example](https://github.com/inaka/cowboy_swagger/tree/master/example).
+See the [Erlang example](example/README.md) for a working Cowboy application
+with public endpoints, path parameters and Bearer authorization through Swagger UI.

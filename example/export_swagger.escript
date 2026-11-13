@@ -11,7 +11,8 @@ main([BuildDir, ConfigPath, OutputPath]) ->
         ok = application:set_env(Config, []),
         ok = application:set_env(example, swagger_output, OutputPath),
         ok = application:set_env(cowboy_swagger, json_exporter, example_json_exporter),
-        Trails = trails:trails([example_echo_handler, example_description_handler]),
+        Trails = example:trails(),
+        ok = cowboy_swagger:validate_paths(Trails),
         JSON = cowboy_swagger:to_json(Trails),
         {ok, JSON} = file:read_file(OutputPath),
         io:format("Exported Swagger specification to ~ts~n", [OutputPath])
