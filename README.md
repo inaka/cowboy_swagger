@@ -123,6 +123,8 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
    %% `robots_noindex`: Add a robots meta tag to the UI HTML. Default: false.
    %% When true, requests noindex, nofollow from search engines.
    {robots_noindex, false},
+   %% Validate path bindings against documented path parameters. Default: false.
+   {validate_path_parameters, false},
    %% `swagger_json_url`: URL loaded by Swagger-UI. Defaults to
    %% `base_path` followed by `/swagger.json`. May also be an absolute URL.
    %% Only changes the UI source; the local JSON route stays under `base_path`.
@@ -170,6 +172,119 @@ Additionally, `cowboy_swagger` can be configured/customized from a `*.config` fi
  }
 ].
 ```
+
+### Validating path parameters
+
+To check that every generated path binding has a matching path parameter in
+each visible HTTP operation, enable `validate_path_parameters` in your
+application's `sys.config` (or the `app.config` loaded by your application):
+
+```erlang
+[
+    {cowboy_swagger, [
+        {validate_path_parameters, true}
+    ]}
+].
+```
+
+The default is `false`, preserving existing generation behavior. When enabled,
+a Cowboy route such as `/shops/:shop_id/items/:sku` requires parameters named
+`shop_id` and `sku` with `in => path`. Names are case-sensitive and apply to
+any binding name, not just `id`. Parameters can be declared at the path level,
+in each operation, or a combination of both. The existing operation parameter
+default of `in => path` when `in` is omitted is preserved.
+
+For example, this Erlang handler metadata describes both bindings:
+
+```erlang
+Metadata = #{
+    parameters => [
+        #{name => ~"shop_id", in => path, required => true,
+          schema => #{type => string}}
+    ],
+    get => #{
+        parameters => [
+            #{name => ~"sku", in => path, required => true,
+              schema => #{type => string}}
+        ],
+        responses => #{~"200" => #{description => ~"Item found"}}
+    }
+},
+Trail = trails:trail("/shops/:shop_id/items/:sku", my_handler, [], Metadata).
+```
+
+A missing parameter, a different name, or an identically named query/header
+parameter causes generation to raise an error identifying the generated path,
+HTTP method and missing names. For example, `/places/:id` with only a parameter
+named `key` raises:
+
+```erlang
+{missing_path_parameters, ~"/places/{id}", ~"get", [~"id"]}
+```
+
+Local parameter `$ref` references are supported, including Swagger 2
+`#/parameters/...` and OpenAPI 3 `#/components/parameters/...`. JSON Pointer
+escaping and percent-encoded fragment tokens are handled. Broken, circular or
+external parameter references raise
+`{unresolved_path_parameter_reference, Path, Method, Reference}` if the missing
+bindings cannot otherwise be satisfied. External references are not fetched.
+An unrelated unresolved reference does not prevent validation when all
+bindings already have matching path parameters.
+
+Validation runs in `cowboy_swagger:to_json/1,2` before JSON is serialized or
+passed to an exporter, using the selected global or server-specific spec.
+Invalid documentation therefore fails build-time generation when enabled,
+and an HTTP request that generates it returns a server error. Fix the metadata
+before enabling the setting in an existing deployment. The setting is read
+on each generation and does not change Cowboy route matching.
+
+Optional bindings are checked as they appear in the generated path:
+`/users/[:slug]` currently becomes `/users/{slug}` and requires a `slug`
+parameter. This option does not expand optional routes into multiple paths.
+Hidden operations are skipped; paths without named bindings require no
+additional checks. Validation checks the operation entries supplied by the
+application, including custom methods, rather than a fixed list of method
+names. Non-operation path fields and `x-*` extensions are skipped.
+This is a binding-name check, not a complete Swagger/OpenAPI
+schema validator: it does not enforce `required: true`, infer parameter types
+or reject extra path parameters.
+
+#### Validation before starting Cowboy
+
+To reject invalid documentation before compiling routes or opening a listener,
+call `cowboy_swagger:validate_paths/1` explicitly in your Erlang startup code:
+
+```erlang
+Trails = trails:trails([my_handler, cowboy_swagger_handler]),
+ok = cowboy_swagger:validate_paths(Trails),
+ok = trails:store(Trails),
+Dispatch = trails:single_host_compile(Trails),
+{ok, _} = cowboy:start_clear(
+    my_listener,
+    #{socket_opts => [{port, 8080}]},
+    #{env => #{dispatch => Dispatch}}
+).
+```
+
+The function returns `ok` or raises the same validation errors described above.
+Calling it explicitly always validates, regardless of `validate_path_parameters`.
+It builds the specification for validation without serializing the final JSON
+or invoking `json_exporter`, so startup validation does not export a file.
+Prepare any application settings and shared parameter definitions before
+calling it. Invalid metadata interrupts this startup sequence before
+`trails:single_host_compile/1` and `cowboy:start_clear/3` are reached.
+
+For a server-specific specification, use this Erlang call instead:
+
+```erlang
+ok = cowboy_swagger:validate_paths(my_listener, Trails).
+```
+
+The server reference selects `server_spec` just as it does in `to_json/2`, with
+fallback to `global_spec`; the listener need not be running. For multiple hosts,
+validate each host's trails with the appropriate server reference before
+compiling its routes. Keep `validate_path_parameters` enabled if subsequent
+JSON generation should also detect metadata changes after startup.
 
 ### Exporting generated JSON
 

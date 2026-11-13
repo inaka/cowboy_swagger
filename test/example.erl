@@ -25,6 +25,10 @@ stop() ->
 -doc false.
 -spec start(normal, [term()]) -> {ok, pid()}.
 start(_StartType, _StartArgs) ->
+    case application:get_env(example, validate_paths_on_startup, false) of
+        true -> ok = cowboy_swagger:validate_paths(example_trails());
+        false -> ok
+    end,
     example_sup:start_link().
 
 -doc false.
@@ -35,12 +39,7 @@ stop(_State) ->
 -spec start_phase(atom(), application:start_type(), []) -> ok.
 start_phase(start_trails_http, _StartType, []) ->
     {ok, Port} = application:get_env(example, http_port),
-    Trails =
-        trails:trails([
-            example_echo_handler,
-            example_description_handler,
-            cowboy_swagger_handler
-        ]),
+    Trails = example_trails(),
     trails:store(Trails),
 
     Dispatch = trails:single_host_compile(Trails),
@@ -54,3 +53,8 @@ start_phase(start_trails_http, _StartType, []) ->
 
     {ok, _} = cowboy:start_clear(example_http, RanchOptions, CowboyOptions),
     ok.
+
+-doc false.
+-spec example_trails() -> trails:trails().
+example_trails() ->
+    trails:trails([example_echo_handler, example_description_handler, cowboy_swagger_handler]).

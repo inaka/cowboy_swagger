@@ -37,6 +37,8 @@ start_phase(start_trails_http, _StartType, []) ->
             example_description_handler,
             cowboy_swagger_handler
         ]),
+    %% To reject inconsistent metadata before compiling routes, opt in here:
+    %% ok = cowboy_swagger:validate_paths(Trails),
     trails:store(Trails),
     Dispatch = trails:single_host_compile(Trails),
     RanchOptions = [{port, Port}],

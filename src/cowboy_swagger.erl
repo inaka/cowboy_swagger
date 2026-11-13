@@ -28,8 +28,13 @@ Cowboy-Swagger main interface.
 -export([enc_json/1, dec_json/1]).
 -export([swagger_paths/1, validate_metadata/1]).
 -export([filter_cowboy_swagger_handler/1]).
+-export([validate_paths/1, validate_paths/2]).
 
--elvis([{elvis_style, no_throw, disable}]).
+%% The two validate_paths entry points extend the existing public API.
+-elvis([
+    {elvis_style, no_throw, disable},
+    {elvis_style, no_god_modules, #{limit => 26}}
+]).
 
 -doc """
 Parameter definition.
@@ -129,6 +134,8 @@ This function basically takes the metadata from each `t:trails:trail/0`
 required `swagger.json`.
 If `json_exporter` is configured, the generated JSON is also exported
 synchronously through `c:cowboy_swagger_json_exporter:export/1`.
+If `validate_path_parameters` is `true`, path bindings are checked against
+the documented parameters before export. Validation is disabled by default.
 """.
 -doc #{group => "Global Spec API"}.
 -spec to_json([trails:trail()]) -> binary().
@@ -143,10 +150,46 @@ If no data is stored in `server_spec` related to the listener, use `global_spec`
 If `json_exporter` is configured, its `export/1` callback receives the
 generated JSON once before this function returns. Export failures propagate
 to the caller.
+If `validate_path_parameters` is `true`, the selected specification's path
+parameters are validated before serialization and export. Validation errors
+propagate to the caller.
 """.
 -doc #{group => "Server Spec API"}.
 -spec to_json(ranch:ref(), [trails:trail()]) -> binary().
 to_json(Server, Trails) ->
+    SwaggerSpec = build_swagger_spec(Server, Trails),
+    ok = cowboy_swagger_path_validator:maybe_validate(SwaggerSpec),
+    Json = enc_json(SwaggerSpec),
+    ok = cowboy_swagger_json_exporter:maybe_export(Json),
+    Json.
+
+-doc """
+Validates path bindings against the global specification's parameters.
+
+Call this explicitly before compiling routes with `trails:single_host_compile/1`
+to reject invalid documentation before starting a Cowboy listener. Unlike the
+automatic check in `to_json/1,2`, this function always validates, regardless of
+`validate_path_parameters`. It returns `ok` or raises a validation error without
+serializing the generated specification or invoking the JSON exporter.
+""".
+-doc #{group => "Global Spec API"}.
+-spec validate_paths([trails:trail()]) -> ok.
+validate_paths(Trails) ->
+    validate_paths(undefined, Trails).
+
+-doc """
+Validates path bindings using the selected server's specification, falling
+back to the global specification when no server-specific spec is configured.
+Like `validate_paths/1`, this always validates and never exports JSON.
+""".
+-doc #{group => "Server Spec API"}.
+-spec validate_paths(ranch:ref(), [trails:trail()]) -> ok.
+validate_paths(Server, Trails) ->
+    cowboy_swagger_path_validator:validate(build_swagger_spec(Server, Trails)).
+
+-doc false.
+-spec build_swagger_spec(ranch:ref(), [trails:trail()]) -> map().
+build_swagger_spec(Server, Trails) ->
     NormalizedSpec =
         case get_server_spec(Server, #{}) of
             Spec when map_size(Spec) =:= 0 ->
@@ -156,10 +199,7 @@ to_json(Server, Trails) ->
                 Spec
         end,
     SanitizeTrails = filter_cowboy_swagger_handler(Trails),
-    SwaggerSpec = create_swagger_spec(NormalizedSpec, SanitizeTrails),
-    Json = enc_json(SwaggerSpec),
-    ok = cowboy_swagger_json_exporter:maybe_export(Json),
-    Json.
+    create_swagger_spec(NormalizedSpec, SanitizeTrails).
 
 -doc """
 Register an array-valued global definition.
